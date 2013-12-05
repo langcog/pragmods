@@ -44,6 +44,7 @@ just ask "which one is his friend" with no reference game or mumbles.
 
 ** note: there was a typo in experiments 4 and 5 such that the salience condition says "friend", e.g. for christmas tree, it would say "the friend I most like to trim has (mumble mumble)." this is not good. 
 
+
 ------- c1: Clean code -------
 
 pragmods_c1.html is cleaned by adding comments and proper indentation.
@@ -62,5 +63,16 @@ scripts are declared do matter a lot because they build on top of each other:
     <script src="pragmods_control_flow_c1.js"></script>
 
 A general framework to write code that dynamically generates experiments from a state-space
-of relevant possible experiments is currently in construction, but more clarifications will
-be needed.
+of relevant possible experiments is to be found in pragmods_parameter_setter_c1.js
+
+
+Bug with Fire Fox and Intermet Explorer:
+It turns out that the end function had a *formatting* bug that Firefox and Internet
+Explorer were not properly reading. However, beause this was compartamentalized in the code 
+of pragmods_c1 and not before, the people with Firefox were probable unable to even start
+the HIT in previous versions.
+
+
+And bug with Interent Explorer:
+getElementByName does not work as it does in every other browser... this in turn makes 
+the check for the last button to fail no matter what. 

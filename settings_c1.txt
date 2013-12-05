@@ -24,8 +24,10 @@
 &&&		sh [nameofexperimentfiles]-postHIT.sh
 
 
-&&&		Andres, try this: python submiterator.py settings_c1.txt
+&&&		Andres, try this: 
+&&&		python submiterator.py settings_c1.txt
 &&&		sh pragmods_c1-postHIT.sh
+&&&		sh pragmods_c1-getResults.sh
 
 &&&	Make sure that this is the SAME folder that you list as the value of "hitfolderpath" below. The most straightforward thing to do is just to make a copy of this file and submiterator.py and run them from within the folder listed as your "hitfolderpath". 
 
@@ -43,22 +45,23 @@ rewriteProperties::yes
 &&&     Selecting 'no' here means that you have to manually choose whether to go live or use the Sandbox, by going to the mturk.properties file and uncommenting the appropriate service URL and commenting out the wrong one. If you choose the manual route, the next ('liveHIT') option is not relevant. Also check that you're using https as Amazon has stopped supporting non-secure connections.
 &&&     This option was added on 8/21/12, in response to changes at AWS which rendered the useful -sandbox CLT option obsolete. (Grr.) 
 
-liveHIT::no
+liveHIT::yes
 &&&     Is this live or sandbox? set to yes to go live. default is no (sandbox). This is only relevant if you've decided to let Submiterator manipulate your mturk-properties file, by selecting 'yes' for the rewriteProperties option. Otherwise, choose sandbox vs. live HIT it manually by modifying the mturk.properties file.
 
-title::What is he talking about? (2-3 mins)
+title::What is he talking about? (1-2 mins)
 &&&	The title of your experiment 		
 
-description:: Short and fun! A 2-3 minute word game about what someone is talking about.
+description:: Short and fun! A 1-2 minute word game about what someone is talking about.
 &&& 	A brief description of your experiment, in a phrase or short sentence
 
 nameofexperimentfiles::pragmods_c1
 &&& 	The files that the script generates for you will have names based on this option. 
 
-experimentURL::http://langcog.stanford.edu/expts/MCF/pragmods_js/pragmods_v7.html
+experimentURL::https://langcog.stanford.edu/expts/pragmods/pragmods_c1.html
+&&&		experimentURL::http://langcog.stanford.edu/expts/MCF/pragmods_js/pragmods_v7.html
 &&& 	The URL where you've posted your external HIT
 
-hitfolderpath::/Users/andesgomez/Documents/Stanford/Autumn2013-Masters/PayedWork/cleanPragmods
+hitfolderpath::/Users/andesgomez/Documents/Stanford/Autumn2013-Masters/PayedWork/pragmods/cleanPragmods
 &&& 	The full path to the folder that you want to contain the scripts for this experiment. 
 &&&	Run the "[nameofexperimentfiles]-postHITs.sh" script from WITHIN THIS FOLDER or you'll have trouble!
 
@@ -78,13 +81,13 @@ minPercentPreviousHITsApproved::90
 frameheight::500
 &&&	The height of the embedded frame that your subjects will see, in pixels. When setting this, think about the smallest screen size you can expect your workers to have. Play with this parameter by posting several times to the sandbox with different settings and seeing which works for your specific experiment for a given screen size. 
 
-reward::0.25
+reward::0.2
 &&&	How much you're paying per HIT, in dollars. E.g., if you want to pay 30 cents per HIT, enter ".30".
 
-numberofassignments::10
+numberofassignments::5
 &&&	How many subjects you want. You can always add more later, through the web interface.
 
-assignmentduration::600  
+assignmentduration::600
 &&& 	In seconds. 
 
 hitlifetime::604800       

@@ -1,3 +1,4 @@
+<!DOCTYPE html> <!-- You need to add this line so that IE renders fun CSS style stuff like unchosen:hover -->
 <html>
   <head>
     <title>What is he talking about?</title>
@@ -26,8 +27,17 @@
       <img src="images/stanford.png" alt="Stanford University">
       <p id='logo-text'>Stanford Language and Cognition Lab</p>
       <p class="block-text">In this experiment, we're interested in your judgments about what people are talking about. We'll introduce you to a person and some of the things he does, and then ask you to make judgments about what he means. It should take less than 2 - 3 minutes. </p>
+
+      <!-- If there is a familiarization stage then the next line should be active, otherwise the one after that should be active-->
       <button type="button" onClick="this.blur(); experiment.next_familiarization()">Start</button>
-      <p class="block-text">(Note: you won't be able to preview this HIT before accepting it because it's so short.)</p>
+      
+
+      <!-- <button type="button" onClick="this.blur(); experiment.next_test()">Start</button> -->
+
+
+      <p class="block-text"> <b> (Note: you won't be able to preview this HIT before accepting it because it's so short.) 
+
+      </b></p>
       <p class="block-text" id="legal">By answering the
       following questions, you are participating in a study being performed by
       cognitive scientists in the Stanford Department of Psychology. If you have
@@ -45,7 +55,10 @@
     </div>
 
     <!-- This part is called the "Familiarization Task".
-    This slide shows the n objects that will compose the different objective base rates for the object varieties. IT WILL BE OPTIONAL IN THE GENERAL EXPERIMENT MAKER SETTUP. I.e. Whether it is used or not will be determined by one of the variables in the experiment instantiator. -->
+    This slide shows the n objects that will compose the different objective base rates for the object varieties. 
+    When the familiarization_status variably is set to 0 images are not displayed, and when 
+    familiarization_status == 1 there are 9  stimulusimages that the user needs to click one at a time
+    to be able to proceed to the "stage" slide-->
     <div class="slide" id="prestage">
       <p class="block-text">Meet Bob:
       <img src="images/guy.jpg" width=75px alt="Bob"></p>
@@ -60,12 +73,13 @@
       </table>
     </div>
     
-    <!-- What does this js script do? -->
+    <!-- This is the slide that tests the *pragmatically* relevant inferences on the subject. THE MAIN TEST so to speak-->
     <div class="slide" id="stage">
       <div id="setup"> </div> <!--dynamically built in javascript-->
       <div id="objects"> </div> <!--dynamically built in javascript-->
       <div id="manipCheck"> </div> <!--dynamically built in javascript-->
       <div id="labelInst"> </div> <!--dynamically built in javascript-->
+      <div id="userSelectionInputFields"> </div> <!--The fields where the user expreses his/her decision/s -->
       <table align="center"><tr><td align="center">
       <button type="button" id="testNextButton" onClick="experiment.check_test()">Next</button>
       </td></tr>
@@ -78,10 +92,10 @@
     <div class="slide" id="check">
       <p class="block-text"> 
         Who did you meet in this survey? :
-        <input type="radio" id="namecheck1" name="namecheckCorrect" value="0"> Joe
-        <input type="radio" id="namecheck2" name="namecheckCorrect" value="0"> Tim
-        <input type="radio" id="namecheck3" name="namecheckCorrect" value="1"> Bob  <!-- Why is it necessary to have one name with a default value of "1"? -->
-      	<input type="radio" id="namecheck4" name="namecheckCorrect" value="0"> Hal
+        <input type="radio" id="namecheck3" name="namecheckCorrect" value="3"> Joe
+        <input type="radio" id="namecheck2" name="namecheckCorrect" value="2"> Tim
+        <input type="radio" id="namecheck1" name="namecheckCorrect" value="1"> Bob  <!-- This is the correct choice, and hence it has a 1 because it tells us that the person was right about "the person he met" -->
+      	<input type="radio" id="namecheck4" name="namecheckCorrect" value="4"> Hal
       </p>
       <p class="block-text">
         What was this survey about? : <br>
@@ -94,7 +108,7 @@
       <table align="center"><tr><td align="center">
         <button type="button" id="checkFinishedButton" onClick="experiment.check_finished()">Finished</button>
         <div id="checkMessage"> </div><!--dynamically built in javascript-->
-        </td></tr>
+        </td></tr></table>
     </div>
 
     <div class="slide" id="finished">
