@@ -71,7 +71,7 @@ This stuff will vary by experiment.
 */
 
 .unchosen {
-     border: 5px solid white;
+    border: 5px solid white;
 }
 
 .unchosen:hover {
@@ -80,6 +80,10 @@ This stuff will vary by experiment.
 
 .chosen {
     border: 5px solid red;
+}
+
+.notChoices {
+	border: 0px solid red;
 }
 
 

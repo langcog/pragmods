@@ -15,7 +15,6 @@ turk = turk || {};
     Array.prototype.map = function(fun /*, thisp*/) {
       var len = this.length >>> 0;
       if (typeof fun != "function") { throw new TypeError(); }
-
       var res = new Array(len);
       var thisp = arguments[1];
       for (var i = 0; i < len; i++) {
