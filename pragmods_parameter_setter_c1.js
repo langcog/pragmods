@@ -10,12 +10,12 @@
 //      1 -> Betting: Splitting $100 among three choices (must include validation check)
 //      2 -> Likert scale (1 - 7): “how likely is this to be his friend?” 1 = very unlikely, 7 = very likely
 //var participant_response_type = random(0,2);
-var participant_response_type = 2;
+var participant_response_type = 0;
 
 // Participant check trials:
 //      0 -> The count of each feature is not asked for
 //      1 -> The count of each feature is requested
-var participant_feature_count = 1;
+var participant_feature_count = 0;
 
 // Linguistic framing
 //      0 -> "My favorite friend has a hat"
@@ -49,8 +49,8 @@ var familiarization_status = 0;
 //    3 -> "snowman"
 //    4 -> "sundae"
 //    5 -> "Christmas tree"
-//var stim_index = random(0,4);
-var stim_index = 1;
+var stim_index = random(0,5);
+//var stim_index = 2;
 
 // Elaborate on the purpose of this. Which image is being changed
 var img_size = 200; // needs to be implemented, currently just a placeholder   
