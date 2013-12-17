@@ -31,6 +31,11 @@ number_to_name[0] = 'A';
 number_to_name[1] = 'B';
 number_to_name[2] = 'C';
 
+
+// The variable that counts the number of trials done.
+trials_completed = 0;
+choice_sequence = ["null", "null", "null", "null", "null", "null"]
+
 showSlide("instructions");
 
 // The main experiment:
@@ -89,6 +94,13 @@ var experiment = {
 
 
 	// When target_filler_sequence is not 0
+	choice_1: "null",
+	choice_2: "null",
+	choice_3: "null",
+	choice_4: "null",
+	choice_5: "null",
+	choice_6: "null",
+
 
 	// FAMILIARIZATION DISPLAY FUNCTION
 	// This 
@@ -463,8 +475,34 @@ var experiment = {
     	}
 
     	if (forced_choice_condition_fulfilled == 1 && betting_condition_fulfilled == 1 && likert_condition_fulfilled == 1 && count_condition_fulfilled == 1) {
-			testNextButton.blur(); 
-			showSlide("check");
+    		// Here you repeat the experiment if the trial number is not done.
+    		trials_completed = trials_completed + 1;
+    		if (trials_completed < 6) {
+				stim_index = ordered_stimuli[trials_completed]
+
+				base = stims[stim_index];
+				plural = stims_plural[stim_index];
+				actions = stims_actions[stim_index];
+				props = stims_props[stim_index];
+				prop_words = stims_prop_words[stim_index];
+				individual_prop_words = stims_single_words[stim_index];
+				times = stims_times[stim_index];
+
+				target = target_perm.indexOf(target_unpermuted);
+				distractor = target_perm.indexOf(distractor_unpermuted);
+				other = target_perm.indexOf(other_unpermuted);
+				target_prop = prop_perm.indexOf(target_prop_unpermuted);
+				distractor_prop = prop_perm.indexOf(distractor_prop_unpermuted);
+
+				actual_target_prop = prop_words[target_prop];
+				actual_distractor_prop = prop_words[distractor_prop];
+
+				testNextButton.blur(); 
+				experiment.next_familiarization();
+    		} else {
+				testNextButton.blur(); 
+				showSlide("check");
+    		}
 		} else {
 	    	$("#testMessage").html('<font color="red">' + 
 			'Please make sure you have answered all the questions!' + 

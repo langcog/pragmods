@@ -15,7 +15,7 @@ var participant_response_type = 0;
 // Participant check trials:
 //      0 -> The count of each feature is not asked for
 //      1 -> The count of each feature is requested
-var participant_feature_count = 0;
+var participant_feature_count = 1;
 
 // Linguistic framing
 //      0 -> "My favorite friend has a hat"
@@ -180,6 +180,11 @@ var stims_times = [["weekend","Week"],
 // In case the number of possible stimulus is changed and hence the stim_index may vary. So far we know it advance there
 // are only 6 stimulus.
 // var stim_index = random(0,stims.length-1);
+// When target_filler_sequence is not equal to zero:
+stimuli_to_show = range(0, 6);
+ordered_stimuli = shuffle(stimuli_to_show);
+stim_index = ordered_stimuli[0]
+
 
 
 
