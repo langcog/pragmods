@@ -45,10 +45,16 @@ var experiment = {
     // and therefore should not be affected by the decisions made by the experimental subject.
 	item: base,
 	target_property: props[target_prop],
-	target_frequency: target_frequencies[fam_cond],
+	logical_property: props[distractor_prop],
+	foil_property: props[foil_prop],
+
 	target_position: positions[target],    // -2
+	logical_position: positions[distractor],
+
+	target_frequency: target_frequencies[fam_cond],
 	familiarization_cond: fam_cond, // This is the index number of the familiarization conditions. For example, fam_cond == 0 means that the distractors, targets etc. are: [0, 1, 2, 2, 2, 2, 2, 2, 2]
-	
+
+
 	// These variables define the state-space of the experiment. linguistic_framing is subordinated to question_type (only matters for the first question type.)
 	participant_response_type_condition: participant_response_type,
 	participant_feature_count_condition: participant_feature_count,
@@ -81,6 +87,11 @@ var experiment = {
 	// Free form text given by the participant
 	about: "",
 	comment: "",
+	age: "",
+	gender: "",
+
+	// Scales
+	scale_and_levels_condition: scale_and_level,
 
 	// For my first batch, I'll make it so that this represents whether familiarization was present or not... 1 is not, -1 is yes.
 	//debugVariable: -1,
@@ -258,7 +269,25 @@ var experiment = {
 			} else if (linguistic_framing == 1) {
 				label_html += 'Bob can only say one word to communicate with you and he says: ';
 				label_html += '<p class="block-text style="font-size:x-large;">  <b>' + individual_prop_words[target_prop] + '</b></p>';
+			} else if (linguistic_framing == 2) {
+				label_html += 'Bob says: ';
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"My least favorite ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
+			} else if (linguistic_framing == 3) {
+				label_html += 'Bob says: ';
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The most beautiful ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
+			} else if (linguistic_framing == 4) {
+				label_html += 'Bob says: ';
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The most ugly ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
+			} else if (linguistic_framing == 5) {
+				label_html += 'Bob says: ';
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The most cheerful ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
+			} else if (linguistic_framing == 6) {
+				label_html += 'Bob says: ';
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The most depressing ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
+			} else if (linguistic_framing == 7 || linguistic_framing == 8) {
+				label_html += '</p>';
 			}
+
 		} else if (question_type == 1) { // SCHELLING (MUMBLE) CONDITION
 			label_html += 'Bob says: '
 		    label_html += '<p class="block-text style="font-size:x-large;">' + '"The ' + base + ' I most like to ' + actions[0] + ' has <b>mumblemumble."</b></p>' + '<p class="block-text style="font-size:small;">' + '(You couldn\'t hear what he said.)</p>';
@@ -268,21 +297,29 @@ var experiment = {
 
 		// Explain what the user is supposed to do for the pragmatic inference
 
-		if (linguistic_framing == 0) {
+		if (linguistic_framing == 0 || linguistic_framing == 7) {
 			if (participant_response_type == 0) {
 				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think is Bob\'s favorite.</p>';
 			} else if (participant_response_type == 1) {
-				label_html += '<p class="block-text">You have $100 you can use to bet on the friends you think may be Bob\'s favorite. Distribute your $100 among the options by how likely you think that each of the options is Bob\'s favorite. (Make sure your bets add to $100).</p>';
+				label_html += '<p class="block-text">You have $100 you can use to bet on the ' + base + ' you think may be Bob\'s favorite. Distribute your $100 among the options by how likely you think that each of the options is Bob\'s favorite. (Make sure your bets add to $100).</p>';
 			} else if (participant_response_type == 2) {
 				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that it is Bob\'s favorite. Here 1 means "very confident that it is not his favorite", 7 means "very confident that it is his favorite" and 4 means that you are not sure one way or the other.</p>';
 			}
-		} else if (linguistic_framing == 1) {
+		} else if (linguistic_framing == 1 || linguistic_framing == 3 || linguistic_framing == 4 || linguistic_framing == 5 || linguistic_framing == 6) {
 			if (participant_response_type == 0) {
 				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think Bob is talking about.</p>';
 			} else if (participant_response_type == 1) {
 				label_html += '<p class="block-text">You have $100 you can use to bet on the ' + base + ' you think Bob is talking about. Distribute your $100 among the options by how likely you think that Bob is referring to each of the options. (Make sure your bets add to $100).</p>';
 			} else if (participant_response_type == 2) {
 				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that Bob is referring to it. Here 1 means "very confident that Bob is NOT referring to it", 7 means "very confident that Bob is referring to it" and 4 means that you are not sure one way or the other.</p>';
+			}
+		} else if (linguistic_framing == 2 || linguistic_framing == 8) {
+			if (participant_response_type == 0) {
+				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think is Bob\'s least favorite.</p>';
+			} else if (participant_response_type == 1) {
+				label_html += '<p class="block-text">You have $100 you can use to bet on the ' + base + ' you think may be Bob\'s least favorite. Distribute your $100 among the options by how likely you think that each of the options is Bob\'s least favorite. (Make sure your bets add to $100).</p>';
+			} else if (participant_response_type == 2) {
+				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that it is Bob\'s least favorite. Here 1 means "very confident that it is not his least favorite", 7 means "very confident that it is his least favorite" and 4 means that you are not sure one way or the other.</p>';
 			}
 		}
 
@@ -497,6 +534,9 @@ var experiment = {
 		    }
 		    experiment.about = document.getElementById("about").value;
 		    experiment.comment = document.getElementById("comments").value;
+		    experiment.age = document.getElementById("age").value;
+		    experiment.gender = document.getElementById("gender").value;
+
 		    showSlide("finished");
 
 		    // HERE you can performe the needed boolean logic to properly account for the target_filler_sequence possibilities.
