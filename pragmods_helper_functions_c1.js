@@ -19,7 +19,7 @@ function range(a,b) {
     for (var i=a; i<=b; i++) {
 	rangeArray.push(i);
     }
-
+    
     return rangeArray;
 }
 
