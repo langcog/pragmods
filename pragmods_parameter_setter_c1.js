@@ -15,12 +15,19 @@ var participant_response_type = 0;
 // Participant check trials:
 //      0 -> The count of each feature is not asked for
 //      1 -> The count of each feature is requested
-var participant_feature_count = 0;
+var participant_feature_count = 1;
 
 // Linguistic framing
 //      0 -> "My favorite friend has a hat"
 //      1 -> "Bob can only say one word to communicate with you: Hat"
-var linguistic_framing = 1;
+//      2 -> "My least favorite friend has a hat"  - from 2 onwards we try different words to measure the effect of different semantics
+//      3 -> "The most beautiful X has a hat"
+//      4 -> "The most ugly X has a hat"
+//      5 -> "The most cheerful x has a y"
+//      6 -> "The most depressing X has y"
+//      7 -> Silent favorite: Click below on the option that represents the X that you think is Bob's favorite X.
+//      8 -> Silent least favorite: Click below on the option that represents the friend that you think is Bob's least favorite.
+var linguistic_framing = 0;
 
 // Question Type (This will be a controlled experiment with an equal proportion for each base rate).
 //      0 -> Listener inference judgement
@@ -53,6 +60,15 @@ var familiarization_status = 0;
 //    5 -> "Christmas tree"
 var stim_index = random(0,5);
 //var stim_index = 2;
+
+// The Scale and Levels.
+//    0 -> scales [[0, 0, 0], [0, 0, 1], [0, 1, 1]], level 0
+//    1 -> scales [[0, 0, 0], [0, 0, 1], [0, 1, 1]], level 1
+//    2 -> scales+ [[0, 0, 1], [0, 1, 1], [1, 1, 0]], level 0
+//    3 -> scales+ [[0, 0, 1], [0, 1, 1], [1, 1, 0]], level 1
+//    4 -> scales+ [[0, 0, 1], [0, 1, 1], [1, 1, 0]], level 2
+// var scale_and_level = random(0,4);
+var scale_and_level = 4;
 
 // Elaborate on the purpose of this. Which image is being changed
 var img_size = 200; // needs to be implemented, currently just a placeholder   
@@ -132,6 +148,7 @@ var distractor_prop_unpermuted = 0;
 */
 
 // level 1 condition
+// m3/r2 and level 1 by default. Then if that is not the case then it is possible to change the variable values
 
 var expt = [[0, 0, 0], [0, 0, 1], [0, 1, 1]]; // SCALES
 var level = 1;
@@ -140,6 +157,70 @@ var distractor_unpermuted = 2;
 var other_unpermuted = 0;
 var target_prop_unpermuted = 2;
 var distractor_prop_unpermuted = 1;
+
+if (scale_and_level > 1) {
+    expt = [[0, 0, 1], [0, 1, 1], [1, 1, 0]];
+}
+
+//  Level 0, scales - m2/r3
+if (scale_and_level == 0) {
+    var level = 0;
+    var target_unpermuted = 2;
+    var distractor_unpermuted = 1;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 1;
+    var distractor_prop_unpermuted = 2;
+    var foil_prop_unpermuted = 0;
+    var choice_names_unpermuted = ["foil","logical","target"];
+}
+
+//  Level 1, scales - m3/r2
+if (scale_and_level == 1) {
+    var level = 1;
+    var target_unpermuted = 1;
+    var distractor_unpermuted = 2;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 2;
+    var distractor_prop_unpermuted = 1;
+    var foil_prop_unpermuted = 0;
+    var choice_names_unpermuted = ["foil","target","logical"];
+}
+
+// Level 0, scales+ - m1/r3     
+// Consider replacing "logical" for a second "foil", since neither alternative is strictly coherent
+if (scale_and_level == 2) {
+    var level = 0;
+    var target_unpermuted = 2;
+    var distractor_unpermuted = 1;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 0;
+    var distractor_prop_unpermuted = 1;
+    var foil_prop_unpermuted = 2;
+    var choice_names_unpermuted = ["foil","logical","target"];
+}
+// Level 1, scales+ - m3/r1
+if (scale_and_level == 3) {
+    var level = 1;
+    var target_unpermuted = 0;
+    var distractor_unpermuted = 1;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 2;
+    var distractor_prop_unpermuted = 1;
+    var foil_prop_unpermuted = 0;
+    var choice_names_unpermuted = ["target","logical","foil"];
+}
+
+// Level 2, scales+ - m2/r2
+if (scale_and_level == 4) {
+    var level = 2;
+    var target_unpermuted = 1;
+    var distractor_unpermuted = 2;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 1;
+    var distractor_prop_unpermuted = 0;
+    var foil_prop_unpermuted = 2;
+    var choice_names_unpermuted = ["foil","target","logical"];
+}
 
 
 var stims = ["boat","friend","pizza","snowman","sundae","Christmas tree"];
@@ -212,6 +293,7 @@ var distractor = target_perm.indexOf(distractor_unpermuted);
 var other = target_perm.indexOf(other_unpermuted);
 var target_prop = prop_perm.indexOf(target_prop_unpermuted);
 var distractor_prop = prop_perm.indexOf(distractor_prop_unpermuted);
+var foil_prop = prop_perm.indexOf(foil_prop_unpermuted);
 
 var actual_target_prop = prop_words[target_prop];
 var actual_distractor_prop = prop_words[distractor_prop];
