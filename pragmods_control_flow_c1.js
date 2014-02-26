@@ -263,6 +263,7 @@ var experiment = {
 		// Create the way in which the question is asked (and the type of question)
 		var label_html = '<br><br><p class="block-text">';
 		if (question_type == 0) { // LISTENER CONDITION
+
 			if (linguistic_framing == 0) {
 				label_html += 'Bob says: ';
 		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"My favorite ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
@@ -289,8 +290,13 @@ var experiment = {
 			}
 
 		} else if (question_type == 1) { // SCHELLING (MUMBLE) CONDITION
-			label_html += 'Bob says: '
-		    label_html += '<p class="block-text style="font-size:x-large;">' + '"The ' + base + ' I most like to ' + actions[0] + ' has <b>mumblemumble."</b></p>' + '<p class="block-text style="font-size:small;">' + '(You couldn\'t hear what he said.)</p>';
+			if (linguistic_framing == 0) {
+				label_html += 'Bob says: '
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The ' + base + ' I most like to ' + actions[0] + ' has <b>mumblemumble."</b></p>' + '<p class="block-text style="font-size:small;">' + '(You couldn\'t hear what he said.)</p>';
+		    } else {
+				label_html += 'Bob says: '
+		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The ' + base + ' I will ' + actions[0] + ' next ' + times[0] +' has <b>mumblemumble."</b></p>' + '<p class="block-text style="font-size:small;">' + '(You couldn\'t hear what he said.)</p>';		    	
+		    }
 		} else if (question_type == 2) { // PURE BASE RATE CONDITION
 			label_html += 'Which ' + base + ' is Bob\'s favorite?</p>';
 		}
@@ -383,7 +389,12 @@ var experiment = {
 
 		// SELECT FUNCTION (called in stage slide)
 	select: function (c) {
+
+		//if (target == c) {
+		//	experiment.choice = "target"
+		//} else {
 		experiment.choice = choice_names[c];
+		//}
 
 		// unchoose everything
 		for (var i=0; i<choices.length; i++) {

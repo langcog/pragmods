@@ -219,6 +219,16 @@ git push -u origin master
 %%%%%%%
 
 
+For maintainance:
+
+git add -a
+git pull
+git commit -m "what you changed/added"
+git push
+
+
+%%%%%%%
+
 
 Finish up the One word design for all stimuli in the three participant input condition. ALL the items.
 
