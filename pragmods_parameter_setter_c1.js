@@ -27,13 +27,13 @@ var participant_feature_count = 1;
 //      6 -> "The most depressing X has y"
 //      7 -> Silent favorite: Click below on the option that represents the X that you think is Bob's favorite X.
 //      8 -> Silent least favorite: Click below on the option that represents the friend that you think is Bob's least favorite.
-var linguistic_framing = 0;
+var linguistic_framing = 1;
 
 // Question Type (This will be a controlled experiment with an equal proportion for each base rate).
 //      0 -> Listener inference judgement
 //      1 -> Couldn't hear: “He said ‘My friend has mumblemumble.’ (you didn’t hear what he said)”
 //      2 -> Pure base rate: "Which one is his friend?" or "Which friend is Bob's favorite?"
-var question_type = 0;
+var question_type = 1;
 
 // Question sequence 
 //      0 -> Default: One target trial -> probably already done
@@ -49,7 +49,7 @@ var target_filler_sequence = 0;
 // Familiarization Status (whether we have the base rate slide)
 //      0 -> We don't have a familiarization stage
 //      1 -> We do have a familiarization stage
-var familiarization_status = 0;
+var familiarization_status = 1;
 
 // The stimulus kind. When it is hardcoded as 1 we get the happy face stimulus.
 //    0 -> "boat"
@@ -67,15 +67,18 @@ var stim_index = random(0,5);
 //    2 -> scales+ [[0, 0, 1], [0, 1, 1], [1, 1, 0]], level 0
 //    3 -> scales+ [[0, 0, 1], [0, 1, 1], [1, 1, 0]], level 1
 //    4 -> scales+ [[0, 0, 1], [0, 1, 1], [1, 1, 0]], level 2
-// var scale_and_level = random(0,4);
-var scale_and_level = 4;
+//    5 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]] level 0
+//    6 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 1
+//    7 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 2
+var scale_and_level = 1;
+//var scale_and_level = 1;
 
 // Elaborate on the purpose of this. Which image is being changed
 var img_size = 200; // needs to be implemented, currently just a placeholder   
 
 // Prior familiarization condition
-var cond = 1;
-// var cond = random(1,4);
+//var cond = 1;
+var cond = random(1,4);
 
 
 
@@ -111,7 +114,7 @@ var fam_dists = [[0, 1, 2, 2, 2, 2, 2, 2, 2],
         [0, 1, 1, 1, 2, 2, 2, 2, 2],
         [0, 1, 1, 1, 1, 1, 2, 2, 2],
         [0, 1, 1, 1, 1, 1, 1, 1, 2]]; 
-var target_frequencies = [0.22, 0.44, 0.667, 0.89]; // just counting the proportion of 1s in that matrix, for book keeping and and labeling
+var target_frequencies = [0.11, 0.33, 0.556, 0.778]; // just counting the proportion of 1s in that matrix, for book keeping and and labeling
 // matrix size, usually 9
 var instances_in_familiarization = fam_dists[0].length
 // matrix size, usually 4
@@ -158,8 +161,12 @@ var other_unpermuted = 0;
 var target_prop_unpermuted = 2;
 var distractor_prop_unpermuted = 1;
 
-if (scale_and_level > 1) {
+if (scale_and_level > 1 && scale_and_level <= 4) {
     expt = [[0, 0, 1], [0, 1, 1], [1, 1, 0]];
+}
+
+if (scale_and_level > 4 && scale_and_level <= 7) {
+    expt = [[0, 1, 1], [1, 0, 1], [1, 0, 1]];
 }
 
 //  Level 0, scales - m2/r3
@@ -221,6 +228,41 @@ if (scale_and_level == 4) {
     var foil_prop_unpermuted = 2;
     var choice_names_unpermuted = ["foil","target","logical"];
 }
+
+// Compltetely underdetermined because the target feature is everywehre.
+if (scale_and_level == 5) {
+    var level = 0;
+    var target_unpermuted = 0;
+    var distractor_unpermuted = 1;
+    var other_unpermuted = 2;
+    var target_prop_unpermuted = 1;
+    var distractor_prop_unpermuted = 0;
+    var foil_prop_unpermuted = 2;
+    var choice_names_unpermuted = ["single","twin","twin"];
+}
+
+if (scale_and_level == 6) {
+    var level = 1;
+    var target_unpermuted = 1;
+    var distractor_unpermuted = 2;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 0;
+    var distractor_prop_unpermuted = 1;
+    var foil_prop_unpermuted = 2;
+    var choice_names_unpermuted = ["single","twin","twin"];
+}
+
+if (scale_and_level == 7) {
+    var level = 2;
+    var target_unpermuted = 1;
+    var distractor_unpermuted = 2;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 2;
+    var distractor_prop_unpermuted = 1;
+    var foil_prop_unpermuted = 0;
+    var choice_names_unpermuted = ["single","twin","twin"];
+}
+
 
 
 var stims = ["boat","friend","pizza","snowman","sundae","Christmas tree"];
