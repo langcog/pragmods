@@ -71,6 +71,7 @@ python submiterator.py settings_c1.txt
 	5) Update the code online
 
 	### Updating All ### (or just part, if you want)
+scp * -r nc07agom@cardinal.stanford.edu:/afs/ir/group/langcog/WWW/expts/pragmods
 scp * nc07agom@cardinal.stanford.edu:/afs/ir/group/langcog/WWW/expts/pragmods
 
 	## If you only changed that one file, then:
@@ -255,3 +256,23 @@ Unique neutral identifier
 
 
 Proposal for estimating Alpha. Three stages.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+qing & Franke 
