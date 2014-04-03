@@ -287,7 +287,10 @@ var experiment = {
 		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The most depressing ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
 			} else if (linguistic_framing == 7 || linguistic_framing == 8) {
 				label_html += '</p>';
+			} else if (linguistic_framing == 9) {
+				label_html += 'Bob points to a patch of cloth the same color as ' + prop_words[target_prop] +  ':' ;
 			}
+
 
 		} else if (question_type == 1) { // SCHELLING (MUMBLE) CONDITION
 			if (linguistic_framing == 0) {
@@ -303,7 +306,7 @@ var experiment = {
 
 		// Explain what the user is supposed to do for the pragmatic inference
 
-		if (linguistic_framing == 0 || linguistic_framing == 7) {
+		if ( linguistic_framing == 7) {
 			if (participant_response_type == 0) {
 				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think is Bob\'s favorite.</p>';
 			} else if (participant_response_type == 1) {
@@ -311,7 +314,7 @@ var experiment = {
 			} else if (participant_response_type == 2) {
 				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that it is Bob\'s favorite. Here 1 means "very confident that it is not his favorite", 7 means "very confident that it is his favorite" and 4 means that you are not sure one way or the other.</p>';
 			}
-		} else if (linguistic_framing == 1 || linguistic_framing == 3 || linguistic_framing == 4 || linguistic_framing == 5 || linguistic_framing == 6) {
+		} else if (linguistic_framing == 0 || linguistic_framing == 2 || linguistic_framing == 1 || linguistic_framing == 3 || linguistic_framing == 4 || linguistic_framing == 5 || linguistic_framing == 6 || linguistic_framing == 9) {
 			if (participant_response_type == 0) {
 				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think Bob is talking about.</p>';
 			} else if (participant_response_type == 1) {
@@ -319,7 +322,7 @@ var experiment = {
 			} else if (participant_response_type == 2) {
 				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that Bob is referring to it. Here 1 means "very confident that Bob is NOT referring to it", 7 means "very confident that Bob is referring to it" and 4 means that you are not sure one way or the other.</p>';
 			}
-		} else if (linguistic_framing == 2 || linguistic_framing == 8) {
+		} else if (linguistic_framing == 8) {
 			if (participant_response_type == 0) {
 				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think is Bob\'s least favorite.</p>';
 			} else if (participant_response_type == 1) {
