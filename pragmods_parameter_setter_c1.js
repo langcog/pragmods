@@ -28,7 +28,8 @@ var participant_feature_count = 1;
 //      7 -> Silent favorite: Click below on the option that represents the X that you think is Bob's favorite X.
 //      8 -> Silent least favorite: Click below on the option that represents the friend that you think is Bob's least favorite.
 //      9 -> (Odd one out) Non-linguistic: Bob points to a patch of cloth the same color as the hats. (odd one out is either 1 / 9)
-var linguistic_framing = 1;
+// var linguistic_framing = 1;
+var linguistic_framing = random(7, 8);
 
 // Question Type (This will be a controlled experiment with an equal proportion for each base rate).
 //      0 -> Listener inference judgement
@@ -72,7 +73,7 @@ var stim_index = random(0,5);
 //    6 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 1
 //    7 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 2
 //    8 -> odd one out [[0, 1, 1], [1, 0 , 1], [1, 1, 0]]
-var scale_and_level = 8;
+var scale_and_level = 1;
 //var scale_and_level = 1;
 
 // Elaborate on the purpose of this. Which image is being changed
@@ -297,8 +298,8 @@ var stims_props = [["cabin","sail","motor"],
 var stims_prop_words = [["a cabin","a sail","a motor"],
 			["a hat","glasses","a mustache"],
 			["mushrooms","olives","peppers"],
-                        ["a hat","a scarf","mittens"],
-                        ["a cherry","whipped cream","chocolate sauce"],
+            ["a hat","a scarf","mittens"],
+            ["a cherry","whipped cream","chocolate sauce"],
 			["lights","ornaments","a star"]];
 var stims_single_words = [["cabin","sail","motor"],
             ["hat","glasses","mustache"],
@@ -328,8 +329,8 @@ var stims_times = [["weekend","Week"],
 
 // Permute the matrix randomly:
 var prop_perm = shuffle(range(0,expt[0].length-1));
-//var target_perm = shuffle(range(0,expt.length-1));
-var target_perm = [0, 1, 2]
+var target_perm = shuffle(range(0,expt.length-1));
+//var target_perm = [0, 1, 2]    // When you want to have a neat order, you can hard code it. That gives you scale level 1 0-items, 1-item, 2-item order always
 var expt_perm = new Array();
 var choice_names = new Array();
 
