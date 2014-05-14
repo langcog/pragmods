@@ -14,8 +14,9 @@ var participant_response_type = 0;
 
 // Participant check trials:
 //      0 -> The count of each feature is not asked for
-//      1 -> The count of each feature is requested
-var participant_feature_count = 1;
+//      1 -> The count of two features are requested
+//      2 -> The count of 3 features are requested
+var participant_feature_count = 2;
 
 // Linguistic framing
 //      0 -> "My favorite friend has a hat"
@@ -27,9 +28,13 @@ var participant_feature_count = 1;
 //      6 -> "The most depressing X has y"
 //      7 -> Silent favorite: Click below on the option that represents the X that you think is Bob's favorite X.
 //      8 -> Silent least favorite: Click below on the option that represents the friend that you think is Bob's least favorite.
-//      9 -> (Odd one out) Non-linguistic: Bob points to a patch of cloth the same color as the hats. (odd one out is either 1 / 9)
-// var linguistic_framing = 1;
-var linguistic_framing = random(7, 8);
+//      9 -> (Odd one out) Non-linguistic: Bob points to a patch of cloth the same color as the hats. (odd one out is either 9 or 10)
+//      10 -> (Odd one out) Linguistic: Bob says "hat" (odd one out is either 9 or 10)
+//      11 -> tricky guy
+//      12 -> Pure randomness condition: You ask a concrete randomness question so that Liker, betting and forced choice can be mapped onto actual estimated probabilities   
+//var linguistic_framing = 9;
+var linguistic_framing = random(9, 10);
+
 
 // Question Type (This will be a controlled experiment with an equal proportion for each base rate).
 //      0 -> Listener inference judgement
@@ -61,7 +66,7 @@ var familiarization_status = 0;
 //    4 -> "sundae"
 //    5 -> "Christmas tree"
 var stim_index = random(0,5);
-//var stim_index = 1;
+//var stim_index = 0;
 
 // The Scale and Levels.
 //    0 -> scales [[0, 0, 0], [0, 0, 1], [0, 1, 1]], level 0
@@ -73,7 +78,7 @@ var stim_index = random(0,5);
 //    6 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 1
 //    7 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 2
 //    8 -> odd one out [[0, 1, 1], [1, 0 , 1], [1, 1, 0]]
-var scale_and_level = 1;
+var scale_and_level = 8;
 //var scale_and_level = 1;
 
 // Elaborate on the purpose of this. Which image is being changed
@@ -84,7 +89,17 @@ var img_size = 200; // needs to be implemented, currently just a placeholder
 var cond = random(1,4);
 
 
+// the X for imageX/ in file  - default is 2, but some things can change it.
+var file_number_to_use_for_referents = '3';
 
+
+// Select color
+
+// question_order_permutations
+var permutation_of_questions =  shuffle(range(0,2));
+
+// 
+//var 
 // I'm still working on figuring out how exactly this part works,
 // but Michael explained that "var condCounts = "1,75;2,75;3,75;4,75""
 // is meant to cycle through four conditions (as of yet I don't get)
@@ -105,6 +120,18 @@ try {
 }
 
 */
+
+// Fixing the logic of parameters to enforce sensible permutations
+
+if (linguistic_framing == 9 || linguistic_framing == 10) {
+    scale_and_level = 8;
+    participant_feature_count = 2;
+}
+if (linguistic_framing != 9 && linguistic_framing != 10) {
+    file_number_to_use_for_referents = '3';
+}
+
+
 
 
 
@@ -271,17 +298,30 @@ if (scale_and_level == 7) {
     var choice_names_unpermuted = ["single","twin","twin"];
 }
 
+
+// This is for the patch of colors series 
 if (scale_and_level == 8) {
-    var level = 2;
+    var level = 3;
     var target_unpermuted = 2;
     var distractor_unpermuted = 1;
     var other_unpermuted = 0;
     var target_prop_unpermuted = 2;
     var distractor_prop_unpermuted = 1;
     var foil_prop_unpermuted = 0;
-    var choice_names_unpermuted = ["twin","twin","target"];
+    var choice_names_unpermuted = ["twin_1","twin_2","odd_one"];
 }
 
+// Odd one out
+if (scale_and_level == 9) {
+    var level = 4;
+    var target_unpermuted = 2;
+    var distractor_unpermuted = 1;
+    var other_unpermuted = 0;
+    var target_prop_unpermuted = 2;
+    var distractor_prop_unpermuted = 1;
+    var foil_prop_unpermuted = 0;
+    var choice_names_unpermuted = ["twin_1","twin_2","odd_one"];
+}
 
 
 
@@ -292,8 +332,8 @@ var stims_plural = ["boats","friends","pizzas","snowmen","sundaes","Christmas tr
 var stims_props = [["cabin","sail","motor"],
 		   ["hat","glasses","mustache"],
 		   ["mushrooms","olives","peppers"],
-                   ["hat","scarf","mittens"],		   
-                   ["cherry","whipped cream","chocolate"],
+           ["hat","scarf","mittens"],
+           ["cherry","whipped cream","chocolate"],
 		   ["lights","ornaments","star"]];
 var stims_prop_words = [["a cabin","a sail","a motor"],
 			["a hat","glasses","a mustache"],
@@ -330,6 +370,7 @@ var stims_times = [["weekend","Week"],
 // Permute the matrix randomly:
 var prop_perm = shuffle(range(0,expt[0].length-1));
 var target_perm = shuffle(range(0,expt.length-1));
+var color_order_permuted = shuffle(range(0,expt[0].length-1));
 //var target_perm = [0, 1, 2]    // When you want to have a neat order, you can hard code it. That gives you scale level 1 0-items, 1-item, 2-item order always
 var expt_perm = new Array();
 var choice_names = new Array();
@@ -361,6 +402,8 @@ var foil_prop = prop_perm.indexOf(foil_prop_unpermuted);
 
 var actual_target_prop = prop_words[target_prop];
 var actual_distractor_prop = prop_words[distractor_prop];
+var actual_foil_prop = prop_words[foil_prop];
+
 
 // create shuffled familiarization
 fam_mat = new Array();

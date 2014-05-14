@@ -57,16 +57,17 @@ function showSlide(id) {
 
 
 // create HTML for property matrix and base image
-function stimHTML(base, n, prop_mat, props, id) {
+// base = the kind of stimuli
+function stimHTML(base, n, prop_mat, props, id, file_number) {
     var html = "";
 
-    html += '<img src="images2/' + base + '-base' + String(n+1) +
-	'.png" width=200px height=200px alt="' + base + '" id="' + id + 'Image"/>';
+    html += '<img src="images' + file_number +  '/' + base + '-base' + String(n+1) +
+    '.png" width=200px height=200px alt="' + base + '" id="' + id + 'Image"/>';
 
     var c = 0;
     for (var p = 0; p < prop_mat.length; p++) {
 	   if (prop_mat[p] == 1) {
-    	    html += '<img  src="images2/' + base + '-' + props[p] + 
+    	    html += '<img  src="images3/' + base + '-' + props[p] + 
     		'.png" width=200px height=200px alt="' + props[p] + '" ' +
     		'id="' + id + 'Property' + String(c+1) + '"/>';
     	    c = c + 1; // keep count of how many properties we've stacked
@@ -75,6 +76,38 @@ function stimHTML(base, n, prop_mat, props, id) {
 
     return html;
 }
+
+
+// the patch of color by color? 
+
+// Select color at first!
+// Patch of cloth referent matcher. file_number = the image folder 
+// disposition: where in the experiment the image will be put on
+function colorPatchHTML(base, n, prop_mat, props, id, position, file_number, color_ordering) {
+    var html = "";
+    //html += '<img src="images3/square' + '-'  + base + '-' + stims_single_words  +'.png" width=200px height=200px id="objImage" />';
+    html += '' //'<img src="images3/square-face-' + props[] +  '.png" width=200px height=200px id="objImage" />';
+
+
+    html += '<img src="images3/square-' + base + '-' + props[n] +  
+        '.png" width=80px height=80px id="objPatch" />';
+
+    var c = 0;
+    return html;
+}
+
+
+
+function hand_HTML(base, n, prop_mat, props, id, position) {
+    var html = "";
+
+    html += '<img  src="images3/hand.png" width=50px height=50px'  + 
+     'alt="it is the hand!" id="objHandProperty"/>';
+    //'alt="' + props[n] + '" ' + 'id="' + id + 'Property' + String(c+10) + '"/>';
+    return html;
+}
+
+
 
 // The way to get the value of the selected radio button
 // I don't use this one because it made IE not work
