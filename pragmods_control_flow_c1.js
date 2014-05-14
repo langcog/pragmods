@@ -66,8 +66,8 @@ var experiment = {
 	// They are the ones necessary to do any science at all. 
 	manip_check_target: -1,  // -1 is the default, which means that the subject did not enter any number because it was not asked to count (participant_feature_count == 1)
 	manip_check_dist: -1,
+	manip_check_foil: -1,
 	name_check_correct: "FALSE",
-
 	// The relevant variables when the participatn response type is: Forced Choice
 	choice: "null",
 	choice_correct: "null",
@@ -99,7 +99,17 @@ var experiment = {
 	familiarization_present_in_study: familiarization_status,
 
 
+	// Manip check question order
+	top_question_order: permutation_of_questions[0],
+	middle_question_order: permutation_of_questions[1],
+	bottom_question_order: permutation_of_questions[2],
+
+	// image file used
+	image_version: file_number_to_use_for_referents,
+
 	// When target_filler_sequence is not 0
+
+	hand_position: -1, 
 
 	// FAMILIARIZATION DISPLAY FUNCTION
 	// This 
@@ -171,7 +181,7 @@ var experiment = {
 			for (i=0;i<3;i++) {
 				forced_choice_objects_html += '<td width=198px height=210px align="center"' + 
 				' class="notChoices objTable">';
-				forced_choice_objects_html += stimHTML(base,i,expt_perm[i],props,'obj');
+				forced_choice_objects_html += stimHTML(base,i,expt_perm[i],props,'obj', file_number_to_use_for_referents);
 				forced_choice_objects_html += '</td>';
 			}
 			forced_choice_objects_html += '</tr><tr>';
@@ -195,7 +205,7 @@ var experiment = {
 				betting_amounts_object_html += '<td width=198px height=210px align="center"' + 
 				' class="notChoices objTable" ' +
 				'id=\"tdchoice' + String(i) + '\">';
-				betting_amounts_object_html += stimHTML(base,i,expt_perm[i],props,'obj');
+				betting_amounts_object_html += stimHTML(base,i,expt_perm[i],props,'obj', file_number_to_use_for_referents);
 				betting_amounts_object_html += '</td>';
 			}
 			betting_amounts_object_html += '</tr><tr>';
@@ -218,7 +228,7 @@ var experiment = {
 				Likert_object_html += '<td width=198px height=210px align="center"' + 
 				' class="notChoices objTable" ' +
 				'id=\"tdchoice' + String(i) + '\">';
-				Likert_object_html += stimHTML(base,i,expt_perm[i],props,'obj');
+				Likert_object_html += stimHTML(base,i,expt_perm[i],props,'obj', file_number_to_use_for_referents);
 				Likert_object_html += '</td>';
 			}
 			Likert_object_html += '</tr><tr>';
@@ -260,6 +270,40 @@ var experiment = {
 		}
 
 
+		// ADD the case in which three counts are requested
+
+
+		if (participant_feature_count == 2) {
+
+			var html_list = ["a", "a", "a"];
+			var manipCheck_html = "";
+
+			html_list[0] = '<p class="block-text">How many of the ' + plural + ' have ' + 
+				actual_target_prop + '?' + '  <input type="text" id="manipCheckTarget" ' + 
+				'name="manipCheckTarget" size="1"></p>';
+
+			html_list[1] = '<p class="block-text">How many of the ' + plural + ' have ' + 
+				actual_distractor_prop + '?' + 
+				'  <input type="text" id="manipCheckDist" ' + 
+				'name="manipCheckDist" size="1"></p>';
+
+			html_list[2] = '<p class="block-text">How many of the ' + plural + ' have ' + 
+				actual_foil_prop + '?' + 
+				'  <input type="text" id="manipCheckFoil" ' + 
+				'name="manipCheckFoil" size="1"></p>';
+
+			// randomize the order... this previously just had the lines above randomly added to manipCheck_html. This is cleaner.
+			
+			
+			manipCheck_html += html_list[experiment.top_question_order];
+			manipCheck_html += html_list[experiment.middle_question_order];
+			manipCheck_html += html_list[experiment.bottom_question_order];
+
+
+			$("#manipCheck").html(manipCheck_html);
+		}
+
+
 		// Create the way in which the question is asked (and the type of question)
 		var label_html = '<br><br><p class="block-text">';
 		if (question_type == 0) { // LISTENER CONDITION
@@ -267,7 +311,7 @@ var experiment = {
 			if (linguistic_framing == 0) {
 				label_html += 'Bob says: ';
 		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"My favorite ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
-			} else if (linguistic_framing == 1) {
+			} else if (linguistic_framing == 1 || linguistic_framing == 10) {
 				label_html += 'Bob can only say one word to communicate with you and he says: ';
 				label_html += '<p class="block-text style="font-size:x-large;">  <b>' + individual_prop_words[target_prop] + '</b></p>';
 			} else if (linguistic_framing == 2) {
@@ -287,8 +331,28 @@ var experiment = {
 		    	label_html += '<p class="block-text style="font-size:x-large;">' + '"The most depressing ' + base + ' has <b>' + prop_words[target_prop] + '."</b></p>';
 			} else if (linguistic_framing == 7 || linguistic_framing == 8) {
 				label_html += '</p>';
+
+
 			} else if (linguistic_framing == 9) {
+				var color_object_html = '<table align="center"><tr>';
+				// Q: Is this 3 a variable thing 
+				for (i=0;i<3;i++) {
+					color_object_html += '<td width=100px height=100px align="center"' + 
+					' class="notChoices objTable">';
+					color_object_html += colorPatchHTML(base,color_order_permuted[i],expt_perm[color_order_permuted[i]],props,'obj', file_number_to_use_for_referents, color_order_permuted);
+					// Add the hand
+					if (color_order_permuted[i] == target_prop) { 
+						color_object_html += hand_HTML(base,color_order_permuted[i],expt_perm[color_order_permuted[i]],props,'obj', file_number_to_use_for_referents);
+						experiment.hand_position = i;
+					}
+					color_object_html += '</td>';
+				}
+				color_object_html += '</tr></table><br><br>';
+				// $("#objects").html(color_object_html) 
+
 				label_html += 'Bob points to a patch of cloth the same color as ' + prop_words[target_prop] +  ':' ;
+				label_html += color_object_html
+
 			}
 
 
@@ -314,7 +378,7 @@ var experiment = {
 			} else if (participant_response_type == 2) {
 				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that it is Bob\'s favorite. Here 1 means "very confident that it is not his favorite", 7 means "very confident that it is his favorite" and 4 means that you are not sure one way or the other.</p>';
 			}
-		} else if (linguistic_framing == 0 || linguistic_framing == 2 || linguistic_framing == 1 || linguistic_framing == 3 || linguistic_framing == 4 || linguistic_framing == 5 || linguistic_framing == 6 || linguistic_framing == 9) {
+		} else if (linguistic_framing == 0 || linguistic_framing == 2 || linguistic_framing == 1 || linguistic_framing == 3 || linguistic_framing == 4 || linguistic_framing == 5 || linguistic_framing == 6) {
 			if (participant_response_type == 0) {
 				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think Bob is talking about.</p>';
 			} else if (participant_response_type == 1) {
@@ -329,6 +393,14 @@ var experiment = {
 				label_html += '<p class="block-text">You have $100 you can use to bet on the ' + base + ' you think may be Bob\'s least favorite. Distribute your $100 among the options by how likely you think that each of the options is Bob\'s least favorite. (Make sure your bets add to $100).</p>';
 			} else if (participant_response_type == 2) {
 				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that it is Bob\'s least favorite. Here 1 means "very confident that it is not his least favorite", 7 means "very confident that it is his least favorite" and 4 means that you are not sure one way or the other.</p>';
+			}
+		} else if (linguistic_framing == 9  || linguistic_framing == 10) {
+			if (participant_response_type == 0) {
+				label_html += '<p class="block-text">Click below on the option that represents the ' + base + ' that you think Bob is refering to.</p>';
+			} else if (participant_response_type == 1) {
+				label_html += '<p class="block-text">You have $100 you can use to bet on the ' + base + ' you think Bob may refering to. Distribute your $100 among the options by how likely you think that Bob is refering to each of the options. (Make sure your bets add to $100).</p>';
+			} else if (participant_response_type == 2) {
+				label_html += '<p class="block-text">On a scale from 1 to 7, for each ' + base + ' choose the level of confidence that you have that Bob is refering to it. Here 1 means "very confident that he is not refering to this ' + base + '", 7 means "very confident that he is refering to this ' + base + '" and 4 means that you are not sure one way or the other.</p>';
 			}
 		}
 
@@ -410,7 +482,7 @@ var experiment = {
 
 		// REVEAL IMAGES IN FAMILIARIZATION
 	reveal: function(n) {
-			day_html = stimHTML(base,fam_dist[fam_perm[n]],fam_mat[n],props,'obj')
+			day_html = stimHTML(base,fam_dist[fam_perm[n]],fam_mat[n],props,'obj', file_number_to_use_for_referents)
 			$("#day" + String(n)).html(day_html) 
 			fam_clicked = unique(fam_clicked.concat(n))
 
@@ -444,9 +516,17 @@ var experiment = {
     	if (participant_feature_count == 0) {
     		count_condition_fulfilled = 1;
     	} else if (document.getElementById("manipCheckTarget").value != "" && document.getElementById("manipCheckDist").value != "") {
-    		count_condition_fulfilled = 1;
-    		experiment.manip_check_target = document.getElementById("manipCheckTarget").value;
-	    	experiment.manip_check_dist = document.getElementById("manipCheckDist").value;
+    		if (participant_feature_count == 1) {
+	    		count_condition_fulfilled = 1;
+	    		experiment.manip_check_target = document.getElementById("manipCheckTarget").value;
+		    	experiment.manip_check_dist = document.getElementById("manipCheckDist").value;
+    		}
+    		if (participant_feature_count == 2) {
+	    		count_condition_fulfilled = 1;
+	    		experiment.manip_check_target = document.getElementById("manipCheckTarget").value;
+		    	experiment.manip_check_dist = document.getElementById("manipCheckDist").value;
+		    	experiment.manip_check_foil = document.getElementById("manipCheckFoil").value;
+    		}
     	}
 
     	// Checking that IF we have a forced choice type then the conditions are fulfilled
