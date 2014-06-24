@@ -1,0 +1,1053 @@
+
+[4 Familiarization conditions and no familiarizaation and all three participant response type - more exploratory]
+
+----------------------------
+November 10 2013
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Added a simple familiarization slide substitute that presents Bob
+and shows that the experiment is about a person talking to you.
+Before that, the familiarization slide was simply skipped.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+----------------------------
+
+November 18 2013
+
+50 subjects | Betting | No familiarization | Friend
+
+var participant_response_type = 1;
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 1;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+----------------------------
+
+November 18 2013
+
+50 subjects | Likert | No familiarization | Friend
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 1;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+----------------------------
+
+November 29 2013
+
+50 subjects | Likert | No familiarization | Pizza
+
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 2;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The experiment now asked the subjects the referent of Bobs statement at the bottom of the page.
+The previous experiments always had the input field just below the stimuli or, in the case of 3fc 
+hoovering over the images did highlighted possible ones.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+----------------------------
+November 30 2013 ~ 7 pm:
+
+50 subjects | 3 forced choice condition | No familiarization | Friend
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 1;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 2:44:40 (h:mm:ss)
+  Average submit time: 82.3 seconds
+
+Filename: forced_choice_no_fam_friends_30_november
+
+Summary of Results: 
+
+-------------------------
+November 30 2013 ~ 11 pm:
+
+50 subjects | 3 forced choice condition | No familiarization | Pizza
+
+
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 2;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 2:13:22 (h:mm:ss)
+  Average submit time: 83.7 seconds
+
+
+
+----------------------------
+
+Sunday December 1 2013 ~ 9:37 am
+
+50 subjects | 3 forced choice condition | No familiarization | Snowmen
+
+
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 3;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 0:23:07 (h:mm:ss)
+  Average submit time: 61.2 seconds
+
+
+----------------------------
+
+Sunday December 1 2013 ~ 9:37 am
+Code: XYZQ
+
+50 subjects | 3 forced choice condition | No familiarization | Boat
+
+
+var participant_feature_count = 1;
+var linguistic_framing = 0;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 0;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Comment: So far all experiments have used the linguistic framing: "My favorite X has a Y"
+
+------------------------------
+
+Sunday December 1 2013 ~ 1:15 pm
+Code: AGSK
+
+50 subjects | 3 forced choice condition | No familiarization | Friend | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 1;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 1:03:38 (h:mm:ss)
+  Average submit time: 66.7 seconds
+
+
+
+Comment: I am running this because the % of people answering with "logical" is so damn high that perhaps 
+the fact that we ask about his "favorite" boat is what makes it different.
+
+Great success! As it turns out, making the linguistic framing change hugelly increased the proportion of
+people who chose the target!
+
+------------------------------
+
+Sunday December 1 2013 ~ 2:40 pm
+50 subjects | Betting | No familiarization | Friend | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: AGHP
+
+
+var participant_response_type = 1;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 1;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Comment: Discovering how the "he can only say one word" linguistic framing affects betting responses
+
+Assignments completed: 49/49 (100%)
+         Time elapsed: 0:57:28 (h:mm:ss)
+  Average submit time: 95.0 seconds
+
+-----------------------------
+
+Monday December 2 2013 ~ 11:10
+50 subjects | Likert | No familiarization | Friend |  Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: JSLD
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 1;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 1:24:39 (h:mm:ss)
+  Average submit time: 82.6 seconds
+
+
+
+------------------------------
+
+Saturday December 7 2013 ~ 7:00 pm
+50 subjects | 3 forced choice condition | No familiarization | Boat | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: LFBN
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 0;  // Boat
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 0:48:44 (h:mm:ss)
+  Average submit time: 69.3 seconds
+
+
+-----------------------------
+
+Saturday December 7 2013 ~ 9:30
+140 subjects | 3 forced choice condition | No familiarization | Snowman | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: LSBN
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 3;  // snowman
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Comment: I accidentally added 90 more subjects than intended. Why? Because Amazon can resubmit your adding subjects request if your refresh your browser even when there is nothing in the screen indicating that you are about to do that.
+
+Assignments completed: 140/140 (100%)
+         Time elapsed: 6:47:16 (h:mm:ss)
+  Average submit time: 78.6 seconds
+
+
+-----------------------------
+
+
+Saturday December 8 2013 ~ 4 PM
+50 subjects | 3 forced choice condition | No familiarization | Sundae | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: LSBZ
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 4;  // Sundae
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 3:51:38 (h:mm:ss)
+  Average submit time: 64.8 seconds
+
+
+-----------------------------
+
+Saturday December 8 2013 ~ 8:33 pm
+50 subjects | Betting | No familiarization | Boat | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: LZZZ
+
+var participant_response_type = 1;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 0;  // Boat
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 0:53:30 (h:mm:ss)
+  Average submit time: 106.1 seconds
+
+
+-----------------------------
+
+Saturday December 8 2013 ~ 9:40 pm
+50 subjects | Betting | No familiarization | Snowman | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: LSSS
+
+var participant_response_type = 1;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 3;  // Snowman
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 0:46:18 (h:mm:ss)
+  Average submit time: 80.9 seconds
+
+
+-----------------------------
+
+Saturday December 8 2013 ~ 10:40 pm
+50 subjects | Betting | No familiarization | Sundae | Linguistic framing: "Bob can only say one word to communicate with you and he says: Hat"
+Code: BSUN
+
+var participant_response_type = 1;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 3;  // Sundae
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Got this as a comment: "I bet 25/0/75 , because #2 had no cherry. #1 and #3 both had a cherry, but #1 had cherry and whip cream. The accurate description would say \"cherry and whip cream\" for #1, but 25% of people (at least) are not accurate."
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 1:49:38 (h:mm:ss)
+  Average submit time: 89.2 seconds
+
+
+
+-----------------------------
+
+Saturday December 9 2013 ~ 12:30 am
+50 subjects | Likert | No familiarization | Sundae | Linguistic framing: "Bob can only say one word to communicate with you and he says: Chocolate"
+Code: LSUN
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 4;  // Sundae
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 2:27:31 (h:mm:ss)
+  Average submit time: 108.1 seconds
+
+
+-----------------------------
+
+Saturday December 9 2013 ~ 3:00 am
+50 subjects | Likert | No familiarization | Snowman | Linguistic framing: "Bob can only say one word to communicate with you and he says: Chocolate"
+Code: FINA
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 3;  // Snowman
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 1:42:41 (h:mm:ss)
+  Average submit time: 104.1 seconds
+
+
+-----------------------------
+
+Saturday December 9 2013 ~ 4
+50 subjects | Likert | No familiarization | Boat | Linguistic framing: "Bob can only say one word to communicate with you and he says: Chocolate"
+Code: FUNU
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 0;  // Boat
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Assignments completed: 50/50 (100%)
+         Time elapsed: 0:41:17 (h:mm:ss)
+  Average submit time: 81.0 seconds
+
+
+-----------------------------
+
+Saturday December 9 2013 ~ 12:15 pm
+50 subjects | Likert | No familiarization | Pizza | Linguistic framing: "Bob can only say one word to communicate with you and he says: Olives"
+Code: FONO
+
+var participant_response_type = 2;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = 2;  // Pizza
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+
+-----------------------------
+
+Monday December 16 2013 ~ 11:00 am
+340 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "Bob can only say one word to communicate with you and he says: Olives" | Participants asked to count
+Code: ALLS
+forced_choice_no_fam_6random_count_16_december_ALLS
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 340/340 (100%)
+         Time elapsed: 2:40:09 (h:mm:ss)
+  Average submit time: 64.8 seconds
+
+
+
+
+-----------------------------
+Monday December XXX 2013 ~ 9:00 pm
+240 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "Bob can only say one word to communicate with you and he says: Olives" | Participants NOT asked to count
+Code: ALNC
+forced_choice_no_fam_6random_NOcount_16_december_ALNC
+
+var participant_response_type = 0;
+var participant_feature_count = 0;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 240/240 (100%)
+         Time elapsed: 4:44:37 (h:mm:ss)
+  Average submit time: 60.9 seconds
+
+
+
+
+-----------------------------
+Sunday January 12 2014 ~ 6:10 pm
+100 subjects | 3FC | No familiarization | random out of 4 | Linguistic framing: "My least favorite friend has a hat" | Participants asked to count
+Code: LEAS
+forced_choice_no_fam_4random_count_12_january_least_LEAS.csv
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 2; // "My least favorite"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,3);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Comment: This experiment seeks to elucidate the role of the adjective "favorite" for the purpose of pragmatic
+inference. 
+%%%%%%%%%%%%%%%%%%%% Comment 2: I am now asking for age and gender (which is optional) %%%%%%%%%%%%%%%%%%%%
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 1:13:55 (h:mm:ss)
+  Average submit time: 75.5 seconds
+
+Comment: Surprisingly, 80% of people do pragmatic inference here
+
+
+
+-----------------------------
+Sunday January 15 2014 ~ 1:50 pm
+159 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "The most beautiful friend has a hat" | Participants asked to count
+Code: BEAU
+forced_choice_no_fam_6random_count_beautiful_15_january_BEAU.csv
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 3; // "Most beautiful"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,3);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 159/159 (100%)
+         Time elapsed: 2:00:44 (h:mm:ss)
+  Average submit time: 66.2 seconds
+~/Documents/Stanford/Autumn2013-Mast
+
+
+
+-----------------------------
+Sunday January 15 2014 ~ 5:00 pm
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "The most ugly friend has a hat" | Participants asked to count
+Code: UGHH
+forced_choice_no_fam_6random_count_ugly_15_january_UHGG.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 4; // "Most ugly"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,3);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+
+Comment: I forgot to change the part about the instroctions.... :/ all wrong.
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 1:04:11 (h:mm:ss)
+  Average submit time: 79.1 seconds
+
+
+
+
+-----------------------------
+Sunday January 15 2014 ~ 9:35 pm
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "The most ugly friend has a hat" | Participants asked to count
+Code: UGLY
+forced_choice_no_fam_6random_count_ugly_15_january_UGLY.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 4; // "Most ugly"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,3);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 6:52:25 (h:mm:ss)
+  Average submit time: 77.9 seconds
+
+
+
+
+-----------------------------
+Sunday January 17 2014 ~ 9:00 pm
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "The most cheerful friend has a hat" | Participants asked to count
+Code: CHEE
+forced_choice_no_fam_6random_count_cheerful_17_january_CHEE.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 5; // "Most Cheerful"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 1:42:53 (h:mm:ss)
+  Average submit time: 75.2 seconds
+
+
+
+-----------------------------
+Tuesday January 21 2014 ~ 9:00 pm
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "The most depressing friend has a hat" | Participants asked to count
+Code: DEPR
+forced_choice_no_fam_6random_count_depressing_17_january_DEPR.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 6; // "Most Depressing"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 8:51:17 (h:mm:ss)
+  Average submit time: 90.3 seconds
+
+
+-----------------------------
+Wednesday January 22 2014 ~ 10:10AM
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "Click on Bob's favorite" - Bob doesnt say anything | Participants asked to count
+Code: MUTE
+forced_choice_no_fam_6random_count_favorite_22_january_MUTE.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 7; // "Favorite" base rate
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 1:30:28 (h:mm:ss)
+  Average submit time: 64.5 seconds
+
+
+
+-----------------------------
+Wednesday January 22 2014 ~ 5:00PM
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "Click on Bob's least favorite" - Bob doesnt say anything | Participants asked to count
+Code: MUTL
+forced_choice_no_fam_6random_count_least_favorite_22_january_MUTL.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 8; // "Least favorite" base rate
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 14:33:58 (h:mm:ss)
+  Average submit time: 73.0 seconds
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% changing levels %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Here you begin to change as a variable the level used. Scales change. Scales+
+Note that from here onwards an additonal variable is included: scale_and_level
+
+Friday January 24 2014 ~ 4:20PM
+200 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: One word | Participants asked to count
+Scale+, levels 0 to 2 at random.
+Code: SCAL
+scale_plus_6stimuli_3levels_no_fam_24_january_SCAL.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1; // One word "he can only say one word to comunicate with you: hat"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var scale_and_level = random(2,4);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+Assignments completed: 200/200 (100%)
+         Time elapsed: 9:14:11 (h:mm:ss)
+  Average submit time: 71.5 seconds
+
+
+-----------------------------
+Friday January 25 2014 ~ 3:40PM
+120 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: One word | Participants asked to count
+Scale, levels 0 to 1 at random.
+Code: OSCA
+scales_6stimuli_3levels_no_fam_25_january_OSCA.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1; // One word "he can only say one word to comunicate with you: hat"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var scale_and_level = random(0,1);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+Assignments completed: 120/120 (100%)
+         Time elapsed: 1:19:13 (h:mm:ss)
+  Average submit time: 71.3 seconds
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The theme of this series is genuinly ambiguous messages. Coonsider this scale, for example:
+[[0, 1, 1], [1, 0, 1], [1, 0, 1]], which I call ScaleWeird.
+
+
+For this one I made a mistake. The linguistic framing was supposed to be "one word" but was favorite instead.
+
+-----------------------------
+Wednesday 19 2014 ~ 10:50AM
+100 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: favorite | Participants asked to count
+ScaleWeird, levels 1 and 2
+Code: WERF
+scaleweird_6stimuli_no_fam_favorite_19_february_WERF.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 0; // One word "he can only say one word to comunicate with you: hat"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var scale_and_level =  random(6,7); // [[0, 1, 1], [1, 0, 1], [1, 0, 1]], levels 1 and 2 with equal probability
+var img_size = 200;
+var cond = 1;
+
+Assignments completed: 17/100 (17%)
+         Time elapsed: 1:10:24 (h:mm:ss)
+  Average submit time: 68.5 seconds
+
+// Comments: "target" is interchangeable with twin here. Mistake. Only a few, perhaps only one, submission hav
+// this problem. Likewise, "undefined" was supposed to be a position. I'll just exclude those datapoints.
+
+
+
+-----------------------------
+Wednesday 19 2014 ~ 1:50AM
+50 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: One word | Participants asked to count
+ScaleWeird, levels 1 and 2
+Code: WERD
+scaleweird_6stimuli_no_fam_oneword_19_february_WERD.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1; // One word "he can only say one word to comunicate with you: hat"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var scale_and_level =  random(6,7); // [[0, 1, 1], [1, 0, 1], [1, 0, 1]], levels 1 and 2 with equal probability
+var img_size = 200;
+var cond = 1;
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 29:21:38 (h:mm:ss)
+  Average submit time: 83.5 seconds
+
+
+Assignments completed: 120/120 (100%)
+         Time elapsed: 48:21:35 (h:mm:ss)
+  Average submit time: 83.8 seconds
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FAMILIARIZE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Here I do familiarization once again, revisiting it after a few months. Today.
+
+
+Tuesday 25 2014 ~ 6:00 PM
+144 subjects | 3FC | Yes familiarization | random out of 6 | Linguistic framing: One word | Participants asked to count
+scale, level 1
+Code: FAMO
+scale_6stimuli_yes_fam_oneword_25_february_FAMO.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1; // One word "he can only say one word to comunicate with you: hat"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 1;
+var stim_index = random(0,5);
+var scale_and_level = 1; // [[0, 1, 1], [1, 0, 1], [1, 0, 1]], levels 1 and 2 with equal probability
+var img_size = 200;
+var cond = random(1,4);
+
+Assignments completed: 100/120 (83%)
+         Time elapsed: 2:25:40 (h:mm:ss)
+  Average submit time: 104.6 seconds
+
+
+Assignments completed: 144/144 (100%)
+         Time elapsed: 3:58:01 (h:mm:ss)
+  Average submit time: 106.2 seconds
+
+
+-----------------------------
+// Mumbre Mumble
+Wednesday 26 2014 ~ 12:50 PM
+96 subjects | 3FC | Yes familiarization | random out of 6 | Linguistic framing: Mumblemumnle | Participants asked to count
+scale, level 1
+Code: FMMM
+scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1; // In this case, not favorite - the mumble mumble overwrites it
+var question_type = 1;  // mumble mumble
+var target_filler_sequence = 0;
+var familiarization_status = 1;
+var stim_index = random(0,5);
+var scale_and_level = 1; // [[0, 1, 1], [1, 0, 1], [1, 0, 1]], levels 1 and 2 with equal probability
+var img_size = 200;
+var cond = random(1,4);
+
+
+Assignments completed: 96/96 (100%)
+         Time elapsed: 0:52:00 (h:mm:ss)
+  Average submit time: 103.3 seconds
+
+
+Assignments completed: 113/144 (78%)
+         Time elapsed: 1:44:08 (h:mm:ss)
+  Average submit time: 103.3 seconds
+
+Assignments completed: 119/144 (82%)
+         Time elapsed: 1:59:55 (h:mm:ss)
+  Average submit time: 102.2 seconds
+
+Assignments completed: 400/400 (100%)
+         Time elapsed: 22:50:57 (h:mm:ss)
+  Average submit time: 104.3 seconds
+
+NOTE: A significant number of people seem to be confused about the referents. That is they either say
+  one or two for the manipulation check, or 8 or 9 or something in that range. Clearly it is an ambiguous question. 
+
+
+-----------------------------
+// Here I repeat the experiment before the last one. This is only to increase the sample size to 400.
+
+March 4 2014 ~ 6:00 AM
+256 subjects | 3FC | Yes familiarization | random out of 6 | Linguistic framing: One word | Participants asked to count
+scale, level 1
+Code: FAMO2
+scale_6stimuli_yes_fam_oneword_25_february_FAMO2.csv
+
+
+var participant_response_type = 0;
+var participant_feature_count = 1;
+var linguistic_framing = 1; // One word "he can only say one word to comunicate with you: hat"
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 1;
+var stim_index = random(0,5);
+var scale_and_level = 1; // [[0, 1, 1], [1, 0, 1], [1, 0, 1]], levels 1 and 2 with equal probability
+var img_size = 200;
+var cond = random(1,4);
+
+
+Assignments completed: 256/256 (100%)
+         Time elapsed: 31:36:25 (h:mm:ss)
+  Average submit time: 106.8 seconds
+
+
+Apparently people do more pragmatic inferences in the language condition (contrary to expectations)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+// Resample and Bootstrap the model-relevant experiments
+// You can do this any time. Also, add some bootstrapping code, maybe?
+// Additional todo - incorporate an hour-of-the-day variable just in case that is some kind of important predictor
+
+
+// This experiment will have a 50% of being "pick the option that you think is Bob's favorite" and 50%
+// of "Bob's least favorite"
+
+April 5 2014 ~ 6:00 PM
+300 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: 50% favorite, 50% least favorite
+| Participants asked to count | scale | level 1
+Code: PRIOLF
+scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv
+
+
+var participant_response_type = 0; // Forced Choice
+var participant_feature_count = 1; // 
+var linguistic_framing = random(7, 8); // Base rate for favorite (7) and least favorite (8)
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var scale_and_level = 1; // [[0, 1, 1], [1, 0, 1], [1, 0, 1]], levels 1 and 2 with equal probability
+var img_size = 200;
+var cond = random(1,4);
+
+
+// Comments: For consistency we have that choice == foil means 0-items, choice == target means 1-item, and choice == logical means 2-items
+
+Assignments completed: 100/100 (100%)
+         Time elapsed: 3:27:19 (h:mm:ss)
+  Average submit time: 77.1 seconds
+
+Assignments completed: 250/250 (100%)
+         Time elapsed: 16:48:42 (h:mm:ss)
+  Average submit time: 73.4 seconds
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+// Do the scale_and_level == 8 
+// expt = [[0, 1, 1], [1, 0 , 1], [1, 1, 0]]
+// The objective of these experiments is to identify when people choose the odd-one out. 
+// I.e. when people make logically *inconsistent* choices
+// 2X2 language/non-language vs. game/non-game
+
+
+
+May 14th 2014 - 00:05
+256 subjects | 3FC | NO familiarization | random out of 6 | Linguistic framing: One word or color patch | Participants asked to count the tshree elements
+scale, level 1
+Code: PATCH
+patch_oddone_no_fam_14_may_PATCH.csv
+
+var participant_response_type = 0;
+var participant_feature_count = 2; // They count all of the props
+var linguistic_framing = random(9,10);
+var question_type = 0;
+var target_filler_sequence = 0;
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var scale_and_level = 8;
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = random(1,4);
+var file_number_to_use_for_referents = '3'
+
+
+
+  End time: Wed May 14 00:04:50 PDT 2014
+--[Done Loading HITs]----------
+  Total load time: 0 seconds.
+  Successfully loaded 1 HITs.
+~/Documents/Stanford/Autumn2013-Masters/PayedWork/pragmods/cleanPragmods
+
+
+
+Assignments completed: 87/160 (54%)
+         Time elapsed: 15:50:31 (h:mm:ss)
+  Average submit time: 107.6 seconds
+~/Documents/Stanford/Autumn2013-Masters/PayedWork/pragmods/cleanPragmods
+
+Assignments completed: 200/200 (100%)
+         Time elapsed: 26:47:53 (h:mm:ss)
+  Average submit time: 97.7 seconds
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+############################ TO DO WHEN THE VERSION 2 WORKS ###############################################
+-----------------------------
+Monday December 16 2013 ~ XYZ pm
+40 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "Bob can only say one word to communicate with you and he says: Olives" | Participants asked to count | 6 trials with same inference question
+Code: SEQ1
+
+var participant_response_type = 0;
+var participant_feature_count = 0;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 1; // 6 trials with same inference question
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
+
+-----------------------------
+Monday December XXX 2013 ~ XYZ pm
+40 subjects | 3FC | No familiarization | random out of 6 | Linguistic framing: "Bob can only say one word to communicate with you and he says: Olives" | Participants asked to count | 6 trials with same inference question
+Code: SEQ1
+
+var participant_response_type = 0;
+var participant_feature_count = 0;
+var linguistic_framing = 1;
+var question_type = 0;
+var target_filler_sequence = 1; // 6 trials with same inference question
+var familiarization_status = 0;
+var stim_index = random(0,5);
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+var cond = 1;
+
