@@ -32,8 +32,8 @@ var participant_feature_count = 2;
 //      10 -> (Odd one out) Linguistic: Bob says "hat" (odd one out is either 9 or 10)
 //      11 -> tricky guy
 //      12 -> Pure randomness condition: You ask a concrete randomness question so that Liker, betting and forced choice can be mapped onto actual estimated probabilities   
-//var linguistic_framing = 9;
-var linguistic_framing = random(9, 10);
+var linguistic_framing = 1;
+//var linguistic_framing = random(9, 10);
 
 
 // Question Type (This will be a controlled experiment with an equal proportion for each base rate).
@@ -78,7 +78,7 @@ var stim_index = random(0,5);
 //    6 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 1
 //    7 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 2
 //    8 -> odd one out [[0, 1, 1], [1, 0 , 1], [1, 1, 0]]
-var scale_and_level = 8;
+var scale_and_level = 7;
 //var scale_and_level = 1;
 
 // Elaborate on the purpose of this. Which image is being changed

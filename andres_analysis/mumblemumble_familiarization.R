@@ -1,6 +1,9 @@
 ### With familiarization_mumble
 familiarization_mumble = read.csv("/Users/andesgomez/Documents/Stanford/Autumn2013-Masters/PayedWork/andres_data/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv",header=TRUE, sep="\t", row.names=NULL, stringsAsFactors = FALSE)
 
+familiarization_mumble$batch = rep(0, length(familiarization_mumble$Answer.gender))
+
+
 familiarization_mumble$target = familiarization_mumble$Answer.choice == "\"target\""
 familiarization_mumble$logical = familiarization_mumble$Answer.choice == "\"logical\"" 
 familiarization_mumble$foil = familiarization_mumble$Answer.choice == "\"foil\""
@@ -24,17 +27,20 @@ familiarization_mumble$thirties = familiarization_mumble$Answer.age == "\"30\"" 
 familiarization_mumble$fourties = familiarization_mumble$Answer.age == "\"40\"" | familiarization_mumble$Answer.age == "\"41\"" | familiarization_mumble$Answer.age == "\"42\"" | familiarization_mumble$Answer.age == "\"43\"" | familiarization_mumble$Answer.age == "\"44\"" | familiarization_mumble$Answer.age == "\"45\"" | familiarization_mumble$Answer.age == "\"46\"" | familiarization_mumble$Answer.age == "\"47\"" | familiarization_mumble$Answer.age == "\"48\"" | familiarization_mumble$Answer.age == "\"49\"" 
 familiarization_mumble$fifties = familiarization_mumble$Answer.age == "\"50\"" | familiarization_mumble$Answer.age == "\"51\"" | familiarization_mumble$Answer.age == "\"52\"" | familiarization_mumble$Answer.age == "\"53\"" | familiarization_mumble$Answer.age == "\"54\"" | familiarization_mumble$Answer.age == "\"55\"" | familiarization_mumble$Answer.age == "\"56\"" | familiarization_mumble$Answer.age == "\"57\"" | familiarization_mumble$Answer.age == "\"58\"" | familiarization_mumble$Answer.age == "\"59\"" 
 
-
-
-
+familiarization_mumble$pragmatic_count_t = (familiarization_mumble$Answer.manip_check_target == "\"2\"")*1
+familiarization_mumble$pragmatic_count_d = (familiarization_mumble$Answer.manip_check_dist == "\"1\"")*1 
+familiarization_mumble$pragmatic_count = familiarization_mumble$pragmatic_count_t * familiarization_mumble$pragmatic_count_d
 
 # Analysis of variance and Regression
 
-single_group_variance = aov(logical ~ as.factor(Answer.target_frequency) + as.factor(Answer.item), data = familiarization_mumble)
+single_group_variance = aov(target ~ as.factor(Answer.target_frequency) * as.factor(Answer.item), data = familiarization_mumble)
 summary(single_group_variance)
 
 familiarization_mumble_variance = aov(target ~ as.factor(Answer.familiarization_cond) + as.factor(Answer.item) + as.factor(Answer.target_position) + as.factor(Answer.logical_position), data = familiarization_mumble)
 summary(familiarization_mumble_variance)
+
+single_group_reg = glm(target ~ Answer.target_frequency, data = familiarization_mumble)
+summary(single_group_reg)
 
 
 familiarization_mumble_control = aov(target ~ as.factor(Answer.familiarization_cond) + as.factor(Answer.item) + as.factor(females) + as.factor(males) + twenties + fifties + fourties, data = familiarization_mumble)
@@ -43,3 +49,8 @@ summary(familiarization_mumble_control)
 manip_check_dist
 manip_check_target
 name_check_correct
+
+
+familiarization_variance = glm(target ~ as.factor(Answer.item) + pragmatic_count, data = familiarization_mumble)
+summary(familiarization_variance)
+

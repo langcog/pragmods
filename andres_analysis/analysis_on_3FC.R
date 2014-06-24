@@ -171,6 +171,11 @@ ms.one_word_total = sum(total_table_one_word$target) / sum(total_table_one_word[
 one_word_separated_together = rbind(one_word_sundae, one_word_snowman, one_word_boat, one_word_friend)
 
 
+ms.one_word_3fc <- aggregate(cbind(target,
+                                      logical,
+                                      foil) ~ 
+                                  Answer.item, data=one_word_separated_together, mean)
+
 ########################################################################################################
 
 
@@ -337,6 +342,9 @@ total_table_one_word
 ms.one_word_total
 # Beautiful
 most_beautiful_randomized
+sum(most_beautiful_randomized$logical) / sum(most_beautiful_randomized[,2:4])
+sum(most_beautiful_randomized$target) / sum(most_beautiful_randomized[,2:4])
+sum(most_beautiful_randomized$foil) / sum(most_beautiful_randomized[,2:4])
 ms.most_beautiful
 # Ugly Wrong
 most_ugly_wrong_randomized
@@ -356,6 +364,12 @@ ms.silent_favorite
 # Bob's least favorite without Bob saying anything
 silent_least_favorite_randomized
 ms.silent_least_favorite
+
+
+sum(least_favorite_randomized$logical) / sum(least_favorite_randomized[,2:4])
+sum(least_favorite_randomized$target) / sum(least_favorite_randomized[,2:4])
+sum(least_favorite_randomized$foil) / sum(least_favorite_randomized[,2:4])
+
 
 ####################################### SemFest writeup #######################################
 
