@@ -6,7 +6,10 @@ Suggested format: Paper title, Authors, Topics covered, Summary in your own word
 ###################################
 On iterated reference games - Avery
 
-
+Pragmatic priming and the search for alternatives. Bott and Chemla 2013.
+	Experiments to see whether people can be primed to get basic vs enriched interpretation of sentences with scalar implicatures within or across domains (some,numbers,plural,ad hoc).
+	PDF: http://mindmodeling.org/cogsci2013/papers/0068/paper0068.pdf
+	presentation w/ some example stimuli: http://www2.hu-berlin.de/linguistic-evidence-berlin-2013/download/Presentation_slides/Bott_LE-Berlin_2013_Slides.pdf
 
 On distractors - Benjamin
 
