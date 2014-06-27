@@ -1,0 +1,48 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%% What you do and in what order %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Use command line to get to the path your pragmods file is saved in.
+	
+	0) If necessary set the Java stuff:
+
+export JAVA_HOME=/Library/Java/Home
+
+	1) Add to the experiment_timeline doc what you will do
+
+	2) change the variables in parameter_setter
+
+	3) change the variables in settings_c1.txt
+
+	4) Run the submiterator
+
+python submiterator.py settings_c1.txt
+
+	5) Update the code online
+
+	### Updating All ### (or just part, if you want)
+scp -r * SUNERID@cardinal.stanford.edu:/afs/ir/group/langcog/WWW/expts/pragmods
+scp * SUNETID@cardinal.stanford.edu:/afs/ir/group/langcog/WWW/expts/pragmods
+
+	## If you only changed that one file, then:
+scp pragmods_parameter_setter_c1.js SUNETID@cardinal.stanford.edu:/afs/ir/group/langcog/WWW/expts/pragmods
+
+
+	6) Post the HIT
+
+sh pragmods_c1-postHIT.sh
+
+	7) Retreive the results
+
+sh pragmods_c1-getResults.sh
+
+	8) Add to experiment timeline the info you get. 
+
+	9) Take pragmods_c1.results.tst and make a copy of it where you want it and rename it there with a good description
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
