@@ -10,7 +10,7 @@
 //      1 -> Betting: Splitting $100 among three choices (must include validation check)
 //      2 -> Likert scale (1 - 7): “how likely is this to be his friend?” 1 = very unlikely, 7 = very likely
 //var participant_response_type = random(0,2);
-var participant_response_type = 2;
+var participant_response_type = 0;
 
 // Participant check trials:
 //      0 -> The count of each feature is not asked for
@@ -78,7 +78,7 @@ var stim_index = random(0,5);
 //    6 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 1
 //    7 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 2
 //    8 -> odd one out [[0, 1, 1], [1, 0 , 1], [1, 1, 0]]
-var scale_and_level = 8;
+var scale_and_level = 5;
 //var scale_and_level = 1;
 
 // Elaborate on the purpose of this. Which image is being changed
