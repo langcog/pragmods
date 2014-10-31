@@ -62,3 +62,9 @@ chisq.test(with_and_without[,2:3])
 table(with_count$Answer.item)
 table(without_count$Answer.item)
 
+
+
+
+
+
+
