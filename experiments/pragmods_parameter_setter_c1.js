@@ -16,7 +16,7 @@ var participant_response_type = 0;
 //      0 -> The count of each feature is not asked for
 //      1 -> The count of two features are requested
 //      2 -> The count of 3 features are requested
-var participant_feature_count = 2;
+var participant_feature_count = 1;
 
 // Linguistic framing
 //      0 -> "My favorite friend has a hat"
@@ -32,7 +32,7 @@ var participant_feature_count = 2;
 //      10 -> (Odd one out) Linguistic: Bob says "hat" (odd one out is either 9 or 10)
 //      11 -> tricky guy
 //      12 -> Pure randomness condition: You ask a concrete randomness question so that Liker, betting and forced choice can be mapped onto actual estimated probabilities   
-var linguistic_framing = 1;
+var linguistic_framing = 8;
 //var linguistic_framing = random(9, 10);
 
 
@@ -65,8 +65,8 @@ var familiarization_status = 0;
 //    3 -> "snowman"
 //    4 -> "sundae"
 //    5 -> "Christmas tree"
-var stim_index = random(0,5);
-//var stim_index = 0;
+//var stim_index = random(0,5);
+var stim_index = 1;
 
 // The Scale and Levels.
 //    0 -> scales [[0, 0, 0], [0, 0, 1], [0, 1, 1]], level 0
@@ -78,7 +78,7 @@ var stim_index = random(0,5);
 //    6 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 1
 //    7 -> scaleweird [[0, 1, 1], [1, 0, 1], [1, 0, 1]], level 2
 //    8 -> odd one out [[0, 1, 1], [1, 0 , 1], [1, 1, 0]]
-var scale_and_level = 5;
+var scale_and_level = 1;
 //var scale_and_level = 1;
 
 // Elaborate on the purpose of this. Which image is being changed

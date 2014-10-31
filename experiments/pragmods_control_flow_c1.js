@@ -45,11 +45,11 @@ var experiment = {
     // and therefore should not be affected by the decisions made by the experimental subject.
 	item: base,
 	target_property: props[target_prop],
-	logical_property: props[distractor_prop],
-	foil_property: props[foil_prop],
+	//logical_property: props[distractor_prop],
+	//foil_property: props[foil_prop],
 
 	target_position: positions[target],    // -2
-	logical_position: positions[distractor],
+	//logical_position: positions[distractor],
 
 	target_frequency: target_frequencies[fam_cond],
 	familiarization_cond: fam_cond, // This is the index number of the familiarization conditions. For example, fam_cond == 0 means that the distractors, targets etc. are: [0, 1, 2, 2, 2, 2, 2, 2, 2]
