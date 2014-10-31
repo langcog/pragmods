@@ -785,7 +785,7 @@ Assignments completed: 17/100 (17%)
   Average submit time: 68.5 seconds
 
 // Comments: "target" is interchangeable with twin here. Mistake. Only a few, perhaps only one, submission hav
-// this problem. Likewise, "undefined" was supposed to be a position. I'll just exclude those datapoints.
+// this problem. Likewise, "undefined" was supposed to be a position. I'll just exclude those datapoints.'
 
 
 
@@ -826,7 +826,7 @@ Assignments completed: 120/120 (100%)
 Here I do familiarization once again, revisiting it after a few months. Today.
 
 
-Tuesday 25 2014 ~ 6:00 PM
+Tuesday February 25 2014 ~ 6:00 PM
 144 subjects | 3FC | Yes familiarization | random out of 6 | Linguistic framing: One word | Participants asked to count
 scale, level 1
 Code: FAMO
@@ -856,7 +856,7 @@ Assignments completed: 144/144 (100%)
 
 -----------------------------
 // Mumbre Mumble
-Wednesday 26 2014 ~ 12:50 PM
+Wednesday February 26 2014 ~ 12:50 PM
 96 subjects | 3FC | Yes familiarization | random out of 6 | Linguistic framing: Mumblemumnle | Participants asked to count
 scale, level 1
 Code: FMMM

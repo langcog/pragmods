@@ -1,0 +1,227 @@
+Odd one out and non-verbal communication
+========================================================
+
+---
+author: Andrés Gómez Emilsson
+
+date: May 14 2014
+
+participants: 200
+---
+
+![alt text]['sd']
+
+
+```{r}
+
+patch <- read.csv("/Users/andesgomez/Documents/Stanford/Autumn2013-Masters/PayedWork/andres_data/Spring2014/patch_oddone_no_fam_14_may_PATCH.csv",
+                           header=TRUE, sep="\t", row.names=NULL, stringsAsFactors = FALSE)
+
+patch$odd_one <- patch$Answer.choice=="\"odd_one\""
+patch$twin_1 <- patch$Answer.choice=="\"twin_1\""
+patch$twin_2 <- patch$Answer.choice=="\"twin_2\""
+
+compliant <- patch$Answer.manip_check_target == "\"2\"" & patch$Answer.manip_check_dist == "\"2\"" & patch$Answer.manip_check_foil == "\"2\"" & patch$Answer.name_check_correct == "\"TRUE\""
+patch_compliant <- subset(patch,compliant)
+
+length(patch$Answer.item)
+
+
+
+```
+
+
+
+```{r echo=FALSE}
+# Compliant test 
+compliant <- patch$Answer.manip_check_target == "\"2\"" & patch$Answer.manip_check_dist == "\"2\"" & patch$Answer.manip_check_foil == "\"2\"" & patch$Answer.name_check_correct == "\"TRUE\""
+patch_compliant <- subset(patch,compliant)
+
+# Number of compliant participants
+print("number of compliant participants")
+print(length(patch_compliant$Answer.item))
+
+patch$odd_one <- patch$Answer.choice=="\"odd_one\""
+patch$twin_1 <- patch$Answer.choice=="\"twin_1\""
+patch$twin_2 <- patch$Answer.choice=="\"twin_2\""
+
+
+
+patch_subset = subset(patch_compliant, patch_compliant$Answer.linguistic_framing_condition == 9)
+word_subset = subset(patch_compliant, patch_compliant$Answer.linguistic_framing_condition == 10)
+
+patch_table <- aggregate(cbind(odd_one,
+                                  twin_1,
+                                  twin_2) ~ 
+                           Answer.linguistic_framing_condition , data=patch_compliant, sum)
+
+# People choosing the odd one out
+points_to_patch = patch_table[1,2] / sum(patch_table[1,2:4])
+
+
+## Demographic processing
+
+patch_compliant$males = patch_compliant$Answer.gender == "\"m\"" | patch_compliant$Answer.gender == "\"male\"" | patch_compliant$Answer.gender == "\"M\"" | patch_compliant$Answer.gender == "\"Male\"" | patch_compliant$Answer.gender == "\"MALE\""
+patch_compliant$females = patch_compliant$Answer.gender == "\"f\"" | patch_compliant$Answer.gender == "\"female\"" | patch_compliant$Answer.gender == "\"F\"" | patch_compliant$Answer.gender == "\"Female\"" | patch_compliant$Answer.gender == "\"FEMALE\""
+
+patch_compliant$twenties =  patch_compliant$Answer.age == "\"20\"" | patch_compliant$Answer.age == "\"21\"" | patch_compliant$Answer.age == "\"22\"" | patch_compliant$Answer.age == "\"23\"" | patch_compliant$Answer.age == "\"24\"" | patch_compliant$Answer.age == "\"25\"" | patch_compliant$Answer.age == "\"26\"" | patch_compliant$Answer.age == "\"27\"" | patch_compliant$Answer.age == "\"28\"" | patch_compliant$Answer.age == "\"29\"" 
+patch_compliant$thirties = patch_compliant$Answer.age == "\"30\"" | patch_compliant$Answer.age == "\"31\"" | patch_compliant$Answer.age == "\"32\"" | patch_compliant$Answer.age == "\"33\"" | patch_compliant$Answer.age == "\"34\"" | patch_compliant$Answer.age == "\"35\"" | patch_compliant$Answer.age == "\"36\"" | patch_compliant$Answer.age == "\"37\"" | patch_compliant$Answer.age == "\"38\"" | patch_compliant$Answer.age == "\"39\"" 
+patch_compliant$fourties = patch_compliant$Answer.age == "\"40\"" | patch_compliant$Answer.age == "\"41\"" | patch_compliant$Answer.age == "\"42\"" | patch_compliant$Answer.age == "\"43\"" | patch_compliant$Answer.age == "\"44\"" | patch_compliant$Answer.age == "\"45\"" | patch_compliant$Answer.age == "\"46\"" | patch_compliant$Answer.age == "\"47\"" | patch_compliant$Answer.age == "\"48\"" | patch_compliant$Answer.age == "\"49\"" 
+patch_compliant$fifties = patch_compliant$Answer.age == "\"50\"" | patch_compliant$Answer.age == "\"51\"" | patch_compliant$Answer.age == "\"52\"" | patch_compliant$Answer.age == "\"53\"" | patch_compliant$Answer.age == "\"54\"" | patch_compliant$Answer.age == "\"55\"" | patch_compliant$Answer.age == "\"56\"" | patch_compliant$Answer.age == "\"57\"" | patch_compliant$Answer.age == "\"58\"" | patch_compliant$Answer.age == "\"59\""
+
+
+#colorblind-friendly color palettes
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+
+```
+
+
+
+
+
+
+```{r}
+# Statistical analysis - (regressions, anova, chi square, factor analysis, etc.)
+
+summary(aov(odd_one ~  Answer.linguistic_framing_condition * Answer.item, data = patch_compliant))
+
+
+summary(glm(odd_one ~  Answer.linguistic_framing_condition + twenties, data = patch_compliant))
+
+
+```
+
+
+
+
+```{r}
+# Visualization - the reason this is after statistical analysis is that some properties of the graphs (e.g. a regression line or confidence intervals) are in themselves statistical analysis computed in the previous section
+
+library(plyr)
+library(reshape2)
+library(ggplot2)
+library(binom)
+library(bootstrap)
+
+
+
+
+
+#statistics for boolean factors; copied from useful.R, with a slightly different mean function to work with the choiceCorrect factor
+l.mean <- function(...){mean(as.logical(...))}
+l.theta <- function(x,xdata,na.rm=T) {l.mean(xdata[x],na.rm=na.rm)}
+l.ci.low <- function(x,na.rm=T) {
+  l.mean(x,na.rm=na.rm) - quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.025,na.rm=na.rm)}
+l.ci.high <- function(x,na.rm=T) {
+  quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.975,na.rm=na.rm) - l.mean(x,na.rm=na.rm)}
+
+
+
+
+# Plot the histogram for the answers given on each item (aggreagating linguistic frame conditions)
+#ms <- aggregate(odd_one ~ Answer.linguistic_framing_condition + Answer.item, data = patch_compliant,l.mean)
+
+#ms$cil <- aggregate(odd_one ~ Answer.linguistic_framing_condition + Answer.item, data = patch_compliant, l.ci.low)$odd_one
+#ms$cih <- aggregate(odd_one ~ Answer.linguistic_framing_condition + Answer.item, data = patch_compliant, l.ci.high)$odd_one
+
+
+
+md <- melt(patch_compliant, measure.vars = c("odd_one","twin_1","twin_2"), variable.name="object", value.name="chosen")
+
+
+ms <- ddply(md, .(object, Answer.item), #Answer.item, 
+            summarise, 
+            c = mean(chosen),
+            n = sum(chosen), 
+            l = length(chosen),
+            sdc = sd(chosen),
+            c.cih = c + l.ci.high(chosen),
+            c.cil = c - l.ci.low(chosen))
+
+
+ms$item <- factor(ms$Answer.item)
+levels(ms$item) <- c("boat","friend", "pizza", "snowman", "sundae", "Christmas tree")
+
+ggplot(ms, aes(x= item, y=c, fill=object)) + 
+  geom_bar(position=position_dodge()) + 
+  geom_linerange(aes(ymin=c.cil,ymax=c.cih), 
+                 position=position_dodge(width=.9)) + 
+  ylab("Probability of choosing") +
+  scale_fill_manual(values=cbPalette)
+
+
+
+# Visualizing the two conditions separately: Show the histogram by item and by condition
+
+ms <- ddply(patch_compliant, .(Answer.linguistic_framing_condition,Answer.item),
+      function(x) {
+        y <- data.frame(choice=c("odd_one","twin_1","twin_2"),
+                        proportion=c(mean(x$odd_one),mean(x$twin_1),mean(x$twin_2)))
+        return(y)
+      })
+
+ms$frame <- factor(ms$Answer.linguistic_framing_condition)
+levels(ms$frame) <- c("patch","word")
+ms$item <- factor(ms$Answer.item)
+
+qplot(item, proportion, fill=choice, facets = . ~ frame, 
+      geom="bar",
+      data=ms)
+
+patch_table <- aggregate(cbind(odd_one,
+                               twin_1,
+                               twin_2) ~ 
+                           Answer.linguistic_framing_condition , data=patch_compliant, sum)
+
+
+
+```
+
+
+
+
+
+Complete Basic info:
+
+May 14th 2014
+
+200 subjects | 3FC | NO familiarization | random out of 6 | Linguistic framing: One 
+word or color patch | Participants asked to count the tshree elements
+scale, level 1
+Code: PATCH
+
+patch_oddone_no_fam_14_may_PATCH.csv
+
+var participant_response_type = 0;
+
+var participant_feature_count = 2; // They count all of the props
+
+var linguistic_framing = random(9,10); // 
+
+var question_type = 0;
+
+var target_filler_sequence = 0;
+
+var familiarization_status = 0;
+
+var stim_index = random(0,5);
+
+var scale_and_level = 8;
+
+var img_size = 200; // needs to be implemented, currently just a placeholder   
+
+var cond = random(1,4);
+
+var file_number_to_use_for_referents = '3'
+
+render("odd_one.Rmd", "pdf_document")
+
+#/Users/andesgomez/Documents/Stanford/Autumn2013-Masters/PayedWork/RMarkdown_files
+#Rscript -e "require(knitr); require(markdown); knit('$odd_one.rmd', '$odd_one.md'); #markdownToHTML('$odd_one.md', '$odd_one.html')"
+
+pandoc -s odd_one.html -o odd_one.html.pdf
+
+
+['sd']: /Users/andesgomez/Documents/Stanford/Autumn2013-Masters/PayedWork/pragmods/cleanPragmods/experiments_in_pictures/odd_one_out_linguisticFraming9.png
