@@ -7,29 +7,198 @@
 \usepackage{pslatex}
 \usepackage{amssymb}
 
-\title{Pragmatics!!}
+\title{\vspace{-10ex}Using rational speech act models of pragmatic reasoning to understand human behavior in reference games}
 
-\twoauthors{ABC}{DEF}
-\twoaffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}
+\fiveauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Alex J. Stiller}{Christopher G. Potts}{Noah D. Goodman}
+\fiveaffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, University of California, San Diego}{Department of Linguistics, Stanford University}{Department of Psychology, Stanford University}
 
-\shorttitle{Learning words via informativeness}
-\rightheader{Learning words via informativeness}
+\shorttitle{Rational speech act models}
+\rightheader{Rational speech act models}
 
 
-\acknowledgements{...
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+
+\acknowledgements{Thanks to Avery Katko, Benjamin Gittleson, Paul Mains for assistance in data collection and design for Experiments XYZ. Generous thanks to Allison Kraus for designing the stimuli used here.  We acknowledge funding from ONR and Merck Family Foundation ...
 
 ~
 
 \noindent Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email: \texttt{mcfrank@stanford.edu}.}
 
 
-\abstract{..}
+\abstract{Human communication is almost always underspecified. Nevertheless, most communication takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation for a listener is reasoning about the speaker's intentions; but a smart speaker will consider what kind of reasoning the listener is going to do and design her message with that in mind. A variety of recent work on formal pragmatics has made use of recursive systems of this type, based on a generalized notion of ``signaling systems.'' Here we show that these systems can be written as special cases of a probabilistic recursive reasoning model, with a small number of choice-points, including the depth of the recursion possible for human communicators and whether they interpret messages greedily. We present experimental data that bear on these decisions.}
 
 \begin{document}
 \maketitle                            
 
 
 \section{Introduction}
+
+
+\section{Models}
+
+We introduce a notation for signaling games and other recursive reasoning problems \cite{golland2010,franke2012,frank2012}. This notation system allows us to define a set of recursive models; we show that a set of recent systems for pragmatic reasoning can be written within this system. As a consequence, they are equivalent to one another modulo three design decisions: 
+
+\begin{enumerate}
+\item The depth of the recursion between speaker and listener,
+\item Whether the recursion starts with speaker or listener,
+\item The decision rule chosen by speaker and listener (soft vs. hard maximization), and 
+\item Whether the model includes a term indicating the prior probability of a referent being talked about.
+\end{enumerate}
+
+\noindent We show equivalences of various special cases of this notation to the systems described in these prior reports.
+
+\section{Formal framework}
+
+A reference game under our definition is a game in which a speaker $S$ and listener $L$ collaborate in a context $C$ to identify a particular object in the context, known as the speaker's intended referent $r_S \in C$. The game has two parts. First the speaker chooses an utterance $w$ based on vocabulary $V$; this process can be as simple as selection from a list or as complex as generation from a grammar. Next the listener guesses a referent $r_L \in C$ after hearing $w$. The game is won if $r_S=r_L$.
+
+There is a ``contextual salience'' distribution $\sigma$ over the objects ${o_1 ... o_n} \in C$, which is mutually known to both speaker and hearer. This distribution picks out those objects in the context which are more or less likely to be talked about, either because of their intrinsic perceptual or conceptual noteworthiness, or because of some prior history between speaker and listener (e.g. one object having been talked about previously). There is also a mutually-known ``extension'' distribution $E$, which assigns uniform probability to each object re
+
+\subsection{The model}
+
+The primary definition of the model is in terms of two functions.The first function, $S(x)$, is the speaker function, which captures the intuition that the speaker chooses the best word to describe a particular object (from those that are available in the vocabulary). $S(x)$ takes an object-word pair from a matrix $X$ and returns the probability of speaking this word, normalized over the other possible words. ($x$ here gives some base probabilities over terms applying to objects.)
+
+\begin{equation}
+S(x_{o,w}) = \frac{x_{o,w}}{\displaystyle \sum_{w' \in V(C)} x_{o,w'}}
+\end{equation}
+
+The second function, $L(x)$, is the listener function, which is a complement to the speaker function; for a particular object word pair, it returns the probability of that object, given the word. 
+% The listener function contains one other constraint, which is that listeners are assumed to consider only true statements. To enforce this constraint, elements are multiplied by $E$, the extension matrix (which is uniform over those objects to which a word refers). 
+
+\begin{equation}
+L(x_{o,w}) = \frac{x_{o,w}}{\displaystyle\sum_{o' \in C} x_{o',w} } %C_{o',w} C_{o,w}
+\end{equation}
+
+We also define variants on these functions. The first variant is greedy listeners and speakers $L^*$ and $S^*$, where
+
+\begin{equation}
+L(x_{o,w}) = 
+\begin{cases}
+1 & \mbox{if } o = \displaystyle \argmax_{o} \frac{x_{o,w} C_{o,w}}{\displaystyle\sum_{o' \in C} x_{o',w} C_{o',w}} \\
+0 & \mbox{otherwise}.
+\end{cases}
+\end{equation}
+
+and $S^*$ is defined similarly. 
+
+Second, we define a Bayesian listener $L_B$ who considers the prior probability $P(o)$ of each object in making a selection. 
+
+\begin{equation}
+L_B(x_{o,w}) = \frac{x_{o,w} C_{o,w} P(o)}{\displaystyle\sum_{o' \in C} x_{o',w} C_{o',w} P(o')}
+\end{equation}
+
+We could also introduce a Bayesian speaker $S_B$ who considers a prior probability over words, but all words were considered equiprobable in our simulations and so we do not pursue this possibility in the current work. (Although they are not referred to this way, this definition highlights that $L$ and $S$ represent a maximum likelihood listener and speaker). 
+
+For convenience, we assume that these functions can be applied over full matrices; hence we can write $L(X)$ to indicate the matrix that is produced by applying $L$ to all the elements of $X$. We can thus write statements like $L(S(C))$ or $L^*(S(L(C)))$ to indicate the recursive application of these functions to a context.\footnote{Note that when applied to matrices, $S(X)$ takes $C^T$ as its input, rather than C.}
+
+
+
+% We also treat the contextual salience distribution $\sigma$ as a special starting point, where we assume that it can be tiled (FIXME) uniformly over words so that we can write $L(\sigma)$ to produce a depth-1 computation that starts from the contextual salience distribution. 
+
+% In previous literature, these functions have been assumed to operate deterministically, by greedily choosing the highest probability word or object, respectively. We notate these greedy versions of the functions by $L^*(\rho)$ and $S^*(\rho)$.
+
+
+
+\section{Equivalences}
+
+The model we describe above has as its special case several previous systems; in what follows we show these equivalences, as they motivate our experiment below.
+
+\subsection{J\"ager (to appear)}
+
+The system described here is a restatement and generalization of the Iterated Best Response model described in J\"aeger's work \cite{jaegerinpress}. That work notates $S(C^T)$ as $\sigma$, and proposes an algorithm in which recursive applications of $L^*$ and $S^*$ are made until $X = L(S(X))$. 
+
+\subsection{Frank \& Goodman (2012)}
+
+In recent work, Frank \& Goodman \cite{frank2012} described a utility-theoretic derivation of a similar framework. They start with the idea that speakers choose messages relative to their utility with respect to the number of bits of information they would send to a simple, truth-functional listener; this formulation reduced to
+
+\begin{equation}
+P(w|r_S,C) = \frac{|w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}},
+\end{equation}
+
+where $|w|$ indicated the number of objects to which $w$ could refer. The associated listener probability was given by Bayesian inference from the speaker's likelihood and a prior term $P(r_S)$:
+
+\begin{equation}
+\label{eq:fg}
+% P(r_S | w, C) \propto P(w | r_S, C) P(r_S).
+P(r_S | w, C) 
+= \frac{P(w | r_S, C) P(r_S)}{\displaystyle \sum_{r' \in C}{P(w | r', C) P(r')}} =
+\frac{\frac{\displaystyle |w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}}P(r_S)}{\displaystyle \sum_{r' \in C}{\frac{|w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}}P(r')}}.
+% \frac{|w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}}
+\end{equation}
+
+Working from our definitions, this formulation is equivalent to $L_B(S(L(C)))$. We can rewrite $L(C_{o,w})$ using the same notation as above, with $|w|$ as the number of objects to which a word refers. This allows us to write 
+
+\begin{eqnarray*}
+% L(C_{o,w}) = \frac{C_{o,w}}{\displaystyle\sum_{o' \in C} C_{o',w}} = |w|^{-1} \\
+S(L(C_{o,w})) &=& \frac{|w|^{-1}}{\displaystyle \sum_{w' \in V(C)} |w|^{-1}} \mbox{, and} \\
+L_B(S(L(C_{w,o}))) &=& \frac{ \frac{\displaystyle |w|^{-1}}{\displaystyle \sum_{w' \in V(C)} |w|^{-1}}P(o)}{\displaystyle\sum_{o' \in C}  \frac{|w|^{-1}}{\displaystyle \sum_{w' \in V(C)} |w|^{-1}}P(o')},
+\end{eqnarray*}
+
+which is equivalent to Equation \ref{eq:fg}.
+
+\subsection{Other work}
+
+Golland, Liang, and Klein \cite{golland2010} describe a similar system based on \cite{jaegerinpress}, in which they call $S(C^T)$ the ``reflex speaker'' and $S(L(C))$ the ``reasoned speaker.'' Benz \cite{benz2005b} describes a game-theoretic system that is similar to $S(L(C))$. 
+
+\subsection{An example}
+
+% \begin{figure}[t]
+%   \begin{center} 
+%     \includegraphics[width=4.5in]{figures/bugs.jpg} 
+%     \caption{\label{fig:ex} An example stimulus for our 3 objects, 3 features experiment. Inferring that ``tail'' referred to C is a depth-0 computation, inferring that ``feet'' referred to A is a depth-1 computation, and inferring that ``horns'' referred to B is a depth-2 computation.} 
+%   \end{center} 
+% \end{figure}
+
+We work through an example computation on the stimulus shown in Figure \ref{fig:ex}, using the J\"ager \cite{jaegerinpress} version of the model described above (for simplicity and finite convergence): $L^*(S^*(L^*(S(C^T))))$. The object by feature matrix $C$ has as its columns the messages ``tail,'' ``horns,'' and ``feet'' and the objects A, B, and C as its rows.:
+
+\begin{equation}
+C= \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 1\\
+      1 & 1 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+The corresponding speaker matrix $S(C^T)$ is inverted, with messages as rows and objects as columns: 
+
+\begin{equation}
+E = \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & .5 & .5\\
+      .5 & .5 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+It is already clear that ``tail'' is true only of object C, thus the interpretation of ``tail'' reaches depth 0. Now we perform a set of renormalizations to lead to the next level of recursion:
+
+\begin{equation}
+L^*(S(C^T)) = \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & .5 & .5\\
+      1 & 0 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+Now, at depth 1, the message ``feet'' is found to refer to object A. A final round of recursion leads to depth 2, where ``horns'' is found to refer to object B:
+
+\begin{equation}
+L^*(S^*(L^*(S(C^T)))) = \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 0\\
+      1 & 0 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+We now say that the model has ``converged''---that is, further iteration will not lead to changes in state.
+
+
 
 \section{Experiment 1: Replication}
 
