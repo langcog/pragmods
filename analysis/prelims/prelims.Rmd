@@ -1,0 +1,292 @@
+---
+title: "Prelims analysis"
+author: "Mike Frank"
+date: "October 16, 2014"
+output: pdf_document
+---
+
+```{r}
+setwd("~/Projects/Pragmatics/pragmods/")
+rm(list=ls())
+source("analysis/helper.R")
+source("~/Projects/R/Ranalysis/useful_dplyr.R")
+```
+
+Dependent Variables
+----
+
+This reads in the huge mess of files with different measures. 
+
+Note that I excluded a number of files in a directory called "unused."
+
+```{r}
+files <- dir("data/prelims/dv/")
+d <- data.frame()
+measures <- c("forced_choice", "betting", "likert")
+
+for (t in measures) {
+  fs <- files[grepl(t, files)]
+  
+  for (f in fs) {
+    d.new <- read.turk(paste("data/prelims/dv/",f, sep=""))
+    d.new$dataset <- f
+    d <- rbind_list(d, d.new)
+    }
+  }
+
+d <- d %>% mutate(response.cond = factor(measures[d$response.cond + 1]))
+```
+
+Counts and exclusions.
+
+```{r}
+d %>% group_by(response.cond) %>%
+  summarise(n=length(workerid))
+
+d %>% group_by(response.cond,item) %>%
+  summarise(n=length(workerid))
+
+
+dc <- d %>% filter(mc.targ == "2", 
+                   mc.dist == "1", 
+                   mc.name == "TRUE")
+
+dc %>% group_by(response.cond) %>%
+  summarise(n=length(workerid))
+```
+
+Note, there is a reversal of the terms "foil" and "distractor" between the likert and the betting conditions here. I've renamed.
+
+```{r}
+d.fc <- dc %>% filter(response.cond == "forced_choice") %>%
+  group_by(item) %>%
+  summarise(pragmatic = mean(choice == "target"),             
+            logical = mean(choice == "logical"),
+            foil = mean(choice == "foil"),
+            pragmatic.cih = ci.high(choice == "target"),
+            pragmatic.cil = ci.low(choice == "target"),
+            logical.cih = ci.high(choice == "logical"),
+            logical.cil = ci.low(choice == "logical"),
+            foil.cih = ci.high(choice == "foil" ),
+            foil.cil = ci.low(choice == "foil"),
+            n = length(workerid), 
+            response.cond = response.cond[1])
+  
+d.likert <- dc %>% filter(response.cond == "likert") %>%
+  group_by(item) %>%
+  summarise(pragmatic = mean(targ.likert/7), 
+            logical = mean(foil.likert)/7, 
+            foil = mean(dist.likert)/7, 
+            pragmatic.cih = ci.high(targ.likert)/7,
+            pragmatic.cil = ci.low(targ.likert)/7,
+            logical.cih = ci.high(foil.likert)/7,
+            logical.cil = ci.low(foil.likert)/7,
+            foil.cih = ci.high(dist.likert)/7,
+            foil.cil = ci.low(dist.likert)/7,
+            n = length(workerid), 
+            response.cond = response.cond[1])
+
+d.bet <- dc %>% filter(response.cond == "betting") %>%
+  group_by(item) %>%
+  summarise(pragmatic = mean(targ.bet)/100, 
+            logical = mean(dist.bet)/100, 
+            foil = mean(foil.bet)/100, 
+            pragmatic.cih = ci.high(targ.bet)/100,
+            pragmatic.cil = ci.low(targ.bet)/100,
+            logical.cih = ci.high(dist.bet)/100,
+            logical.cil = ci.low(dist.bet)/100,
+            foil.cih = ci.high(foil.bet)/100,
+            foil.cil = ci.low(foil.bet)/100,
+            n = length(workerid),
+            response.cond = response.cond[1])
+```
+
+Plot. 
+
+```{r}
+ms <- rbind_list(d.fc, d.likert, d.bet) %>% 
+  gather(measure, value, pragmatic, logical, 
+         foil, pragmatic.cil, logical.cil, 
+         foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
+  mutate(role = ifelse(grepl("cih",measure), "cih", 
+                       ifelse(grepl("cil",measure), "cil", "mean")),
+         measure = str_replace(measure,".ci[lh]","")) %>%
+  spread(role, value)
+
+qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+      ymin=mean - cil, ymax=mean + cih, fill=measure,
+      facets=response.cond~item, 
+  data=ms) 
+```
+
+Exactly the same thing without the items.
+
+
+```{r}
+d.fc <- dc %>% filter(response.cond == "forced_choice") %>%
+  summarise(pragmatic = mean(choice == "target"),             
+            logical = mean(choice == "logical"),
+            foil = mean(choice == "foil"),
+            pragmatic.cih = ci.high(choice == "target"),
+            pragmatic.cil = ci.low(choice == "target"),
+            logical.cih = ci.high(choice == "logical"),
+            logical.cil = ci.low(choice == "logical"),
+            foil.cih = ci.high(choice == "foil" ),
+            foil.cil = ci.low(choice == "foil"),
+            n = length(workerid), 
+            response.cond = response.cond[1])
+  
+d.likert <- dc %>% filter(response.cond == "likert") %>%
+  summarise(pragmatic = mean(targ.likert/7), 
+            logical = mean(foil.likert)/7, 
+            foil = mean(dist.likert)/7, 
+            pragmatic.cih = ci.high(targ.likert)/7,
+            pragmatic.cil = ci.low(targ.likert)/7,
+            logical.cih = ci.high(foil.likert)/7,
+            logical.cil = ci.low(foil.likert)/7,
+            foil.cih = ci.high(dist.likert)/7,
+            foil.cil = ci.low(dist.likert)/7,
+            n = length(workerid), 
+            response.cond = response.cond[1])
+
+d.bet <- dc %>% filter(response.cond == "betting") %>%
+  summarise(pragmatic = mean(targ.bet)/100, 
+            logical = mean(dist.bet)/100, 
+            foil = mean(foil.bet)/100, 
+            pragmatic.cih = ci.high(targ.bet)/100,
+            pragmatic.cil = ci.low(targ.bet)/100,
+            logical.cih = ci.high(dist.bet)/100,
+            logical.cil = ci.low(dist.bet)/100,
+            foil.cih = ci.high(foil.bet)/100,
+            foil.cil = ci.low(foil.bet)/100,
+            n = length(workerid),
+            response.cond = response.cond[1])
+
+ms <- rbind_list(d.fc, d.likert, d.bet) %>% 
+  gather(measure, value, pragmatic, logical, 
+         foil, pragmatic.cil, logical.cil, 
+         foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
+  mutate(role = ifelse(grepl("cih",measure), "cih", 
+                       ifelse(grepl("cil",measure), "cil", "mean")),
+         measure = str_replace(measure,".ci[lh]","")) %>%
+  spread(role, value)
+
+qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+      ymin=mean - cil, ymax=mean + cih, fill=measure,
+      facets=.~response.cond, 
+  data=ms) + 
+  ylim(c(0,1)) + 
+  ylab("Measure mean") + 
+  xlab("Target")
+```
+
+Dependent Variables
+----
+
+Files: 
+
+* forced_choice_no_fam_6random_count_ALLS.csv
+* forced_choice_no_fam_6random_NOcount_ALNC.csv
+
+```{r}
+d1 <- read.turk("data/prelims/mc/forced_choice_no_fam_6random_count_ALLS.csv")
+d2 <- read.turk("data/prelims/mc/forced_choice_no_fam_6random_NOcount_ALNC.csv")
+d1$cond <- "manip check"
+d2$cond <- "no manip check"
+d1$mc.targ <- as.numeric(d1$mc.targ)
+d1$mc.dist <- as.numeric(d1$mc.dist)
+d <- rbind_list(d1,d2)
+```
+
+Counts and exclusions
+
+```{r}
+
+d %>% group_by(cond,item) %>%
+  summarise(n=length(workerid))
+
+dc <- d %>% filter(mc.targ == 2 | mc.targ == -1, 
+                   mc.dist == 1 | mc.dist == -1, 
+                   mc.name == "TRUE")
+
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+```
+
+Lost  10% from the MC condition, and 4.2% from the no MC condition.
+
+Now average and plot with item. 
+
+```{r}
+d.fc <- dc %>% group_by(cond,item) %>%
+  summarise(pragmatic = mean(choice == "target"),             
+            logical = mean(choice == "logical"),
+            foil = mean(choice == "foil"),
+            pragmatic.cih = ci.high(choice == "target"),
+            pragmatic.cil = ci.low(choice == "target"),
+            logical.cih = ci.high(choice == "logical"),
+            logical.cil = ci.low(choice == "logical"),
+            foil.cih = ci.high(choice == "foil" ),
+            foil.cil = ci.low(choice == "foil"),
+            n = length(workerid))
+  
+ms <- d.fc %>%
+  gather(measure, value, pragmatic, logical, 
+         foil, pragmatic.cil, logical.cil, 
+         foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
+  mutate(role = ifelse(grepl("cih",measure), "cih", 
+                       ifelse(grepl("cil",measure), "cil", "mean")),
+         measure = str_replace(measure,".ci[lh]","")) %>%
+  spread(role, value)
+
+qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+      ymin=mean - cil, ymax=mean + cih, fill=measure,
+      facets=cond~item, 
+  data=ms) + 
+  ylim(c(0,1)) + 
+  ylab("Mean") + 
+  xlab("Target")
+```
+
+And without item.
+
+```{r}
+d.fc <- dc %>% group_by(cond) %>%
+  summarise(pragmatic = mean(choice == "target"),             
+            logical = mean(choice == "logical"),
+            foil = mean(choice == "foil"),
+            pragmatic.cih = ci.high(choice == "target"),
+            pragmatic.cil = ci.low(choice == "target"),
+            logical.cih = ci.high(choice == "logical"),
+            logical.cil = ci.low(choice == "logical"),
+            foil.cih = ci.high(choice == "foil" ),
+            foil.cil = ci.low(choice == "foil"),
+            n = length(workerid))
+  
+ms <- d.fc %>%
+  gather(measure, value, pragmatic, logical, 
+         foil, pragmatic.cil, logical.cil, 
+         foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
+  mutate(role = ifelse(grepl("cih",measure), "cih", 
+                       ifelse(grepl("cil",measure), "cil", "mean")),
+         measure = str_replace(measure,".ci[lh]","")) %>%
+  spread(role, value)
+
+qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+      ymin=mean - cil, ymax=mean + cih, fill=measure,
+      facets=.~cond, 
+  data=ms) + 
+  ylim(c(0,1)) + 
+  ylab("Mean") + 
+  xlab("Target")
+```
+
+
+Linguistic Frame
+----
+
+
+
