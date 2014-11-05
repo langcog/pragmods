@@ -1,0 +1,100 @@
+\section{Equivalences}
+
+The model we describe above has as its special case several previous systems; in what follows we show these equivalences, as they motivate our experiment below.
+
+\subsection{J\"ager (to appear)}
+
+The system described here is a restatement and generalization of the Iterated Best Response model described in J\"aeger's work \cite{jaegerinpress}. That work notates $S(C^T)$ as $\sigma$, and proposes an algorithm in which recursive applications of $L^*$ and $S^*$ are made until $X = L(S(X))$. 
+
+\subsection{Frank \& Goodman (2012)}
+
+In recent work, Frank \& Goodman \cite{frank2012} described a utility-theoretic derivation of a similar framework. They start with the idea that speakers choose messages relative to their utility with respect to the number of bits of information they would send to a simple, truth-functional listener; this formulation reduced to
+
+\begin{equation}
+P(w|r_S,C) = \frac{|w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}},
+\end{equation}
+
+where $|w|$ indicated the number of objects to which $w$ could refer. The associated listener probability was given by Bayesian inference from the speaker's likelihood and a prior term $P(r_S)$:
+
+\begin{equation}
+\label{eq:fg}
+% P(r_S | w, C) \propto P(w | r_S, C) P(r_S).
+P(r_S | w, C) 
+= \frac{P(w | r_S, C) P(r_S)}{\displaystyle \sum_{r' \in C}{P(w | r', C) P(r')}} =
+\frac{\frac{\displaystyle |w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}}P(r_S)}{\displaystyle \sum_{r' \in C}{\frac{|w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}}P(r')}}.
+% \frac{|w|^{-1}}{\displaystyle \sum_{w' \in W} {|w'|^{-1}}}
+\end{equation}
+
+Working from our definitions, this formulation is equivalent to $L_B(S(L(C)))$. We can rewrite $L(C_{o,w})$ using the same notation as above, with $|w|$ as the number of objects to which a word refers. This allows us to write 
+
+\begin{eqnarray*}
+% L(C_{o,w}) = \frac{C_{o,w}}{\displaystyle\sum_{o' \in C} C_{o',w}} = |w|^{-1} \\
+S(L(C_{o,w})) &=& \frac{|w|^{-1}}{\displaystyle \sum_{w' \in V(C)} |w|^{-1}} \mbox{, and} \\
+L_B(S(L(C_{w,o}))) &=& \frac{ \frac{\displaystyle |w|^{-1}}{\displaystyle \sum_{w' \in V(C)} |w|^{-1}}P(o)}{\displaystyle\sum_{o' \in C}  \frac{|w|^{-1}}{\displaystyle \sum_{w' \in V(C)} |w|^{-1}}P(o')},
+\end{eqnarray*}
+
+which is equivalent to Equation \ref{eq:fg}.
+
+\subsection{Other work}
+
+Golland, Liang, and Klein \cite{golland2010} describe a similar system based on \cite{jaegerinpress}, in which they call $S(C^T)$ the ``reflex speaker'' and $S(L(C))$ the ``reasoned speaker.'' Benz \cite{benz2005b} describes a game-theoretic system that is similar to $S(L(C))$. 
+
+\subsection{An example}
+
+% \begin{figure}[t]
+%   \begin{center} 
+%     \includegraphics[width=4.5in]{figures/bugs.jpg} 
+%     \caption{\label{fig:ex} An example stimulus for our 3 objects, 3 features experiment. Inferring that ``tail'' referred to C is a depth-0 computation, inferring that ``feet'' referred to A is a depth-1 computation, and inferring that ``horns'' referred to B is a depth-2 computation.} 
+%   \end{center} 
+% \end{figure}
+
+We work through an example computation on the stimulus shown in Figure \ref{fig:ex}, using the J\"ager \cite{jaegerinpress} version of the model described above (for simplicity and finite convergence): $L^*(S^*(L^*(S(C^T))))$. The object by feature matrix $C$ has as its columns the messages ``tail,'' ``horns,'' and ``feet'' and the objects A, B, and C as its rows.:
+
+\begin{equation}
+C= \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 1\\
+      1 & 1 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+The corresponding speaker matrix $S(C^T)$ is inverted, with messages as rows and objects as columns: 
+
+\begin{equation}
+E = \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & .5 & .5\\
+      .5 & .5 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+It is already clear that ``tail'' is true only of object C, thus the interpretation of ``tail'' reaches depth 0. Now we perform a set of renormalizations to lead to the next level of recursion:
+
+\begin{equation}
+L^*(S(C^T)) = \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & .5 & .5\\
+      1 & 0 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+Now, at depth 1, the message ``feet'' is found to refer to object A. A final round of recursion leads to depth 2, where ``horns'' is found to refer to object B:
+
+\begin{equation}
+L^*(S^*(L^*(S(C^T)))) = \left(
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 0\\
+      1 & 0 & 0 
+    \end{array} 
+  \right)
+\end{equation}
+
+We now say that the model has ``converged''---that is, further iteration will not lead to changes in state.
+

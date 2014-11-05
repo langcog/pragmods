@@ -1,0 +1,61 @@
+\section{Models}
+
+We introduce a notation for signaling games and other recursive reasoning problems \cite{golland2010,franke2012,frank2012}. This notation system allows us to define a set of recursive models; we show that a set of recent systems for pragmatic reasoning can be written within this system. As a consequence, they are equivalent to one another modulo three design decisions: 
+
+\begin{enumerate}
+\item The depth of the recursion between speaker and listener,
+\item Whether the recursion starts with speaker or listener,
+\item The decision rule chosen by speaker and listener (soft vs. hard maximization), and 
+\item Whether the model includes a term indicating the prior probability of a referent being talked about.
+\end{enumerate}
+
+\noindent We show equivalences of various special cases of this notation to the systems described in these prior reports.
+
+\section{Formal framework}
+
+A reference game under our definition is a game in which a speaker $S$ and listener $L$ collaborate in a context $C$ to identify a particular object in the context, known as the speaker's intended referent $r_S \in C$. The game has two parts. First the speaker chooses an utterance $w$ based on vocabulary $V$; this process can be as simple as selection from a list or as complex as generation from a grammar. Next the listener guesses a referent $r_L \in C$ after hearing $w$. The game is won if $r_S=r_L$.
+
+There is a ``contextual salience'' distribution $\sigma$ over the objects ${o_1 ... o_n} \in C$, which is mutually known to both speaker and hearer. This distribution picks out those objects in the context which are more or less likely to be talked about, either because of their intrinsic perceptual or conceptual noteworthiness, or because of some prior history between speaker and listener (e.g. one object having been talked about previously). There is also a mutually-known ``extension'' distribution $E$, which assigns uniform probability to each object re
+
+\subsection{The model}
+
+The primary definition of the model is in terms of two functions.The first function, $S(x)$, is the speaker function, which captures the intuition that the speaker chooses the best word to describe a particular object (from those that are available in the vocabulary). $S(x)$ takes an object-word pair from a matrix $X$ and returns the probability of speaking this word, normalized over the other possible words. ($x$ here gives some base probabilities over terms applying to objects.)
+
+\begin{equation}
+S(x_{o,w}) = \frac{x_{o,w}}{\displaystyle \sum_{w' \in V(C)} x_{o,w'}}
+\end{equation}
+
+The second function, $L(x)$, is the listener function, which is a complement to the speaker function; for a particular object word pair, it returns the probability of that object, given the word. 
+% The listener function contains one other constraint, which is that listeners are assumed to consider only true statements. To enforce this constraint, elements are multiplied by $E$, the extension matrix (which is uniform over those objects to which a word refers). 
+
+\begin{equation}
+L(x_{o,w}) = \frac{x_{o,w}}{\displaystyle\sum_{o' \in C} x_{o',w} } %C_{o',w} C_{o,w}
+\end{equation}
+
+We also define variants on these functions. The first variant is greedy listeners and speakers $L^*$ and $S^*$, where
+
+\begin{equation}
+L(x_{o,w}) = 
+\begin{cases}
+1 & \mbox{if } o = \displaystyle \argmax_{o} \frac{x_{o,w} C_{o,w}}{\displaystyle\sum_{o' \in C} x_{o',w} C_{o',w}} \\
+0 & \mbox{otherwise}.
+\end{cases}
+\end{equation}
+
+and $S^*$ is defined similarly. 
+
+Second, we define a Bayesian listener $L_B$ who considers the prior probability $P(o)$ of each object in making a selection. 
+
+\begin{equation}
+L_B(x_{o,w}) = \frac{x_{o,w} C_{o,w} P(o)}{\displaystyle\sum_{o' \in C} x_{o',w} C_{o',w} P(o')}
+\end{equation}
+
+We could also introduce a Bayesian speaker $S_B$ who considers a prior probability over words, but all words were considered equiprobable in our simulations and so we do not pursue this possibility in the current work. (Although they are not referred to this way, this definition highlights that $L$ and $S$ represent a maximum likelihood listener and speaker). 
+
+For convenience, we assume that these functions can be applied over full matrices; hence we can write $L(X)$ to indicate the matrix that is produced by applying $L$ to all the elements of $X$. We can thus write statements like $L(S(C))$ or $L^*(S(L(C)))$ to indicate the recursive application of these functions to a context.\footnote{Note that when applied to matrices, $S(X)$ takes $C^T$ as its input, rather than C.}
+
+
+
+% We also treat the contextual salience distribution $\sigma$ as a special starting point, where we assume that it can be tiled (FIXME) uniformly over words so that we can write $L(\sigma)$ to produce a depth-1 computation that starts from the contextual salience distribution. 
+
+% In previous literature, these functions have been assumed to operate deterministically, by greedily choosing the highest probability word or object, respectively. We notate these greedy versions of the functions by $L^*(\rho)$ and $S^*(\rho)$.
