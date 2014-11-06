@@ -1,0 +1,155 @@
+---
+title: Overspecification--sequence aggregation, level 1
+output: html_document
+---
+
+##Basic information
+Participants: 450
+Dates: ???
+Description of study: Participants encounter a level 1 reference game paradigm. They used any of the three inputs (text entry, checkboxes, virtual keyboard) as outlined in the other experiments. Participants then completed a comprehension task in which they were identified an object based on a one-word description that another Turker had given them. Crucially, they were told that this Turker had just completed the same experiment that they had completed (e.g., text entry, checkbox, or virtual keyboard). This word prompted participants to make a level 1 implicature.
+Hypothesis: Participants may be more successful at making level 1 implicatures if they know that the cost of expression is high. For instance, participants may be more willing to make level 1 implicatures if they know that their interlocutor had to use the same cumbersome keyboard that they used.
+Concerns: Rate of correct responses was around 90% in all conditions, which is significantly higher than the 75% reported in the literature. Why this is the case remains unclear.
+
+---
+##Data preprocessing
+
+Load all csv files.
+
+```{r}
+s4 <- read.csv("~/Documents/CSLI/pragmods_paul/experiments/pragmods_overspec_seq_baseline_lvl1.results.csv")
+s5 <- read.csv("~/Documents/CSLI/pragmods_paul/experiments/pragmods_overspec_seq_checkbox_lvl1.results.csv")
+s6 <- read.csv("~/Documents/CSLI/pragmods_paul/experiments/pragmods_overspec_seq_virtual_lvl1.results.csv")
+```
+
+Then, exclude the relevant cases from each of them:
+
+```{r}
+exclude <- s4$Answer.overspec == "NA"
+s4 <- subset(s4, exclude == FALSE)
+
+exclude <- s5$Answer.name_check_correct == "\"FALSE\"" | s5$Answer.overspec == "NA"
+s5 <- subset(s5, exclude == FALSE)
+
+exclude <- s6$Answer.overspec == "NA"
+s6 <- subset(s6, exclude == FALSE)
+```
+
+Create tables for each dataset:
+
+```{r}
+library(plyr)
+
+overspec4seq <- ddply(s4, .(Answer.features_in_referent_to_describe), summarise,
+                  no = sum(Answer.overspec==0),
+                  yes = sum(Answer.overspec==1),
+                  no.prop = mean(Answer.overspec==0),
+                  yes.prop = mean(Answer.overspec==1),
+                  type = ("text"))
+
+overspec5seq <- ddply(s5, .(Answer.features_in_referent_to_describe), summarise,
+                   no = sum(Answer.overspec==0),
+                   yes = sum(Answer.overspec==1),
+                   no.prop = mean(Answer.overspec==0),
+                   yes.prop = mean(Answer.overspec==1),
+                   type = ("checkbox"))
+
+overspec6seq <- ddply(s6, .(Answer.features_in_referent_to_describe), summarise,
+                  no = sum(Answer.overspec==0),
+                  yes = sum(Answer.overspec==1),
+                  no.prop = mean(Answer.overspec==0),
+                  yes.prop = mean(Answer.overspec==1),
+                  type = ("virtual keyboard"))
+```
+
+Aggregate all of these into a single table:
+
+```{r}
+level1seq <- rbind(overspec4seq, overspec5seq, overspec6seq)
+```
+
+We're also interested if people made the correct inference in the sequence condition. Create tables for each experiment:
+
+```{r}
+targetcorrect4 <- ddply(s4, .(Answer.overspec), summarise,
+                        no.prop = mean(Answer.targetcorrect==0),
+                        yes.prop = mean(Answer.targetcorrect==1),
+                        type = ("text"))
+
+targetcorrect5 <- ddply(s5, .(Answer.overspec), summarise,
+                        no.prop = mean(Answer.targetcorrect==0),
+                        yes.prop = mean(Answer.targetcorrect==1),
+                        type = ("checkbox"))
+
+targetcorrect6 <- ddply(s6, .(Answer.overspec), summarise,
+                        no.prop = mean(Answer.targetcorrect==0),
+                        yes.prop = mean(Answer.targetcorrect==1),
+                        type = ("virtual keyboard"))
+```
+
+And combine these:
+
+```{r}
+targetcorrectlvl1 <- rbind(targetcorrect4, targetcorrect5, targetcorrect6)
+```
+
+The above table shows us the percent of correct inferences based on whether or not participants overspecified. The next table will show this by input type:
+
+```{r}
+level1target <- ddply(targetcorrectlvl1, .(type), summarise,
+                      correct=mean(yes.prop))
+```
+
+---
+##Statistical Analyses
+
+Add error bars to the data on the percent of correct inferences:
+
+```{r}
+library(bootstrap)
+#statistics for boolean factors; copied from useful.R, with a slightly different mean function to work with the choiceCorrect factor
+l.mean <- function(...){mean(as.logical(...))}
+l.theta <- function(x,xdata,na.rm=T) {l.mean(xdata[x],na.rm=na.rm)}
+l.ci.low <- function(x,na.rm=T) {
+  l.mean(x,na.rm=na.rm) - quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.025,na.rm=na.rm)}
+l.ci.high <- function(x,na.rm=T) {
+  quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.975,na.rm=na.rm) - l.mean(x,na.rm=na.rm)}
+
+s4cms <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s4, l.mean)
+s4cms$cil <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s4, l.ci.low)$Answer.targetcorrect
+s4cms$cih <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s4, l.ci.high)$Answer.targetcorrect
+
+s5cms <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s5, l.mean)
+s5cms$cil <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s5, l.ci.low)$Answer.targetcorrect
+s5cms$cih <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s5, l.ci.high)$Answer.targetcorrect
+
+s6cms <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s6, l.mean)
+s6cms$cil <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s6, l.ci.low)$Answer.targetcorrect
+s6cms$cih <- aggregate(Answer.targetcorrect ~ Answer.overspec + Experiment.type, data = s6, l.ci.high)$Answer.targetcorrect
+```
+
+```{r}
+seqcms <- rbind(s4cms, s5cms, s6cms)
+```
+
+---
+##Visualization
+Convert the data (with error bars) into a bar graph:
+
+```{r}
+library(ggplot2)
+labelx = c("No", "Yes")
+
+qplot(factor(Answer.overspec),
+       Answer.targetcorrect,
+       data=seqcms,
+       geom="bar",
+       stat="identity",
+       position="dodge",
+       fill=factor(Experiment.type),
+       xlab="Overspecification",
+       ylab="Proportion of Correct Responses") +
+       geom_errorbar(aes(ymin=Answer.targetcorrect - cil, ymax = Answer.targetcorrect + cih), width=0.2, position=position_dodge(width=.9)) +
+       ylim(c(0,1)) +
+       scale_fill_discrete(name="Experiment Type") +
+       scale_x_discrete(labels=labelx)
+```

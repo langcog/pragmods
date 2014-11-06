@@ -1,0 +1,131 @@
+---
+title: "Prior analysis"
+author: "Mike Frank"
+date: "November 5, 2014"
+output: pdf_document
+---
+  
+```{r}
+setwd("~/Projects/Pragmatics/pragmods/")
+rm(list=ls())
+source("analysis/helper.R")
+source("~/Projects/R/Ranalysis/useful_dplyr.R")
+```
+
+Base rate manipulation
+-----
+
+Files:
+
+* scale_6stimuli_yes_fam_oneword_25_february_FAMO.csv
+* scale_6stimuli_yes_fam_oneword_25_february_FAMO2.csv
+* scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv
+
+
+```{r}
+d1 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.csv")
+d2 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.csv")
+d1$cond <- "inference"
+d2$cond <- "inference"
+
+d3 <-  read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv")
+d3$cond <- "prior"
+
+d <- rbind_list(d1,d2,d3) 
+
+d <- d %>% mutate(baserate = c(1/9,3/9,5/9,7/9)[familiarization + 1])
+```
+
+Counts and exclusions. Note that MANY workers in this experiment misinterpreted and counted the familiarization stimuli, so there are a LOT of exclusions (28.5%)
+
+```{r}
+d %>% group_by(cond, baserate) %>%
+  summarise(n=length(workerid))
+
+dc <- d %>% filter(as.numeric(mc.targ) == 2,
+                   as.numeric(mc.dist) == 1,
+                   mc.name == "TRUE")
+
+dc %>% group_by(cond,baserate) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now get averages and CIs.
+
+```{r}
+ms <- dc %>% 
+  group_by(cond, baserate) %>%
+  summarise(correct = mean(choice == "target"),             
+            cih = ci.high(choice == "target"),
+            cil = ci.low(choice == "target"))
+
+qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
+      ymin=correct - cil, ymax=correct + cih, col=factor(cond),
+      data=ms) + 
+  ylim(c(0,1)) + 
+  xlim(c(0,1)) +
+  ylab("Proportion correct") + 
+  xlab("Base rate of target")
+```
+
+Linguistic Manipulation
+----
+
+Files:
+
+* forced_choice_no_fam_6random_count_ALLS.csv
+* forced_choice_no_fam_6random_NOcount_ALNC.csv
+* forced_choice_no_fam_4random_count_12_january_least_LEAS.csv
+
+```{r}
+d1 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.csv")
+d2 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.csv")
+d1$cond <- "inference"
+d2$cond <- "inference"
+
+d3 <-  read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv")
+d3$cond <- "prior"
+
+d <- rbind_list(d1,d2,d3) 
+```
+
+Counts and exclusions. Note that MANY workers in this experiment misinterpreted and counted the familiarization stimuli, so there are a LOT of exclusions (28.5%)
+
+```{r}
+d %>% group_by(cond, baserate) %>%
+  summarise(n=length(workerid))
+
+dc <- d %>% filter(as.numeric(mc.targ) == 2,
+                   as.numeric(mc.dist) == 1,
+                   mc.name == "TRUE")
+
+dc %>% group_by(cond,baserate) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now get averages and CIs.
+
+```{r}
+ms <- dc %>% 
+  group_by(cond, baserate) %>%
+  summarise(correct = mean(choice == "target"),             
+            cih = ci.high(choice == "target"),
+            cil = ci.low(choice == "target"))
+
+qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
+      ymin=correct - cil, ymax=correct + cih, col=factor(cond),
+      data=ms) + 
+  ylim(c(0,1)) + 
+  xlim(c(0,1)) +
+  ylab("Proportion correct") + 
+  xlab("Base rate of target")
+```
+
+
+
