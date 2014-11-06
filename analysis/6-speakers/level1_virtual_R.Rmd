@@ -1,0 +1,84 @@
+---
+title: Overspecification: level 1, virtual keyboard entry
+output: html_document
+---
+
+##Basic information
+Participants: 150
+Dates: ???
+Description of study: Participants encounter a level 1 reference game paradigm. They are asked to describe any of the three possible referents by clicking on keys using an on-screen virtual keyboard (from http://mottie.github.io/Keyboard/basic.html).
+Hypothesis: The virtual keyboard is cumbersome and time-consuming; thus, the cost of expression is fairly high. Participants should overspecify less than in the other conditions.
+
+---
+
+##Data preprocessing
+
+Open csv file.
+
+```{r}
+d3 <- read.csv("~/Documents/CSLI/pragmods_paul/experiments/pragmods_overspec_virtual.results.csv")
+```
+
+Exclude participants who answered incorrectly and those who failed the name check.
+
+```{r}
+exclude <- d3$Answer.name_check_correct == "\"FALSE\"" | d3$Answer.overspec == "NA"
+d3 <- subset(d3, exclude == FALSE)
+```
+
+Aggregate the data into a table that shows instances of overspecification by condition.
+
+```{r}
+library(plyr)
+overspec3 <- ddply(d3, .(Answer.features_in_referent_to_describe), summarise,
+                   no = sum(Answer.overspec==0),
+                   yes = sum(Answer.overspec==1),
+                   no.prop = mean(Answer.overspec==0),
+                   yes.prop = mean(Answer.overspec==1))
+```
+
+---
+##Statistical Analyses
+
+Add error bars to graphs:
+
+```{r}
+#statistics for boolean factors; copied from useful.R, with a slightly different mean function to work with the choiceCorrect factor
+library(bootstrap)
+l.mean <- function(...){mean(as.logical(...))}
+l.theta <- function(x,xdata,na.rm=T) {l.mean(xdata[x],na.rm=na.rm)}
+l.ci.low <- function(x,na.rm=T) {
+  l.mean(x,na.rm=na.rm) - quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.025,na.rm=na.rm)}
+l.ci.high <- function(x,na.rm=T) {
+  quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.975,na.rm=na.rm) - l.mean(x,na.rm=na.rm)}
+
+d3ms <- aggregate(Answer.overspec ~ Answer.features_in_referent_to_describe + Experiment.type, data = d3, l.mean)
+d3ms$cil <- aggregate(Answer.overspec ~ Answer.features_in_referent_to_describe + Experiment.type, data = d3, l.ci.low)$Answer.overspec
+d3ms$cih <- aggregate(Answer.overspec ~ Answer.features_in_referent_to_describe + Experiment.type, data = d3, l.ci.high)$Answer.overspec
+```
+
+Run a chi-squared test:
+
+```{r}
+chisq.test(overspec3[,c("no","yes")]) 
+#    X-squared = 27.1589, df = 2, p-value = 1.266e-06
+```
+
+##Visualization
+Convert the data (with error bars) into a bar graph:
+
+```{r}
+library(ggplot2)
+qplot(Answer.features_in_referent_to_describe,
+      Answer.overspec,
+      data=d3ms,
+      geom="bar",
+      stat="identity",
+      position="dodge",
+      fill="red",
+      xlab="Features in Referent",
+      ylab="Proportion of Overspecification") +
+      geom_errorbar(aes(ymin=Answer.overspec - cil, ymax = Answer.overspec + cih), width = 0.2) +
+      ylim(c(0,1)) +
+      theme(legend.position="none")
+```
