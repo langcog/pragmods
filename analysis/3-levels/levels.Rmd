@@ -9,19 +9,15 @@ output: pdf_document
 setwd("~/Projects/Pragmatics/pragmods/")
 rm(list=ls())
 source("analysis/helper.R")
-source("~/Projects/R/Ranalysis/useful_dplyr.R")
+source("analysis/useful_dplyr.R")
 ```
 
-Dependent Variables
+Level of recursion
 ----
   
-  This reads in the huge mess of files with different measures. 
-
-Note that I excluded a number of files in a directory called "unused."
-
 ```{r}
-d1 <- read.turk("data/levels/scale_plus_6stimuli_3levels_no_fam_24_january_SCAL.csv")
-d2 <- read.turk("data/levels/scales_6stimuli_3levels_no_fam_25_january_OSCA.csv")
+d1 <- read.turk("data/3-levels/levels/scale_plus_6stimuli_3levels_no_fam_24_january_SCAL.csv")
+d2 <- read.turk("data/3-levels/levels/scales_6stimuli_3levels_no_fam_25_january_OSCA.csv")
 d1$cond <- "complex"
 d2$cond <- "simple"
 d1 <- d1 %>% rename(level = scale_and_levels_condition) %>% mutate(level = level -2)
@@ -67,9 +63,127 @@ ms <- dc %>%
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
+ms$cond <- factor(ms$cond, levels=c("simple","complex"))
+ms$level <- factor(ms$level)
+
+pdf("plots/3-levels-levels.pdf",width=6, height=3.5)
 qplot(level, correct, geom=c("bar","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, fill=factor(level),
       facets=.~cond, 
       data=ms) 
+dev.off()
 ```
+
+"Twins" displays
+----
+  
+Files:
+
+* mistake: used favorite "scaleweird_6stimuli_no_fam_favorite_19_february_WERF.csv"
+* scaleweird_6stimuli_no_fam_oneword_19_february_WERD.csv
+  
+```{r}
+d <- read.turk("data/3-levels/twins/scaleweird_6stimuli_no_fam_oneword_19_february_WERD.csv")
+d <- d %>% rename(cond = scale_and_levels_condition) %>% 
+  mutate(cond = factor(c("twin feature","uniform feature")[cond - 5]))
+```
+
+Counts and exclusions.
+
+```{r}
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid), 
+            mc.targ = mean(as.numeric(mc.targ, na.rm=TRUE)),
+            mc.dist = mean(as.numeric(mc.dist, na.rm=TRUE)))
+
+mcs <- data.frame(cond = c("twin feature","uniform feature"), 
+                  mc.targ.ans = c(2, 3),
+                  mc.dist.ans = c(1, 1))
+
+d <- left_join(d, mcs)
+
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc <- d %>% filter(is.na(mc.targ.ans) | as.numeric(mc.targ) == mc.targ.ans,
+                   as.numeric(mc.dist) == mc.dist.ans,
+                   mc.name == "TRUE")
+
+dc %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now get averages and CIs.
+
+```{r}
+ms <- dc %>% 
+  group_by(cond) %>%
+  summarise(correct = mean(choice == "twin"),             
+            cih = ci.high(choice == "twin"),
+            cil = ci.low(choice == "twin"))
+
+pdf("plots/3-levels-twins.pdf",width=4.5, height=3.5)
+qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
+      ymin=correct - cil, ymax=correct + cih, fill=cond,
+      data=ms) + 
+  ylab("Proportion choosing either twin face") + 
+  xlab("Target feature")
+dev.off()
+```
+
+
+"Odd man" displays
+----
+  
+Files:
+
+* patch_oddone_no_fam_14_may_PATCH.csv
+  
+```{r}
+d <- read.turk("data/3-levels/oddman/patch_oddone_no_fam_14_may_PATCH.csv")
+d <- d %>% rename(cond = ling.cond) %>% 
+  mutate(cond = factor(c("patch","word")[cond - 8]))
+```
+
+Counts and exclusions.
+
+```{r}
+dc <- d %>% filter(as.numeric(mc.targ) == 2,
+                   as.numeric(mc.dist) == 2,
+                   mc.name == "TRUE")
+
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now get averages and CIs.
+
+```{r}
+ms <- dc %>% 
+  group_by(cond) %>%
+  summarise(correct = mean(choice == "odd_one"),             
+            cih = ci.high(choice == "odd_one"),
+            cil = ci.low(choice == "odd_one"))
+
+pdf("plots/3-levels-oddman.pdf",width=4.5, height=3.5)
+qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
+      ymin=correct - cil, ymax=correct + cih, fill=cond,
+      data=ms) + 
+  ylab("Proportion choosing non-literal interpretation") + 
+  xlab("Target feature") + 
+  ylim(c(0,1))
+dev.off()
+```
+
+
+
 

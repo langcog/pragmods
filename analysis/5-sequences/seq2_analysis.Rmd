@@ -1,0 +1,188 @@
+---
+title: "seq2_analysis"
+author: "Avery Katko"
+date: "August 7, 2014"
+output: html_document
+---
+
+```{r}
+rm(list=ls())
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(bootstrap)
+#source("useful.R")
+setwd("~/github/local/ibr_pragmods")
+#source("tests.R")
+setwd("~/github/local/pragmods")
+d <- read.csv("seq_data/pragmods_seq2.anondata.csv")
+#head(d)
+```
+
+Exclude participants that either failed manipulation check or were rejected.
+
+```{r}
+exclude <- d$assignmentstatus == "Rejected" |
+  d$Answer.name_check_correct == "\"FALSE\""
+sum(exclude)
+mean(exclude)
+
+d <- subset(d, exclude == FALSE)
+
+d$Answer.choice_correct_1 <- factor(as.logical(d$Answer.choice_correct_1))
+d$Answer.choice_correct_2 <- factor(as.logical(d$Answer.choice_correct_2))
+d$Answer.choice_correct_3 <- factor(as.logical(d$Answer.choice_correct_3))
+```
+
+Restructure data to have trial variable. (working around mturk data submission limitations; can't safely submit arrays, so we have to use separate variables for each trial)
+
+```{r}
+d$level_1 <- factor(ifelse(d$Answer.sequence_condition == "\"0w1w2w\"",0,2))
+d$level_2 <- factor(rep(1,nrow(d)))
+d$level_3 <- factor(ifelse(d$Answer.sequence_condition == "\"0w1w2w\"",2,0))
+
+trial.df <- function(tn){
+  df <- data.frame(id = d$workerid,
+                   seqCond = d$Answer.sequence_condition,
+                   trial = factor(rep(tn,nrow(d))),
+                   level = d[sprintf("level_%d",tn)],
+                   item = d[sprintf("Answer.item_%d",tn)],
+                   targetProp = d[sprintf("Answer.target_prop_%d",tn)],
+                   distractorProp = d[sprintf("Answer.distractor_prop_%d",tn)],
+                   targetPosition = d[sprintf("Answer.target_position_%d",tn)],
+                   distractorPosition = d[sprintf("Answer.distractor_position_%d",tn)],
+                   choice = d[sprintf("Answer.choice_%d",tn)],
+                   choiceCorrect = d[sprintf("Answer.choice_correct_%d",tn)])
+  names(df) <- c("id","seqCond","trial","level","item","targetProp","distractorProp",
+                 "targetPosition","distractorPosition","choice","choiceCorrect")
+  return(df)
+}
+
+d2 <- rbind(trial.df(1),trial.df(2),trial.df(3))
+d2$level <- ordered(d2$level, levels = c("0","1","2"))
+summary(d2)
+```
+
+```{r}
+#statistics for boolean factors; copied from useful.R, with a slightly different mean function to work with the choiceCorrect factor
+l.mean <- function(...){mean(as.logical(...))}
+l.theta <- function(x,xdata,na.rm=T) {l.mean(xdata[x],na.rm=na.rm)}
+l.ci.low <- function(x,na.rm=T) {
+  l.mean(x,na.rm=na.rm) - quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.025,na.rm=na.rm)}
+l.ci.high <- function(x,na.rm=T) {
+  quantile(bootstrap(1:length(x),1000,l.theta,x,na.rm=na.rm)$thetastar,.975,na.rm=na.rm) - l.mean(x,na.rm=na.rm)}
+
+ms <- aggregate(choiceCorrect ~ seqCond + trial + level,data = d2,l.mean)
+ms$cil <- aggregate(choiceCorrect ~ seqCond + trial + level, data = d2, l.ci.low)$choiceCorrect
+ms$cih <- aggregate(choiceCorrect ~ seqCond + trial + level, data = d2, l.ci.high)$choiceCorrect
+
+#colorblind-friendly color palettes
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+```
+
+Compare performance on trials, in chronological order; facet by ordering condition.
+
+```{r}
+ggplot(data = ms, aes(x = trial, y = choiceCorrect, fill = level)) +
+  geom_bar(stat = "identity", color = "black") +
+  geom_errorbar(aes(ymin = choiceCorrect - cil, ymax = choiceCorrect + cih), width = 0.2) +
+  facet_grid(. ~ seqCond) + 
+  theme_bw() +
+  scale_fill_manual(values=cbPalette)
+```
+
+Compare performance in each condition for each inference level
+
+```{r}
+ggplot(data = ms, aes(x = seqCond, y = choiceCorrect, fill = seqCond)) +
+  geom_bar(stat = "identity", color = "black") +
+  geom_errorbar(aes(ymin = choiceCorrect - cil, ymax = choiceCorrect + cih), width = 0.2) +
+  facet_grid(. ~ level) +
+  theme_bw() +
+  scale_fill_manual(values=cbPalette)
+```
+
+```{r}
+setwd("~/github/local/ibr_pragmods")
+source("tests.R")
+
+LS(linear)
+LSLS(linear)
+
+# four models
+# 1. don't update matrix
+# 2. don't reuse word
+# 3. don't reuse object
+# 4. don't reuse either
+
+#NOTE: just changed all as.numeric parts to remove +1's
+
+max.col <- function(row){
+  max.idx = 1
+  for(i in 1:ncol(row)){
+    if(row[i] > row[max.idx]){
+      max.idx = i
+    }
+  }
+  return(max.idx)
+}
+target.idx <- function(l){ # return col.# w/ target ref for level l
+  return(c(3,1,2)[as.numeric(l)])
+}
+choice.idx <- function(choice,level) # return col# w/ chosen ref
+{
+  tbl = data.frame(target=c(0,1,2),logical=c(1,2,0),foil=c(2,0,1))
+  return(target.idx(tbl[as.numeric(level),choice]+1))
+}
+
+response.probs <- data.frame()
+for (p in d2$id) {
+  target.mat <- linear
+  eref.mat <- linear
+  lex.mat <- linear
+  never.same.mat <- linear
+  #eboth.mat <- linear
+  particip.data <- subset(d2,id==p)
+  for (tn in 1:3) {
+    cur.df <- subset(particip.data,trial==tn)
+    word.row <- c(1,2,3)[as.numeric(cur.df$level)]
+    target.col <- target.idx(cur.df$level) # c(3,1,2)[cur.df$level+1]
+    choice.col <- choice.idx(cur.df$choice,cur.df$level)
+    response.probs <- rbind.fill(response.probs,
+                                 data.frame(particip=p,
+                                            trial=tn,
+                                            condition=cur.df$seqCond,
+                                            level=cur.df$level,
+                                            human.choice=cur.df$choice,
+                                            rp.target.L0=L0(target.mat)[word.row,target.col],
+                                            rp.target.LS=LS(target.mat)[word.row,target.col],
+                                            
+                                            rp.eref.target=L0(eref.mat)[word.row,target.col],
+                                            rp.lex.target=L0(lex.mat)[word.row,target.col],
+                                            rp.never.same.target=L0(never.same.mat)[word.row,target.col],
+                                            rp.choice.L0=L0(target.mat)[word.row,choice.col],
+                                            rp.choice.LS=LS(target.mat)[word.row,choice.col],
+                                            
+                                            rp.eref.choice=L0(eref.mat)[word.row,choice.col],
+                                            rp.lex.choice=L0(lex.mat)[word.row,choice.col],
+                                            rp.never.same.choice=L0(never.same.mat)[word.row,choice.col]
+                                            #more...
+                                            ))
+
+    # evolve matrix according to some rule
+    eref.mat[choice.idx(cur.df$choice,cur.df$level),] <- 0 # don't reuse referent
+    
+    # lexicalize word as referring to chosen ref
+    lex.mat[,word.row] <- 0
+    lex.mat[cur.df$choice,word.row] <- 1
+    
+    # don't reuse word-referent pair
+    never.same.mat[cur.df$choice,word.row] <- 0
+    
+    #pe.word.mat[target[blah],] <- ... # don't reuse word
+    #pe.both.mat[...] <- ... # don't reuse either
+  }# for tn
+}# for p
+
+```

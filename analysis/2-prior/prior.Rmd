@@ -9,7 +9,7 @@ output: pdf_document
 setwd("~/Projects/Pragmatics/pragmods/")
 rm(list=ls())
 source("analysis/helper.R")
-source("~/Projects/R/Ranalysis/useful_dplyr.R")
+source("analysis/useful_dplyr.R")
 ```
 
 Base rate manipulation
@@ -49,6 +49,13 @@ dc <- d %>% filter(as.numeric(mc.targ) == 2,
 dc %>% group_by(cond,baserate) %>%
   summarise(n=length(workerid))
 
+
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
 d %>% summarise(n=length(workerid))
 dc %>% summarise(n=length(workerid))
 ```
@@ -57,18 +64,21 @@ Now get averages and CIs.
 
 ```{r}
 ms <- dc %>% 
+  mutate(cond = factor(cond)) %>%
   group_by(cond, baserate) %>%
   summarise(correct = mean(choice == "target"),             
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
+pdf("plots/2-prior-baserates.pdf", width=6, height=3.5)
 qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
-      ymin=correct - cil, ymax=correct + cih, col=factor(cond),
+      ymin=correct - cil, ymax=correct + cih, col=cond,
       data=ms) + 
   ylim(c(0,1)) + 
   xlim(c(0,1)) +
   ylab("Proportion correct") + 
   xlab("Base rate of target")
+dev.off()
 ```
 
 Linguistic Manipulation
@@ -76,33 +86,31 @@ Linguistic Manipulation
 
 Files:
 
-* forced_choice_no_fam_6random_count_ALLS.csv
-* forced_choice_no_fam_6random_NOcount_ALNC.csv
-* forced_choice_no_fam_4random_count_12_january_least_LEAS.csv
+* favorite = forced_choice_no_fam_6random_count_ALLS.csv
+* least favorite = forced_choice_no_fam_4random_count_12_january_least_LEAS.csv
+* prior for these = scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv
 
 ```{r}
-d1 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.csv")
-d2 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.csv")
-d1$cond <- "inference"
-d2$cond <- "inference"
-
-d3 <-  read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv")
-d3$cond <- "prior"
+d1 <- read.turk("data/2-prior/language/forced_choice_no_fam_6random_count_16_december_ALLS.csv")
+d2 <- read.turk("data/2-prior/language/forced_choice_no_fam_4random_count_12_january_least_LEAS.csv")
+d3 <- read.turk("data/2-prior/language/scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv")
 
 d <- rbind_list(d1,d2,d3) 
+d$cond <- factor(d$ling.cond)
+levels(d$cond) <- c("favorite","least favorite","favorite prior","least favorite prior")
 ```
 
 Counts and exclusions. Note that MANY workers in this experiment misinterpreted and counted the familiarization stimuli, so there are a LOT of exclusions (28.5%)
 
 ```{r}
-d %>% group_by(cond, baserate) %>%
-  summarise(n=length(workerid))
-
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 1,
                    mc.name == "TRUE")
 
-dc %>% group_by(cond,baserate) %>%
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(cond) %>%
   summarise(n=length(workerid))
 
 d %>% summarise(n=length(workerid))
@@ -113,16 +121,15 @@ Now get averages and CIs.
 
 ```{r}
 ms <- dc %>% 
-  group_by(cond, baserate) %>%
+  group_by(cond) %>%
   summarise(correct = mean(choice == "target"),             
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
-      ymin=correct - cil, ymax=correct + cih, col=factor(cond),
+qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
+      ymin=correct - cil, ymax=correct + cih, fill=factor(cond),
       data=ms) + 
   ylim(c(0,1)) + 
-  xlim(c(0,1)) +
   ylab("Proportion correct") + 
   xlab("Base rate of target")
 ```
