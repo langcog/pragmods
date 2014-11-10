@@ -9,8 +9,40 @@ output: pdf_document
 setwd("~/Projects/Pragmatics/pragmods/")
 rm(list=ls())
 source("analysis/helper.R")
-source("~/Projects/R/Ranalysis/useful_dplyr.R")
+source("analysis/useful_dplyr.R")
 ```
+
+Preliminary CI analysis
+---
+
+```{r}
+ms <- seq(.1,.9,.1)
+ns <- c(10,20,50,100)
+
+n.samps <- 10000
+d <- data.frame()
+
+for (m in ms) {
+  for (n in ns) {
+    d <- rbind_list(d, 
+                   data.frame(m = m,                            
+                              n = n,
+                              p = rbinom(n.samps, n, m)))  
+    }
+  }
+  
+ms <- d %>% 
+  group_by(m,n) %>%
+  summarise(em = mean(p/n),
+            ymin = quantile(p/n, .025),
+            ymax = quantile(p/n, .975))
+
+qplot(x=m, y=em, ymin=ymin, ymax=ymax, col=factor(n), 
+      position=position_dodge(.03), group=factor(n),
+      geom=c("line","linerange"), data=ms) + facet_wrap(~n)
+```
+  
+  
 
 Dependent Variables
 ----
@@ -20,7 +52,7 @@ This reads in the huge mess of files with different measures.
 Note that I excluded a number of files in a directory called "unused."
 
 ```{r}
-files <- dir("data/prelims/dv/")
+files <- dir("data/1-prelims/dv/")
 d <- data.frame()
 measures <- c("forced_choice", "betting", "likert")
 
@@ -28,7 +60,7 @@ for (t in measures) {
   fs <- files[grepl(t, files)]
   
   for (f in fs) {
-    d.new <- read.turk(paste("data/prelims/dv/",f, sep=""))
+    d.new <- read.turk(paste("data/1-prelims/dv/",f, sep=""))
     d.new$dataset <- f
     d <- rbind_list(d, d.new)
     }
@@ -53,6 +85,9 @@ dc <- d %>% filter(mc.targ == "2",
 
 dc %>% group_by(response.cond) %>%
   summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
 ```
 
 Note, there is a reversal of the terms "foil" and "distractor" between the likert and the betting conditions here. I've renamed.
@@ -171,13 +206,15 @@ ms <- rbind_list(d.fc, d.likert, d.bet) %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
+pdf("plots/1-prelims-dv.pdf", width=8, height=3.5)
 qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~response.cond, 
   data=ms) + 
   ylim(c(0,1)) + 
-  ylab("Measure mean") + 
+  ylab("Normalized measure mean") + 
   xlab("Target")
+dev.off()
 ```
 
 Dependent Variables
@@ -189,8 +226,8 @@ Files:
 * forced_choice_no_fam_6random_NOcount_ALNC.csv
 
 ```{r}
-d1 <- read.turk("data/prelims/mc/forced_choice_no_fam_6random_count_ALLS.csv")
-d2 <- read.turk("data/prelims/mc/forced_choice_no_fam_6random_NOcount_ALNC.csv")
+d1 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_count_ALLS.csv")
+d2 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_NOcount_ALNC.csv")
 d1$cond <- "manip check"
 d2$cond <- "no manip check"
 d1$mc.targ <- as.numeric(d1$mc.targ)
@@ -214,6 +251,9 @@ d %>% group_by(cond) %>%
 
 dc %>% group_by(cond) %>%
   summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
 ```
 
 Lost  10% from the MC condition, and 4.2% from the no MC condition.
@@ -275,6 +315,7 @@ ms <- d.fc %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
+pdf("plots/1-prelims-manip.pdf", width=6, height=3)
 qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~cond, 
@@ -282,6 +323,7 @@ qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
   ylim(c(0,1)) + 
   ylab("Mean") + 
   xlab("Target")
+dev.off()
 ```
 
 

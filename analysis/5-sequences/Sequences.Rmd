@@ -1,0 +1,175 @@
+---
+title: "Sequences Analysis"
+author: "Avery Katko & Mike Frank"
+date: "August 12, 2014"
+output: pdf_document
+---
+
+Sequential effects
+----
+
+```{r}
+setwd("~/Projects/Pragmatics/pragmods/")
+rm(list=ls())
+source("analysis/helper.R")
+source("analysis/useful_dplyr.R")
+```
+
+Read data.
+
+```{r}
+d.seq <- read.turk("data/5-sequences/pragmods_seq.anondata.csv")
+d.wx3 <- read.turk("data/5-sequences/pragmods_wx3.anondata.csv")
+d.bx3 <- read.turk("data/5-sequences/pragmods_bx3.anondata.csv")
+d.seq2 <- read.turk("data/5-sequences/pragmods_seq2.anondata.csv")
+d.L2second <- read.turk("data/5-sequences/pragmods_L2second.anondata.tsv")
+
+d <- rbind_list(d.seq, d.wx3, d.bx3, d.seq2, d.L2second)
+```
+
+Counts and exclusions. Note that this experiment has no manipulation check (Must check whether it has a manipulation check at all!). 
+
+```{r}
+dc <- d %>% filter(mc.name == "TRUE")
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Restructure data to have trial and level variables. (working around mturk data submission limitations; can't safely submit arrays, so we have to use separate variables for each trial)
+
+```{r}
+d.seq$level_1 <- factor(ifelse(d.seq$sequence_condition == "1w0w1b",1,0))
+d.seq$level_2 <- factor(ifelse(d.seq$sequence_condition == "1w0w1b",0,1))
+d.seq$level_3 <- factor(rep(1,nrow(d.seq)))
+
+d.wx3$level_1 <- factor(rep(0,nrow(d.wx3)))
+d.wx3$level_2 <- factor(rep(1,nrow(d.wx3)))
+d.wx3$level_3 <- factor(rep(0,nrow(d.wx3)))
+d.wx3$level_4 <- factor(rep(1,nrow(d.wx3)))
+d.wx3$level_5 <- factor(rep(0,nrow(d.wx3)))
+d.wx3$level_6 <- factor(rep(1,nrow(d.wx3)))
+
+d.bx3$level_1 <- factor(rep(0,nrow(d.bx3)))
+d.bx3$level_2 <- factor(rep(1,nrow(d.bx3)))
+d.bx3$level_3 <- factor(rep(0,nrow(d.bx3)))
+d.bx3$level_4 <- factor(rep(1,nrow(d.bx3)))
+d.bx3$level_5 <- factor(rep(0,nrow(d.bx3)))
+d.bx3$level_6 <- factor(rep(1,nrow(d.bx3)))
+
+d.seq2$level_1 <- factor(ifelse(d.seq2$sequence_condition == "0w1w2w",0,2))
+d.seq2$level_2 <- factor(rep(1,nrow(d.seq2)))
+d.seq2$level_3 <- factor(ifelse(d.seq2$sequence_condition == "0w1w2w",2,0))
+
+d.L2second$level_1 <- factor(ifelse(d.L2second$sequence_condition == "0w2w1w",0,1))
+d.L2second$level_2 <- factor(rep(2,nrow(d.L2second)))
+d.L2second$level_3 <- factor(ifelse(d.L2second$sequence_condition == "0w2w1w",1,0))
+```
+
+Now reshape. This code is from Avery - I haven't modified much - would be a pain using reshape/tidyr.
+
+```{r}
+trial.df <- function(d,tn){
+  df <- data.frame(id = d$workerid,
+                   seqCond = d$sequence_condition,
+                   trial = factor(rep(tn,nrow(d))),
+                   level = d[sprintf("level_%d",tn)],
+                   item = d[sprintf("item_%d",tn)],
+                   targetProp = d[sprintf("target_prop_%d",tn)],
+                   distractorProp = d[sprintf("distractor_prop_%d",tn)],
+                   targetPosition = d[sprintf("target_position_%d",tn)],
+                   distractorPosition = d[sprintf("distractor_position_%d",tn)],
+                   choice = d[sprintf("choice_%d",tn)],
+                   mc.name = as.logical(d$mc.name),
+                   choiceCorrect = d[sprintf("choice_correct_%d",tn)])
+  names(df) <- c("id","seqCond","trial","level","item","targetProp",
+                 "distractorProp",
+                 "targetPosition","distractorPosition","choice","mc.name","choiceCorrect")
+  return(df)
+}
+
+df <- rbind(trial.df(d.seq,1),trial.df(d.seq,2),trial.df(d.seq,3),
+            trial.df(d.wx3,1),trial.df(d.wx3,2),trial.df(d.wx3,3),
+            trial.df(d.wx3,4),trial.df(d.wx3,5),trial.df(d.wx3,6),
+            trial.df(d.bx3,1),trial.df(d.bx3,2),trial.df(d.bx3,3),
+            trial.df(d.bx3,4),trial.df(d.bx3,5),trial.df(d.bx3,6),
+            trial.df(d.seq2,1),trial.df(d.seq2,2),trial.df(d.seq2,3),
+            trial.df(d.L2second,1),trial.df(d.L2second,2),trial.df(d.L2second,3))
+
+df$seqCondAndTrial <- sprintf("%s[%s]",df$seqCond,df$trial)
+
+summary(df)
+```
+
+Aggregate.
+
+```{r}
+dc <- df %>% filter(mc.name) 
+ms <- dc %>% group_by(seqCond, trial, level) %>%
+  summarise(correct = na.mean(choiceCorrect),  
+            n = length(trial),
+            cih = ci.high(choice == "target"),
+            cil = ci.low(choice == "target"))
+```
+
+Level 1 expts
+----
+
+```{r}
+ms.L1 <- filter(ms,!grepl("2w",seqCond) & !grepl("x3",seqCond))
+# levels(ms.L1$seqCond) <- c("aaa","bbb","ccc","ddd","0,1,2","2,1,0","0,2,1","1,2,0")
+
+pdf("plots/5-sequences-level1.pdf",width=6,height=3.5)
+ggplot(data = ms.L1, aes(x = trial, y = correct, fill = level)) +
+  geom_bar(stat = "identity", position="dodge") +
+  geom_linerange(aes(ymin = correct - cil, ymax = correct + cih), 
+                 position=position_dodge(width=1)) +
+  facet_grid(. ~ seqCond) +
+  xlab("Trial") +
+  ylab("Proportion correct")
+dev.off()
+```
+
+Level 1 x3 expts
+----
+
+```{r}
+ms.L1x3 <- filter(ms,!grepl("2w",seqCond) & grepl("x3",seqCond))
+
+pdf("plots/5-sequences-level1x3.pdf",width=6,height=3.5)
+ggplot(data = ms.L1x3, aes(x = trial, y = correct, fill = level)) +
+  geom_bar(stat = "identity", position="dodge") +
+  geom_linerange(aes(ymin = correct - cil, ymax = correct + cih), 
+                 position=position_dodge(width=1)) +
+  facet_grid(. ~ seqCond) +
+  xlab("Trial") +
+  ylab("Proportion correct")
+dev.off()
+```
+
+Level 2
+----
+
+```{r}
+pdf("plots/5-sequences-level2.pdf",width=8,height=4)
+ms.L2 <- filter(ms,grepl("2w",seqCond))
+levels(ms.L2$seqCond) <- c("aaa","bbb","ccc","ddd","0,1,2","2,1,0","0,2,1","1,2,0")
+ggplot(data = ms.L2, aes(x = trial, y = correct, fill = level)) +
+  geom_bar(stat = "identity") +
+  geom_linerange(aes(ymin = correct - cil, ymax = correct + cih), width = 0.2) +
+  facet_grid(. ~ seqCond) +
+  xlab("Trial") +
+  ylab("Proportion correct")
+dev.off()
+```
+
+Another plot. 
+
+```{r}
+ggplot(data = ms.L2, aes(x = seqCond, y = correct, fill = trial)) +
+  geom_bar(stat = "identity") +
+  geom_linerange(aes(ymin = correct - cil, ymax = correct + cih), width = 0.2) +
+  facet_grid(. ~ level) +
+  xlab("Trial") +
+  ylab("Proportion correct")
+```
