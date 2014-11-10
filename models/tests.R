@@ -1,7 +1,5 @@
-#!/usr/bin/env R
-
-source('ibr.R')
-source('viz_img.R')
+source('models/ibr.R')
+source('models/viz_img.R')
 
 ######################################################################
 ## SCENARIOS:
@@ -118,8 +116,4 @@ stiller.scales = matrix(
     c('r1', 'r2', 'r3'), # Row names; referents.
     c('hat', 'glasses'))) # Column names; messages.
 
-#demos for vogel paper
-quartz()
-ImageViz(stiller.scales[c(3,2,1),])
-ImageViz(linear[c(3,1,2),])
 
