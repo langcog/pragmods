@@ -1,7 +1,5 @@
-#!/usr/bin/env R
-
-source('util.R')
-source('agents.R')
+source('models/util.R')
+source('models/agents.R')
 
 ######################################################################
 ## CLASSICAL IBR
