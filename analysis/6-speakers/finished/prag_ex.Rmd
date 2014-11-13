@@ -1,0 +1,91 @@
+---
+title: "prag_ex.Rmd"
+output: html_document
+---
+
+```{r}
+rm(list=ls())
+source("~/Projects/R/Ranalysis/useful.R")
+
+d <- read.csv("~/Desktop/pragmods_c1_overspec.results_mod.csv")
+```
+
+Exclude participants that either failed manipulation check or were rejected.
+
+```{r}
+exclude <- d$assignmentstatus == "Rejected" |
+  d$Answer.name_check_correct == "\"FALSE\""
+sum(exclude)
+mean(exclude)
+
+d <- subset(d, exclude == FALSE)
+```
+
+Descriptive analyses
+---
+
+Now look at answers by condition, measured in terms of length in characters:
+
+```{r}
+d$length.chars <- str_length(d$Answer.free_response)
+d$features <- factor(d$Answer.features_in_referent_to_describe)
+
+ms <- ddply(d, .(features), summarise,
+            len = mean(length.chars),
+            len.cih = ci.high(length.chars),
+            len.cil = ci.low(length.chars))
+
+qplot(features, len, 
+      ymin=len - len.cil, ymax = len + len.cih,
+      fill=features,
+      geom=c("bar","linerange"),
+      stat="identity",
+      data=ms) + 
+  ylab("Length (characters)")
+```
+
+Now measured in terms of length in words:
+
+```{r}
+d$length.words <- sapply(d$Answer.free_response, 
+                         function (x) {
+                           split <- str_split(x, " ")
+                           return(length(split[[1]]))
+                           })
+
+ms <- ddply(d, .(features), summarise,
+            len = mean(length.words),
+            len.cih = ci.high(length.words),
+            len.cil = ci.low(length.words))
+
+qplot(features, len, 
+      ymin=len - len.cil, ymax = len + len.cih,
+      fill=features,
+      geom=c("bar","linerange"),
+      stat="identity",
+      data=ms) + 
+  ylab("Length (words)")
+```
+
+
+Overspecification analyses
+---
+
+Now analyze hand-coded overspecification:
+
+```{r}
+d$overspec <- 1
+
+ms <- ddply(d, .(features), summarise,
+            os = mean(overspec),
+            os.cih = ci.high(overspec),
+            os.cil = ci.low(overspec))
+
+qplot(features, os, 
+      ymin=os - os.cil, ymax = os + os.cih,
+      fill=features,
+      geom=c("bar","linerange"),
+      stat="identity",
+      data=ms) + 
+  ylab("Proportion overspecification")
+```
