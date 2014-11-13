@@ -25,61 +25,61 @@ Exclude participants that either failed manipulation check or were rejected.
 
 ```{r}
 exclude.seq <- d.seq$assignmentstatus == "Rejected" |
-  d.seq$Answer.name_check_correct == "\"FALSE\""
+  d.seq$name_check_correct == "\"FALSE\""
 d.seq <- subset(d.seq, exclude.seq == FALSE)
 
 exclude.wx3 <- d.wx3$assignmentstatus == "Rejected" |
-  d.wx3$Answer.name_check_correct == "\"FALSE\""
+  d.wx3$name_check_correct == "\"FALSE\""
 d.wx3 <- subset(d.wx3, exclude.wx3 == FALSE)
 
 exclude.bx3 <- d.bx3$assignmentstatus == "Rejected" |
-  d.bx3$Answer.name_check_correct == "\"FALSE\""
+  d.bx3$name_check_correct == "\"FALSE\""
 d.bx3 <- subset(d.bx3, exclude.bx3 == FALSE)
 
 exclude.seq2 <- d.seq2$assignmentstatus == "Rejected" |
-  d.seq2$Answer.name_check_correct == "\"FALSE\""
+  d.seq2$name_check_correct == "\"FALSE\""
 d.seq2 <- subset(d.seq2, exclude.seq2 == FALSE)
 
 exclude.L2second <- d.L2second$assignmentstatus == "Rejected" |
-  d.L2second$Answer.name_check_correct == "\"FALSE\""
+  d.L2second$name_check_correct == "\"FALSE\""
 d.L2second <- subset(d.L2second, exclude.L2second == FALSE)
 ```
 
 Choice correct as logical factors
 
 ```{r}
-d.seq$Answer.choice_correct_1 <- factor(as.logical(d.seq$Answer.choice_correct_1))
-d.seq$Answer.choice_correct_2 <- factor(as.logical(d.seq$Answer.choice_correct_2))
-d.seq$Answer.choice_correct_3 <- factor(as.logical(d.seq$Answer.choice_correct_3))
+d.seq$choice_correct_1 <- factor(as.logical(d.seq$choice_correct_1))
+d.seq$choice_correct_2 <- factor(as.logical(d.seq$choice_correct_2))
+d.seq$choice_correct_3 <- factor(as.logical(d.seq$choice_correct_3))
 
-d.wx3$Answer.choice_correct_1 <- factor(as.logical(d.wx3$Answer.choice_correct_1))
-d.wx3$Answer.choice_correct_2 <- factor(as.logical(d.wx3$Answer.choice_correct_2))
-d.wx3$Answer.choice_correct_3 <- factor(as.logical(d.wx3$Answer.choice_correct_3))
-d.wx3$Answer.choice_correct_4 <- factor(as.logical(d.wx3$Answer.choice_correct_4))
-d.wx3$Answer.choice_correct_5 <- factor(as.logical(d.wx3$Answer.choice_correct_5))
-d.wx3$Answer.choice_correct_6 <- factor(as.logical(d.wx3$Answer.choice_correct_6))
+d.wx3$choice_correct_1 <- factor(as.logical(d.wx3$choice_correct_1))
+d.wx3$choice_correct_2 <- factor(as.logical(d.wx3$choice_correct_2))
+d.wx3$choice_correct_3 <- factor(as.logical(d.wx3$choice_correct_3))
+d.wx3$choice_correct_4 <- factor(as.logical(d.wx3$choice_correct_4))
+d.wx3$choice_correct_5 <- factor(as.logical(d.wx3$choice_correct_5))
+d.wx3$choice_correct_6 <- factor(as.logical(d.wx3$choice_correct_6))
 
-d.bx3$Answer.choice_correct_1 <- factor(as.logical(d.bx3$Answer.choice_correct_1))
-d.bx3$Answer.choice_correct_2 <- factor(as.logical(d.bx3$Answer.choice_correct_2))
-d.bx3$Answer.choice_correct_3 <- factor(as.logical(d.bx3$Answer.choice_correct_3))
-d.bx3$Answer.choice_correct_4 <- factor(as.logical(d.bx3$Answer.choice_correct_4))
-d.bx3$Answer.choice_correct_5 <- factor(as.logical(d.bx3$Answer.choice_correct_5))
-d.bx3$Answer.choice_correct_6 <- factor(as.logical(d.bx3$Answer.choice_correct_6))
+d.bx3$choice_correct_1 <- factor(as.logical(d.bx3$choice_correct_1))
+d.bx3$choice_correct_2 <- factor(as.logical(d.bx3$choice_correct_2))
+d.bx3$choice_correct_3 <- factor(as.logical(d.bx3$choice_correct_3))
+d.bx3$choice_correct_4 <- factor(as.logical(d.bx3$choice_correct_4))
+d.bx3$choice_correct_5 <- factor(as.logical(d.bx3$choice_correct_5))
+d.bx3$choice_correct_6 <- factor(as.logical(d.bx3$choice_correct_6))
 
-d.seq2$Answer.choice_correct_1 <- factor(as.logical(d.seq2$Answer.choice_correct_1))
-d.seq2$Answer.choice_correct_2 <- factor(as.logical(d.seq2$Answer.choice_correct_2))
-d.seq2$Answer.choice_correct_3 <- factor(as.logical(d.seq2$Answer.choice_correct_3))
+d.seq2$choice_correct_1 <- factor(as.logical(d.seq2$choice_correct_1))
+d.seq2$choice_correct_2 <- factor(as.logical(d.seq2$choice_correct_2))
+d.seq2$choice_correct_3 <- factor(as.logical(d.seq2$choice_correct_3))
 
-d.L2second$Answer.choice_correct_1 <- factor(as.logical(d.L2second$Answer.choice_correct_1))
-d.L2second$Answer.choice_correct_2 <- factor(as.logical(d.L2second$Answer.choice_correct_2))
-d.L2second$Answer.choice_correct_3 <- factor(as.logical(d.L2second$Answer.choice_correct_3))
+d.L2second$choice_correct_1 <- factor(as.logical(d.L2second$choice_correct_1))
+d.L2second$choice_correct_2 <- factor(as.logical(d.L2second$choice_correct_2))
+d.L2second$choice_correct_3 <- factor(as.logical(d.L2second$choice_correct_3))
 ```
 
 Restructure data to have trial and level variables. (working around mturk data submission limitations; can't safely submit arrays, so we have to use separate variables for each trial)
 
 ```{r}
-d.seq$level_1 <- factor(ifelse(d.seq$Answer.sequence_condition == "\"1w0w1b\"",1,0))
-d.seq$level_2 <- factor(ifelse(d.seq$Answer.sequence_condition == "\"1w0w1b\"",0,1))
+d.seq$level_1 <- factor(ifelse(d.seq$sequence_condition == "\"1w0w1b\"",1,0))
+d.seq$level_2 <- factor(ifelse(d.seq$sequence_condition == "\"1w0w1b\"",0,1))
 d.seq$level_3 <- factor(rep(1,nrow(d.seq)))
 
 d.wx3$level_1 <- factor(rep(0,nrow(d.wx3)))
@@ -96,26 +96,26 @@ d.bx3$level_4 <- factor(rep(1,nrow(d.bx3)))
 d.bx3$level_5 <- factor(rep(0,nrow(d.bx3)))
 d.bx3$level_6 <- factor(rep(1,nrow(d.bx3)))
 
-d.seq2$level_1 <- factor(ifelse(d.seq2$Answer.sequence_condition == "\"0w1w2w\"",0,2))
+d.seq2$level_1 <- factor(ifelse(d.seq2$sequence_condition == "\"0w1w2w\"",0,2))
 d.seq2$level_2 <- factor(rep(1,nrow(d.seq2)))
-d.seq2$level_3 <- factor(ifelse(d.seq2$Answer.sequence_condition == "\"0w1w2w\"",2,0))
+d.seq2$level_3 <- factor(ifelse(d.seq2$sequence_condition == "\"0w1w2w\"",2,0))
 
-d.L2second$level_1 <- factor(ifelse(d.L2second$Answer.sequence_condition == "\"0w2w1w\"",0,1))
+d.L2second$level_1 <- factor(ifelse(d.L2second$sequence_condition == "\"0w2w1w\"",0,1))
 d.L2second$level_2 <- factor(rep(2,nrow(d.L2second)))
-d.L2second$level_3 <- factor(ifelse(d.L2second$Answer.sequence_condition == "\"0w2w1w\"",1,0))
+d.L2second$level_3 <- factor(ifelse(d.L2second$sequence_condition == "\"0w2w1w\"",1,0))
 
 trial.df <- function(d,tn){
   df <- data.frame(id = d$workerid,
-                   seqCond = d$Answer.sequence_condition,
+                   seqCond = d$sequence_condition,
                    trial = factor(rep(tn,nrow(d))),
                    level = d[sprintf("level_%d",tn)],
-                   item = d[sprintf("Answer.item_%d",tn)],
-                   targetProp = d[sprintf("Answer.target_prop_%d",tn)],
-                   distractorProp = d[sprintf("Answer.distractor_prop_%d",tn)],
-                   targetPosition = d[sprintf("Answer.target_position_%d",tn)],
-                   distractorPosition = d[sprintf("Answer.distractor_position_%d",tn)],
-                   choice = d[sprintf("Answer.choice_%d",tn)],
-                   choiceCorrect = d[sprintf("Answer.choice_correct_%d",tn)])
+                   item = d[sprintf("item_%d",tn)],
+                   targetProp = d[sprintf("target_prop_%d",tn)],
+                   distractorProp = d[sprintf("distractor_prop_%d",tn)],
+                   targetPosition = d[sprintf("target_position_%d",tn)],
+                   distractorPosition = d[sprintf("distractor_position_%d",tn)],
+                   choice = d[sprintf("choice_%d",tn)],
+                   choiceCorrect = d[sprintf("choice_correct_%d",tn)])
   names(df) <- c("id","seqCond","trial","level","item","targetProp","distractorProp",
                  "targetPosition","distractorPosition","choice","choiceCorrect")
   return(df)

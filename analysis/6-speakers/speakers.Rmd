@@ -1,0 +1,268 @@
+---
+title: "Speakers Analysis"
+author: "Paul Mains & Mike Frank"
+date: "November 13th, 2014"
+output: pdf_document
+---
+
+Production effects
+----
+
+```{r}
+setwd("~/Projects/Pragmatics/pragmods/")
+rm(list=ls())
+source("analysis/helper.R")
+source("analysis/useful_dplyr.R")
+```
+
+Level 1
+---
+
+Read data.
+
+```{r}
+d1 <- read.turk("data/6-speakers/pragmods_overspec_baseline.results.csv")
+d1$cond <- "text"
+d1$workerid <- as.character(d1$workerid)
+d2 <- read.turk("data/6-speakers/pragmods_overspec_checkbox.results.csv")
+d2$cond <- "checkbox"
+d2$free_response <- as.character(d2$free_response)
+d3 <- read.turk("data/6-speakers/pragmods_overspec_virtual.results.csv")
+d3$cond <- "virtual keyboard"
+
+d <- rbind_list(d1,d2,d3)
+d <- d %>% rename(targ.features = features_in_referent_to_describe)
+```
+
+Counts and exclusions. Note that this experiment has no manipulation check (Must check whether it has a manipulation check at all!). 
+
+```{r}
+dc <- d %>% filter(mc.name == "TRUE"& !is.na(overspec))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Aggregate: 
+
+```{r}
+ms <- dc %>% 
+  group_by(targ.features, cond) %>%
+  summarise(m = mean(overspec),
+            cil = ci.low(overspec),
+            cih = ci.high(overspec),
+            n = length(overspec))
+```
+
+Convert the data (with error bars) into a bar graph:
+
+```{r}
+pdf("plots/6-speakers-level1.pdf",width=8, height=4)
+qplot(targ.features, m, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=m - cil, ymax=m + cih), 
+                 position = position_dodge(width=.9)) + 
+  xlab("Features in Referent") + 
+  ylab("Proportion Overspecification") + 
+  scale_fill_discrete(name="Experiment Type")
+dev.off()
+```
+
+Level 1 Sequential
+---
+
+Now analyze the same paradigm with level 1 sequential judgments.
+
+```{r}
+d1 <- read.turk("data/6-speakers/pragmods_overspec_seq_baseline_lvl1.results.csv")
+d1$cond <- "text"
+d1$workerid <- as.character(d1$workerid)
+d2 <- read.turk("data/6-speakers/pragmods_overspec_seq_checkbox_lvl1.results.csv")
+d2$cond <- "checkbox"
+d2$keyboard <- as.character(d2$keyboard)
+d3 <- read.turk("data/6-speakers/pragmods_overspec_seq_virtual_lvl1.results.csv")
+d3$cond <- "virtual keyboard"
+
+d <- rbind_list(d1,d2,d3)
+d <- d %>% rename(targ.features = features_in_referent_to_describe)
+```
+
+Counts and exclusions. Note that this experiment has no manipulation check (Must check whether it has a manipulation check at all!). 
+
+```{r}
+dc <- d %>% filter(mc.name == "TRUE"& !is.na(overspec))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Aggregate: 
+
+```{r}
+ms <- dc %>% 
+  group_by(targ.features, cond) %>%
+  summarise(m = mean(overspec),
+            cil = ci.low(overspec),
+            cih = ci.high(overspec),
+            correct = mean(choice_2 == "target"),
+            correct.cil = ci.low(choice_2 == "target"),
+            correct.cih = ci.high(choice_2 == "target"),
+            n = length(overspec))
+```
+
+Convert the data (with error bars) into a bar graph:
+
+```{r}
+# pdf("plots/6-speakers-level1seq.pdf",width=8, height=4)
+qplot(targ.features, m, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=m - cil, ymax=m + cih), 
+                 position = position_dodge(width=.9)) + 
+  xlab("Features in Referent") + 
+  ylab("Proportion Overspecification") + 
+  scale_fill_discrete(name="Experiment Type")
+# dev.off()
+```
+
+Look at inference data. 
+
+```{r}
+pdf("plots/6-speakers-level1seq-inferences.pdf",width=8, height=4)
+qplot(targ.features, correct, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=correct - correct.cil, ymax=correct + correct.cih), 
+                 position = position_dodge(width=.9)) + 
+  xlab("Features in Referent") + 
+  ylab("Proportion Correct") + 
+  scale_fill_discrete(name="Experiment Type")
+dev.off()
+```
+
+Split by whether you overspecified. Hard to interpret this. 
+
+```{r}
+ms <- dc %>% 
+  group_by(targ.features, overspec, cond) %>%
+  summarise(correct = mean(choice_2 == "target"),
+            correct.cil = ci.low(choice_2 == "target"),
+            correct.cih = ci.high(choice_2 == "target"),
+            n = length(overspec))
+
+qplot(targ.features, correct, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=correct - correct.cil, ymax=correct + correct.cih), 
+                 position = position_dodge(width=.9)) + 
+  facet_grid(.~overspec) +
+  xlab("Features in Referent") + 
+  ylab("Proportion Correct") + 
+  scale_fill_discrete(name="Experiment Type")
+# dev.off()
+```
+
+
+Level 2 Sequential
+---
+
+Now analyze the same paradigm with level 1 sequential judgments.
+
+```{r}
+d1 <- read.turk("data/6-speakers/pragmods_overspec_seq_baseline_lvl2.results.csv")
+d1$cond <- "text"
+d1$workerid <- as.character(d1$workerid)
+d2 <- read.turk("data/6-speakers/pragmods_overspec_seq_checkbox_lvl2.results.csv")
+d2$cond <- "checkbox"
+d2$keyboard <- as.character(d2$keyboard)
+d3 <- read.turk("data/6-speakers/pragmods_overspec_seq_virtual_lvl2.results.csv")
+d3$cond <- "virtual keyboard"
+
+d <- rbind_list(d1,d2,d3)
+d <- d %>% rename(targ.features = features_in_referent_to_describe)
+```
+
+Counts and exclusions. Note that this experiment has no manipulation check (Must check whether it has a manipulation check at all!). 
+
+```{r}
+dc <- d %>% filter(mc.name == "TRUE"& !is.na(overspec))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Aggregate: 
+
+```{r}
+ms <- dc %>% 
+  group_by(targ.features, cond) %>%
+  summarise(m = mean(overspec),
+            cil = ci.low(overspec),
+            cih = ci.high(overspec),
+            correct = mean(choice_2 == "target"),
+            correct.cil = ci.low(choice_2 == "target"),
+            correct.cih = ci.high(choice_2 == "target"),
+            n = length(overspec))
+```
+
+Convert the data (with error bars) into a bar graph:
+
+```{r}
+pdf("plots/6-speakers-level2seq.pdf",width=8, height=4)
+qplot(targ.features, m, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=m - cil, ymax=m + cih), 
+                 position = position_dodge(width=.9)) + 
+  xlab("Features in Referent") + 
+  ylab("Proportion Overspecification") + 
+  scale_fill_discrete(name="Experiment Type")
+dev.off()
+```
+
+Look at inference data. 
+
+```{r}
+pdf("plots/6-speakers-level2seq-inferences.pdf",width=8, height=4)
+qplot(targ.features, correct, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=correct - correct.cil, ymax=correct + correct.cih), 
+                 position = position_dodge(width=.9)) + 
+  xlab("Features in Referent") + 
+  ylab("Proportion Correct") + 
+  scale_fill_discrete(name="Experiment Type")
+dev.off()
+```
+
+Split by whether you overspecified. 
+
+```{r}
+ms <- dc %>% 
+  group_by(targ.features, overspec, cond) %>%
+  summarise(correct = mean(choice_2 == "target"),
+            correct.cil = ci.low(choice_2 == "target"),
+            correct.cih = ci.high(choice_2 == "target"),
+            n = length(overspec))
+
+qplot(targ.features, correct, fill=cond, 
+      geom="bar", stat="identity", position="dodge",
+      data=ms) + 
+  ylim(c(0,1)) + 
+  geom_linerange(aes(ymin=correct - correct.cil, ymax=correct + correct.cih), 
+                 position = position_dodge(width=.9)) + 
+  facet_grid(.~overspec) +
+  xlab("Features in Referent") + 
+  ylab("Proportion Correct") + 
+  scale_fill_discrete(name="Experiment Type")
+# dev.off()
+```
+
+
