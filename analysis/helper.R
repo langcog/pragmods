@@ -2,7 +2,7 @@ read.turk <- function (fname) {
   if (grepl("csv", fname)) {
     d <- read.table(fname,
                     header=TRUE, sep=",", row.names=NULL, stringsAsFactors = FALSE)
-    } else {
+  } else {
     d <- read.table(fname,
                     header=TRUE, sep="\t", row.names=NULL, stringsAsFactors = FALSE)
   }

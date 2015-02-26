@@ -60,11 +60,12 @@ for (t in measures) {
   fs <- files[grepl(t, files)]
   
   for (f in fs) {
+    print(f)
     d.new <- read.turk(paste("data/1-prelims/dv/",f, sep=""))
     d.new$dataset <- f
     d <- rbind_list(d, d.new)
-    }
   }
+}
 
 d <- d %>% mutate(response.cond = factor(measures[d$response.cond + 1]))
 ```
@@ -226,8 +227,8 @@ Files:
 * forced_choice_no_fam_6random_NOcount_ALNC.csv
 
 ```{r}
-d1 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_count_ALLS.csv")
-d2 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_NOcount_ALNC.csv")
+d1 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_count_ALLS.tsv")
+d2 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_NOcount_ALNC.tsv")
 d1$cond <- "manip check"
 d2$cond <- "no manip check"
 d1$mc.targ <- as.numeric(d1$mc.targ)
@@ -326,5 +327,75 @@ qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
 dev.off()
 ```
 
+Linguistic frame
+----
 
+Goal is to find out whether the "bob can say one word: glasses" is different from "bob says 'my friend has glasses'" frames.
 
+Files: 
+* forced_choice_no_fam_6random_count_baseratesmy_14jan2015_BASERATES
+
+Ling cond = 1 ->
+Ling cond = 13 ->
+```{r}
+d <- read.turk("data/1-prelims/linguistic_framing/forced_choice_no_fam_6random_count_baseratesmy_14jan2015_BASERATES.tsv")
+
+d$ling.cond <- factor(d$ling.cond, 
+                      levels = c(1, 13), 
+                      labels = c("one word","friend has"))
+```
+
+Counts and exclusions
+
+```{r}
+d %>% group_by(ling.cond) %>%
+  summarise(n=length(workerid))
+
+dc <- d %>% filter(mc.targ == "2", 
+                   mc.dist == "1", 
+                   mc.name == "TRUE")
+
+d %>% group_by(ling.cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(ling.cond) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now average and plot with item. 
+
+```{r}
+d.fc <- dc %>% group_by(ling.cond) %>%
+  summarise(pragmatic = mean(choice == "target"),             
+            logical = mean(choice == "logical"),
+            foil = mean(choice == "foil"),
+            pragmatic.cih = ci.high(choice == "target"),
+            pragmatic.cil = ci.low(choice == "target"),
+            logical.cih = ci.high(choice == "logical"),
+            logical.cil = ci.low(choice == "logical"),
+            foil.cih = ci.high(choice == "foil" ),
+            foil.cil = ci.low(choice == "foil"),
+            n = length(workerid))
+  
+ms <- d.fc %>%
+  gather(measure, value, pragmatic, logical, 
+         foil, pragmatic.cil, logical.cil, 
+         foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
+  mutate(role = ifelse(grepl("cih",measure), "cih", 
+                       ifelse(grepl("cil",measure), "cil", "mean")),
+         measure = str_replace(measure,".ci[lh]","")) %>%
+  spread(role, value)
+
+pdf("plots/1-prelims-lingframe.pdf", width=6, height=3)
+qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+      ymin=mean - cil, ymax=mean + cih, fill=measure,
+      facets=.~ling.cond, 
+  data=ms) + 
+  ylim(c(0,1)) + 
+  ylab("Mean") + 
+  xlab("Target")
+dev.off()
+```
