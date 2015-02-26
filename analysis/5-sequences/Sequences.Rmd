@@ -19,21 +19,26 @@ Read data.
 
 ```{r}
 d.seq <- read.turk("data/5-sequences/pragmods_seq.anondata.csv")
+d.seq$expt <- "L1"
 d.wx3 <- read.turk("data/5-sequences/pragmods_wx3.anondata.csv")
+d.wx3$expt <- "x3"
 d.bx3 <- read.turk("data/5-sequences/pragmods_bx3.anondata.csv")
+d.bx3$expt <- "x3"
 d.seq2 <- read.turk("data/5-sequences/pragmods_seq2.anondata.csv")
+d.seq2$expt <- "L2"
 d.L2second <- read.turk("data/5-sequences/pragmods_L2second.anondata.tsv")
+d.L2second$expt <- "L2"
 
 d <- rbind_list(d.seq, d.wx3, d.bx3, d.seq2, d.L2second)
 ```
 
-Counts and exclusions. Note that this experiment has no manipulation check (Must check whether it has a manipulation check at all!). 
+Counts and exclusions. Note that these experiments have no manipulation check (Must check whether it has a manipulation check at all!). 
 
 ```{r}
 dc <- d %>% filter(mc.name == "TRUE")
 
-d %>% summarise(n=length(workerid))
-dc %>% summarise(n=length(workerid))
+d %>% group_by(expt) %>% summarise(n=length(workerid))
+dc %>% group_by(expt) %>% summarise(n=length(workerid))
 ```
 
 Restructure data to have trial and level variables. (working around mturk data submission limitations; can't safely submit arrays, so we have to use separate variables for each trial)
@@ -80,7 +85,7 @@ trial.df <- function(d,tn){
                    targetPosition = d[sprintf("target_position_%d",tn)],
                    distractorPosition = d[sprintf("distractor_position_%d",tn)],
                    choice = d[sprintf("choice_%d",tn)],
-                   mc.name = as.logical(d$mc.name),
+                   mc.name = d$mc.name,
                    choiceCorrect = d[sprintf("choice_correct_%d",tn)])
   names(df) <- c("id","seqCond","trial","level","item","targetProp",
                  "distractorProp",
@@ -101,11 +106,12 @@ df$seqCondAndTrial <- sprintf("%s[%s]",df$seqCond,df$trial)
 summary(df)
 ```
 
-Aggregate.
+Aggregate. Note that the filtering happens again here. 
 
 ```{r}
-dc <- df %>% filter(mc.name) 
-ms <- dc %>% group_by(seqCond, trial, level) %>%
+ms <- df %>%
+  filter(mc.name == TRUE) %>%
+  group_by(seqCond, trial, level) %>%
   summarise(correct = na.mean(choiceCorrect),  
             n = length(trial),
             cih = ci.high(choice == "target"),
