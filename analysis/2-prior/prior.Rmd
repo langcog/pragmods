@@ -6,7 +6,8 @@ output: pdf_document
 ---
   
 ```{r}
-setwd("~/Projects/Pragmatics/pragmods/")
+#setwd("~/Projects/Pragmatics/pragmods/")
+setwd("~/Users/andesgomez/Documents/Stanford/pragmods_2015/pragmods")
 rm(list=ls())
 source("analysis/helper.R")
 source("analysis/useful_dplyr.R")
