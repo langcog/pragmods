@@ -6,11 +6,12 @@
 \usepackage{fullpage,rotating}
 \usepackage{pslatex}
 \usepackage{amssymb}
+\usepackage{setspace}
 
 \title{\vspace{-16ex} Rational speech act models of pragmatic reasoning in reference games}
 
-\fiveauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Alex J. Stiller}{Christopher G. Potts}{Noah D. Goodman}
-\fiveaffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, University of California, San Diego}{Department of Linguistics, Stanford University}{Department of Psychology, Stanford University}
+\sixauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Alex J. Stiller}{Benjamin Gittelson}{Christopher G. Potts}{Noah D. Goodman}
+\sixaffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, University of California, San Diego}{Columbia University}{Department of Linguistics, Stanford University}{Department of Psychology, Stanford University}
 
 \shorttitle{Rational speech act models}
 \rightheader{Rational speech act models}
@@ -18,22 +19,30 @@
 
 \newcommand{\argmax}{\operatornamewithlimits{argmax}}
 
-\acknowledgements{Thanks to Avery Katko, Benjamin Gittleson, Paul Mains for assistance in data collection and design for Experiments XYZ. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Generous thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from Experiment XYZ were presented in \cite{vogel2013}. We acknowledge funding from ONR and Merck Family Foundation ...
+% EXPERIMENT COUNTER
+\newcounter{Experiment}
+\setcounter{Experiment}{0}
+\newcommand{\expt}[1]{\protect\refstepcounter{Experiment}\arabic{Experiment}\label{#1}}
+\newcommand{\exptref}[1]{expt.\,\ref{#1}}
+\newcommand{\Exptref}[1]{Expt.\,\ref{#1}}
+\newcommand{\exptrefrange}[2]{expts.\,\ref{#1}--\ref{#2}}
+\newcommand{\Exptrefrange}[2]{Expts.\,\ref{#1}--\ref{#2}}
+\newcommand{\exptrefnoexpt}[1]{\ref{#1}}
 
-~
 
-\noindent Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email: \texttt{mcfrank@stanford.edu}.}
+\acknowledgements{\singlespace Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \Exptrefrange{exp:seqs-1}{exp:prod-2seq}. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \Exptref{exp:levels-level} were presented in \cite{vogel2013}. We acknowledge funding from ONR and Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
+
+~\\
+}
 
 
-\abstract{Human communication is almost always underspecified. Nevertheless, most communication takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation for a listener is reasoning about the speaker's intentions; but a smart speaker will consider what kind of reasoning the listener is going to do and design her message with that in mind. A variety of recent work on formal pragmatics has made use of recursive systems of this type, based on a generalized notion of ``signaling systems.'' Here we show that these systems can be written as special cases of a probabilistic recursive reasoning model, with a small number of choice-points, including the depth of the recursion possible for human communicators and whether they interpret messages greedily. We present experimental data that bear on these decisions.}
+\abstract{Human communication is almost always underspecified, but it typically takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Consolidating previous modeling work, we describe this process of recursive reasoning---in which listeners reason about speakers and vice versa---through a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of more than 20 experiments using simple one-shot reference-resolution games. Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described within the dynamics of the RSA model.}
 
 \begin{document}
 \maketitle                            
 
 
-\section{Introduction}
-
-
+\input{section-intro}
 
 \input{section-models}
 
@@ -45,27 +54,27 @@
 \hline
 Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \hline
-1 & Prelims & Dependent variable & 689 & 629 & Forced choice yields best DV \\
-2 & & Manipulation check & 580 & 536 & Manipulation check does not create effect \\
-3 & & Linguistic frame & 100  & 89 & No difference\\
-4 & Prior & Elicitation frame & & CHECK \\
-5 &  & Base rate & 800 & 525 & Base rate affects inference \\
-6 &  & Linguistic framing & & CHECK & Linguistic valence affects inference\\
-7 &  & Perceptual salience & CHECK & & \\
-8 & Levels & Level of inference & 320 & 280 & Level 2 difficult for participants \\
-9 &    & Levels prior & & CHECK  & \\
-10 &    & Twins & 120 & 106  & Hard to get non-literal readings\\
-11 &    & Oddman & 200 & 182  & Hard to get non-literal readings\\
- 12    &    & Twins prior & & CHECK \\
-  13   &    & Oddman prior & & CHECK \\
-14 & Size  & Distractors & 1300 & 1224 & Model captures matrix layout\\
-15 &  & Distractors prior & TODO & & \\
-16 & Sequences & Level 1 & 200 & 191 & Limited sequential effect, no transfer \\
-17 & & Level 1 x3 & 200 & 193 & No repetion effects \\
-18 & & Level 2 & 100 & 93 & Strong sequence effect for L2 \\
-19 & Production & Level 1 & 450 & 383 & Cost affects overspecification\\
-20 & & Level 1 sequential & 453 & 394 & Production increases L1 inference\\
-21 & & Level 2 sequential & 450 & 389 & Production doesn't increase L2 inference\\
+\expt{exp:prelims-dv} & Prelims & Dependent variable & 689 & 629 & Forced choice yields best DV \\
+\expt{exp:prelims-mc} & & Manipulation check & 580 & 536 & Manipulation check does not create effect \\
+\expt{exp:prelims-frame} & & Linguistic frame & 100  & 89 & No difference\\
+\expt{exp:prior-frame} & Prior & Elicitation frame & 200 & 175 & No difference \\
+\expt{exp:prior-baserate} &  & Base rate & 800 & 525 & Base rate affects inference \\
+\expt{exp:prior-framing} &  & Linguistic framing & 690 & 627 & Linguistic valence affects inference\\
+\expt{exp:prior-salience} &  & Perceptual salience & & CHECK & \\
+\expt{exp:levels-level} & Levels & Level of inference & 320 & 280 & Level 2 difficult for participants \\
+\expt{exp:levels-prior} &    & Levels prior & & CHECK  & \\
+\expt{exp:levels-twins}  &    & Twins & 120 & 106  & Hard to get non-literal readings\\
+\expt{exp:levels-oddman} &    & Oddman & 200 & 182  & Hard to get non-literal readings\\
+\expt{exp:levels-twinsprior} &    & Twins prior & & CHECK \\
+\expt{exp:levels-oddmanprior}&    & Oddman prior & & CHECK \\
+\expt{exp:size-dists} & Size  & Distractors & 1300 & 1224 & Model captures matrix layout\\
+\expt{exp:size-distsprior} &  & Distractors prior & TODO & & \\
+\expt{exp:seqs-1} & Sequences & Level 1 & 200 & 191 & Limited sequential effect, no transfer \\
+\expt{exp:seqs-1x3} & & Level 1 x3 & 200 & 193 & No repetion effects \\
+\expt{exp:seqs-2} & & Level 2 & 100 & 93 & Strong sequence effect for L2 \\
+\expt{exp:prod-1} & Production & Level 1 & 450 & 383 & Cost affects overspecification\\
+\expt{exp:prod-1seq} & & Level 1 sequential & 453 & 394 & Production increases L1 inference\\
+\expt{exp:prod-2seq} & & Level 2 sequential & 450 & 389 & Production doesn't increase L2 inference\\
 \hline
 \end{tabular}
 \end{table}
@@ -118,9 +127,11 @@ Experiment
 \bibliographystyle{apacite}
 \bibliography{pragmods}
 
+\newpage
+
 \theappendix
 
-\section{Equivalences to other models}
+\section{Appendix A: Equivalences to other models}
 \input{section-equivalences}
 
 \end{document}
