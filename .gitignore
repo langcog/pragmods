@@ -13,3 +13,12 @@
 .Rproj.user/
 
 pragmods.pdf
+
+*.db
+
+*.aux
+*.dvi
+*.log
+*.blg
+*.bbl
+*.*~
