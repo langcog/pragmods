@@ -146,6 +146,16 @@ qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
 dev.off()
 ```
 
+Stats.
+
+```{r}
+d$correct <- d$choice=="target"
+dc$correct <- dc$choice=="target"
+dc$cond <- factor(dc$cond, levels = c("inference","prior"))
+summary(glm(correct ~ baserate * cond, data=dc))
+
+summary(glm(correct ~ baserate, data=filter(dc, cond=="inference")))
+```
 Linguistic Manipulation
 ----
 
