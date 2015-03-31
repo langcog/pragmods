@@ -4,7 +4,7 @@ library(bootstrap)
 library(lme4)
 library(stringr)
 library(lubridate)
-library(plyr) # first load plyr then dplyr from https://github.com/hadley/dplyr
+# library(plyr) # first load plyr then dplyr from https://github.com/hadley/dplyr
 library(dplyr)
 library(tidyr)
 

@@ -23,12 +23,17 @@
 \newcounter{Experiment}
 \setcounter{Experiment}{0}
 \newcommand{\expt}[1]{\protect\refstepcounter{Experiment}\arabic{Experiment}\label{#1}}
-\newcommand{\exptref}[1]{expt.\,\ref{#1}}
-\newcommand{\Exptref}[1]{Expt.\,\ref{#1}}
-\newcommand{\exptrefrange}[2]{expts.\,\ref{#1}--\ref{#2}}
-\newcommand{\Exptrefrange}[2]{Expts.\,\ref{#1}--\ref{#2}}
+\newcommand{\exptref}[1]{Experiment\,\ref{#1}}
+\newcommand{\Exptref}[1]{Experiment\,\ref{#1}}
+\newcommand{\exptrefrange}[2]{Experiments\,\ref{#1}--\ref{#2}}
+\newcommand{\Exptrefrange}[2]{Experiments\,\ref{#1}--\ref{#2}}
 \newcommand{\exptrefnoexpt}[1]{\ref{#1}}
 
+
+% SECTION REFERENCES
+\newcommand{\secref}[1]{Section\,\ref{#1}}
+% \newcommand{\secref}[1]{section\,\ref{#1}}
+% \newcommand{\dashsecref}[2]{sections\,\ref{#1}--\ref{#2}}
 
 \acknowledgements{\singlespace Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \Exptrefrange{exp:seqs-1}{exp:prod-2seq}. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \Exptref{exp:levels-level} were presented in \cite{vogel2013}. We acknowledge funding from ONR and Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
 
@@ -49,17 +54,17 @@
 \input{section-general-methods}
 
 \begin{table}
-\caption{Organization of the experiments reported here.}
+\caption{\label{tab:expts} Outline of the experiments reported here.}
 \begin{tabular}{cllllll}
 \hline
 Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \hline
-\expt{exp:prelims-dv} & Prelims & Dependent variable & 689 & 629 & Forced choice yields best DV \\
-\expt{exp:prelims-mc} & & Manipulation check & 580 & 536 & Manipulation check does not create effect \\
+\expt{exp:prelims-dv} & Prelims & Dependent variable & 689 & 554 & Forced choice yields best DV \\
+\expt{exp:prelims-mc} & & Manipulation check & 580 & 513 & Modest increase in inference for MC \\
 \expt{exp:prelims-frame} & & Linguistic frame & 100  & 89 & No difference\\
 \expt{exp:prior-frame} & Prior & Elicitation frame & 200 & 175 & No difference \\
-\expt{exp:prior-baserate} &  & Base rate & 800 & 525 & Base rate affects inference \\
-\expt{exp:prior-framing} &  & Linguistic framing & 690 & 627 & Linguistic valence affects inference\\
+\expt{exp:prior-baserate} &  & Base rate & 800 & 488 & Base rate affects inference \\
+\expt{exp:prior-valence} &  & Linguistic framing & 690 & 627 & Linguistic valence affects inference\\
 \expt{exp:prior-salience} &  & Perceptual salience & & CHECK & \\
 \expt{exp:levels-level} & Levels & Level of inference & 320 & 280 & Level 2 difficult for participants \\
 \expt{exp:levels-prior} &    & Levels prior & & CHECK  & \\
@@ -79,23 +84,10 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \end{tabular}
 \end{table}
 
-\section{Methodological preliminaries}
-% prelims
+\input{section-prelims}
 
+\input{section-prior}
 
-% DV
-% manipulation check
-% linguistic framing - 
-
-Our first experiments establish the simple reference games in Figure \ref{fig:ex} as a viable methods
-
-Experiment
-
-
-\section{Prior measurement}
-% prior
-
-% prior-baserates
 
 
 \section{Levels of recursion}

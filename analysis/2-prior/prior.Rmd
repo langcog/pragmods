@@ -6,18 +6,16 @@ output: pdf_document
 ---
   
 ```{r}
-setwd("~/Projects/Pragmatics/pragmods/")
-# setwd("~/Users/andesgomez/Documents/Stanford/pragmods_2015/pragmods")
 rm(list=ls())
-source("analysis/helper.R")
-source("analysis/useful_dplyr.R")
+source("../helper.R")
+source("../useful_dplyr.R")
 ```
 
 Does it matter how we measure the prior? 
 ----
 
 ```{r}
-d <- read.turk("data/2-prior/measurement/forced_choice_no_fam_6random_count_onewordmumble_21jan2015_WORDMUMBLE.tsv")
+d <- read.turk("../../data/2-prior/measurement/forced_choice_no_fam_6random_count_onewordmumble_21jan2015_WORDMUMBLE.tsv")
 
 d$cond <- factor(d$ques.cond)
 levels(d$cond) <- c("mumble","action")
@@ -28,7 +26,8 @@ Counts and exclusions. Note that MANY workers in this experiment misinterpreted 
 ```{r}
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 1,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE",
+                   duplicated(workerid)==FALSE)
 
 d %>% group_by(cond) %>%
   summarise(n=length(workerid))
@@ -52,7 +51,7 @@ ms <- dc %>%
          cil = binom.bayes(n, sum(n))$lower,
          cih = binom.bayes(n, sum(n))$upper)  
 
-pdf("plots/2-prior-ques.pdf", width=6, height=3.5)
+pdf("../../plots/2-prior-frame.pdf", width=6, height=3.5)
 qplot(choice, prop, geom=c("bar","linerange"), stat="identity",
       ymin=cil, ymax=cih, position=position_dodge(width=.9), 
       fill=factor(cond),
@@ -87,12 +86,12 @@ Files:
 
 
 ```{r}
-d1 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.tsv")
-d2 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.tsv")
+d1 <- read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.tsv")
+d2 <- read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.tsv")
 d1$cond <- "inference"
 d2$cond <- "inference"
 
-d3 <-  read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.tsv")
+d3 <-  read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.tsv")
 d3$cond <- "prior"
 
 d <- rbind_list(d1,d2,d3) 
@@ -108,7 +107,8 @@ d %>% group_by(cond, baserate) %>%
 
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 1,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid) == FALSE)
 
 dc %>% group_by(cond,baserate) %>%
   summarise(n=length(workerid))
@@ -130,11 +130,12 @@ Now get averages and CIs.
 ms <- dc %>% 
   mutate(cond = factor(cond)) %>%
   group_by(cond, baserate) %>%
-  summarise(correct = mean(choice == "target"),             
+  summarise(n = n(), 
+            correct = mean(choice == "target"),             
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-pdf("plots/2-prior-baserates.pdf", width=6, height=3.5)
+pdf("../plots/2-prior-baserates.pdf", width=6, height=3.5)
 qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, col=cond,
       data=ms) + 
