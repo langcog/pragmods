@@ -6,11 +6,73 @@ output: pdf_document
 ---
   
 ```{r}
-#setwd("~/Projects/Pragmatics/pragmods/")
-setwd("~/Users/andesgomez/Documents/Stanford/pragmods_2015/pragmods")
 rm(list=ls())
-source("analysis/helper.R")
-source("analysis/useful_dplyr.R")
+source("../helper.R")
+source("../useful_dplyr.R")
+```
+
+Does it matter how we measure the prior? 
+----
+
+```{r}
+d <- read.turk("../../data/2-prior/measurement/forced_choice_no_fam_6random_count_onewordmumble_21jan2015_WORDMUMBLE.tsv")
+
+d$cond <- factor(d$ques.cond)
+levels(d$cond) <- c("mumble","action")
+```
+
+Counts and exclusions. Note that MANY workers in this experiment misinterpreted and counted the familiarization stimuli, so there are a LOT of exclusions (28.5%)
+
+```{r}
+dc <- d %>% filter(as.numeric(mc.targ) == 2,
+                   as.numeric(mc.dist) == 1,
+                   mc.name == "TRUE",
+                   duplicated(workerid)==FALSE)
+
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now get averages and CIs.
+
+```{r}
+library(binom)
+ms <- dc %>% 
+  group_by(cond, choice) %>%  
+  summarise(n = n()) %>%
+  group_by(cond) %>%
+  mutate(prop = n / sum(n), 
+         cil = binom.bayes(n, sum(n))$lower,
+         cih = binom.bayes(n, sum(n))$upper)  
+
+pdf("../../plots/2-prior-frame.pdf", width=6, height=3.5)
+qplot(choice, prop, geom=c("bar","linerange"), stat="identity",
+      ymin=cil, ymax=cih, position=position_dodge(width=.9), 
+      fill=factor(cond),
+      data=ms) + 
+  ylim(c(0,1)) + 
+  ylab("Proportion correct") + 
+  xlab("Base rate of target")
+dev.off()
+```
+
+Stats
+
+```{r}
+library(binom)
+ms <- dc %>% 
+  group_by(cond, choice) %>%  
+  summarise(n = n()) %>%
+  spread(choice, n)
+
+chisq <- chisq.test(as.matrix(ms[,2:4]))
+chisq
 ```
 
 Base rate manipulation
@@ -24,12 +86,12 @@ Files:
 
 
 ```{r}
-d1 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.csv")
-d2 <- read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.csv")
+d1 <- read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO.tsv")
+d2 <- read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_oneword_25_february_FAMO2.tsv")
 d1$cond <- "inference"
 d2$cond <- "inference"
 
-d3 <-  read.turk("data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.csv")
+d3 <-  read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.tsv")
 d3$cond <- "prior"
 
 d <- rbind_list(d1,d2,d3) 
@@ -45,7 +107,8 @@ d %>% group_by(cond, baserate) %>%
 
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 1,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid) == FALSE)
 
 dc %>% group_by(cond,baserate) %>%
   summarise(n=length(workerid))
@@ -67,11 +130,12 @@ Now get averages and CIs.
 ms <- dc %>% 
   mutate(cond = factor(cond)) %>%
   group_by(cond, baserate) %>%
-  summarise(correct = mean(choice == "target"),             
+  summarise(n = n(), 
+            correct = mean(choice == "target"),             
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-pdf("plots/2-prior-baserates.pdf", width=6, height=3.5)
+pdf("../plots/2-prior-baserates.pdf", width=6, height=3.5)
 qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, col=cond,
       data=ms) + 
@@ -82,6 +146,16 @@ qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
 dev.off()
 ```
 
+Stats.
+
+```{r}
+d$correct <- d$choice=="target"
+dc$correct <- dc$choice=="target"
+dc$cond <- factor(dc$cond, levels = c("inference","prior"))
+summary(glm(correct ~ baserate * cond, data=dc))
+
+summary(glm(correct ~ baserate, data=filter(dc, cond=="inference")))
+```
 Linguistic Manipulation
 ----
 
@@ -92,9 +166,9 @@ Files:
 * prior for these = scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv
 
 ```{r}
-d1 <- read.turk("data/2-prior/language/forced_choice_no_fam_6random_count_16_december_ALLS.csv")
-d2 <- read.turk("data/2-prior/language/forced_choice_no_fam_4random_count_12_january_least_LEAS.csv")
-d3 <- read.turk("data/2-prior/language/scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv")
+d1 <- read.turk("data/2-prior/language/forced_choice_no_fam_6random_count_16_december_ALLS.tsv")
+d2 <- read.turk("data/2-prior/language/forced_choice_no_fam_4random_count_12_january_least_LEAS.tsv")
+d3 <- read.turk("data/2-prior/language/scale_6stimuli_no_fam_prior_5_april_PRIOLF.tsv")
 
 d <- rbind_list(d1,d2,d3) 
 d$cond <- factor(d$ling.cond)
@@ -127,13 +201,18 @@ ms <- dc %>%
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
+pdf("plots/2-prior-ling.pdf", width=6, height=3.5)
 qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, fill=factor(cond),
       data=ms) + 
   ylim(c(0,1)) + 
   ylab("Proportion correct") + 
   xlab("Base rate of target")
+dev.off()
 ```
+
+
+
 
 
 

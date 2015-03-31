@@ -18,8 +18,7 @@ read.turk <- function (fname) {
     select(-about, -comment,          
            -familiarization_present_in_study,
            -participant_feature_count_condition, 
-           -target_filler_sequence_condition,            
-           -question_type_condition) # substantive 
+           -target_filler_sequence_condition) # substantive 
   
   types <- sapply(d, class)
   
@@ -41,6 +40,7 @@ read.turk <- function (fname) {
                     familiarization = familiarization_cond, 
                     response.cond = participant_response_type_condition,
                     ling.cond = linguistic_framing_condition,
+                    ques.cond = question_type_condition,
                     targ.bet = money_allocated_to_target, 
                     dist.bet = money_allocated_to_logical,
                     foil.bet = money_allocated_to_foil,                    
