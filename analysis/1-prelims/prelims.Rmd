@@ -2,14 +2,13 @@
 title: "Prelims analysis"
 author: "Mike Frank"
 date: "November 5, 2014"
-output: pdf_document
+output: html_document
 ---
 
 ```{r}
-setwd("~/Projects/Pragmatics/pragmods/")
 rm(list=ls())
-source("analysis/helper.R")
-source("analysis/useful_dplyr.R")
+source("../helper.R")
+source("../useful_dplyr.R")
 ```
 
 Preliminary CI analysis
@@ -42,17 +41,16 @@ qplot(x=m, y=em, ymin=ymin, ymax=ymax, col=factor(n),
       geom=c("line","linerange"), data=ms) + facet_wrap(~n)
 ```
   
-  
 
 Dependent Variables
 ----
 
-This reads in the huge mess of files with different measures. 
+This reads in a mess of files with different measures. 
 
 Note that I excluded a number of files in a directory called "unused."
 
 ```{r}
-files <- dir("data/1-prelims/dv/")
+files <- dir("../../data/1-prelims/dv/")
 d <- data.frame()
 measures <- c("forced_choice", "betting", "likert")
 
@@ -61,7 +59,7 @@ for (t in measures) {
   
   for (f in fs) {
     print(f)
-    d.new <- read.turk(paste("data/1-prelims/dv/",f, sep=""))
+    d.new <- read.turk(paste("../../data/1-prelims/dv/",f, sep=""))
     d.new$dataset <- f
     d <- rbind_list(d, d.new)
   }
@@ -82,7 +80,8 @@ d %>% group_by(response.cond,item) %>%
 
 dc <- d %>% filter(mc.targ == "2", 
                    mc.dist == "1", 
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid) == FALSE)
 
 dc %>% group_by(response.cond) %>%
   summarise(n=length(workerid))
@@ -207,7 +206,7 @@ ms <- rbind_list(d.fc, d.likert, d.bet) %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
-pdf("plots/1-prelims-dv.pdf", width=8, height=3.5)
+pdf("../../plots/1-prelims-dv.pdf", width=8, height=3.5)
 qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~response.cond, 
@@ -218,7 +217,15 @@ qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
 dev.off()
 ```
 
-Dependent Variables
+Analysis of "hedging" by choosing the same rating for pragmatic and logical. 
+
+```{r}
+dc %>% group_by(response.cond) %>%
+  summarise(mean(targ.likert==foil.likert), # same dumb error with dist = foil
+            mean(targ.bet == dist.bet))
+```
+
+Manipulation check
 ----
 
 Files: 
@@ -227,8 +234,8 @@ Files:
 * forced_choice_no_fam_6random_NOcount_ALNC.csv
 
 ```{r}
-d1 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_count_ALLS.tsv")
-d2 <- read.turk("data/1-prelims/manip/forced_choice_no_fam_6random_NOcount_ALNC.tsv")
+d1 <- read.turk("../../data/1-prelims/manip/forced_choice_no_fam_6random_count_ALLS.tsv")
+d2 <- read.turk("../../data/1-prelims/manip/forced_choice_no_fam_6random_NOcount_ALNC.tsv")
 d1$cond <- "manip check"
 d2$cond <- "no manip check"
 d1$mc.targ <- as.numeric(d1$mc.targ)
@@ -245,7 +252,8 @@ d %>% group_by(cond,item) %>%
 
 dc <- d %>% filter(mc.targ == 2 | mc.targ == -1, 
                    mc.dist == 1 | mc.dist == -1, 
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid) == FALSE)
 
 d %>% group_by(cond) %>%
   summarise(n=length(workerid))
@@ -256,8 +264,6 @@ dc %>% group_by(cond) %>%
 d %>% summarise(n=length(workerid))
 dc %>% summarise(n=length(workerid))
 ```
-
-Lost  10% from the MC condition, and 4.2% from the no MC condition.
 
 Now average and plot with item. 
 
@@ -316,7 +322,7 @@ ms <- d.fc %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
-pdf("plots/1-prelims-manip.pdf", width=6, height=3)
+pdf("../../plots/1-prelims-manip.pdf", width=6, height=3)
 qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~cond, 
@@ -326,6 +332,19 @@ qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
   xlab("Target")
 dev.off()
 ```
+
+Stats.
+
+```{r}
+
+ms <- dc %>% group_by(cond) %>%
+  summarise(pragmatic = sum(choice == "target"),             
+            logical = sum(choice == "logical"),
+            foil = sum(choice == "foil"))
+
+chisq.test(as.matrix(ms[,2:4]))
+```
+
 
 Linguistic frame
 ----
@@ -338,7 +357,7 @@ Files:
 Ling cond = 1 ->
 Ling cond = 13 ->
 ```{r}
-d <- read.turk("data/1-prelims/linguistic_framing/forced_choice_no_fam_6random_count_baseratesmy_14jan2015_BASERATES.tsv")
+d <- read.turk("../../data/1-prelims/linguistic_framing/forced_choice_no_fam_6random_count_baseratesmy_14jan2015_BASERATES.tsv")
 
 d$ling.cond <- factor(d$ling.cond, 
                       levels = c(1, 13), 
@@ -353,7 +372,8 @@ d %>% group_by(ling.cond) %>%
 
 dc <- d %>% filter(mc.targ == "2", 
                    mc.dist == "1", 
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid) == FALSE)
 
 d %>% group_by(ling.cond) %>%
   summarise(n=length(workerid))
@@ -389,7 +409,7 @@ ms <- d.fc %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
-pdf("plots/1-prelims-lingframe.pdf", width=6, height=3)
+pdf("../../plots/1-prelims-lingframe.pdf", width=6, height=3)
 qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~ling.cond, 
@@ -398,4 +418,16 @@ qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
   ylab("Mean") + 
   xlab("Target")
 dev.off()
+```
+
+Stats.
+
+```{r}
+
+ms <- dc %>% group_by(ling.cond) %>%
+  summarise(pragmatic = sum(choice == "target"),             
+            logical = sum(choice == "logical"),
+            foil = sum(choice == "foil"))
+
+chisq.test(as.matrix(ms[,2:4]))
 ```
