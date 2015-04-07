@@ -135,7 +135,7 @@ ms <- dc %>%
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-pdf("../plots/2-prior-baserates.pdf", width=6, height=3.5)
+pdf("../../plots/2-prior-baserates.pdf", width=6, height=3.5)
 qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, col=cond,
       data=ms) + 
@@ -156,26 +156,47 @@ summary(glm(correct ~ baserate * cond, data=dc))
 
 summary(glm(correct ~ baserate, data=filter(dc, cond=="inference")))
 ```
+
+Output for models.
+
+```{r}
+dc %>%  
+  group_by(cond, baserate, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n) 
+```
+
 Linguistic Manipulation
 ----
 
 Files:
 
-* favorite = forced_choice_no_fam_6random_count_ALLS.csv
-* least favorite = forced_choice_no_fam_4random_count_12_january_least_LEAS.csv
-* prior for these = scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv
+"favorite":
+* forced_choice_no_fam_friends_30_november.csv
+* forced_choice_no_fam_boat_1_december_XYZQ.csv
+* forced_choice_no_fam_pizza_30_november.csv
+* forced_choice_no_fam_snowman_30_november.csv
+
+The "least favorite" condition is computed from the file:
+* forced_choice_no_fam_4random_count_12_january_least_LEAS.csv
+
+prior
+* scale_6stimuli_no_fam_prior_5_april_PRIOLF.csv
 
 ```{r}
-d1 <- read.turk("data/2-prior/language/forced_choice_no_fam_6random_count_16_december_ALLS.tsv")
-d2 <- read.turk("data/2-prior/language/forced_choice_no_fam_4random_count_12_january_least_LEAS.tsv")
-d3 <- read.turk("data/2-prior/language/scale_6stimuli_no_fam_prior_5_april_PRIOLF.tsv")
+d1a <- read.turk("../../data/2-prior/language/forced_choice_no_fam_friends_30_november.tsv")
+d1b <- read.turk("../../data/2-prior/language/forced_choice_no_fam_boat_1_december_XYZQ_incomplete.tsv")
+d1c <- read.turk("../../data/2-prior/language/forced_choice_no_fam_pizza_30_november.tsv")
+d1d <- read.turk("../../data/2-prior/language/forced_choice_no_fam_snowman_30_november.tsv")
+d2 <- read.turk("../../data/2-prior/language/forced_choice_no_fam_4random_count_12_january_least_LEAS.tsv")
+d3 <- read.turk("../../data/2-prior/language/scale_6stimuli_no_fam_prior_5_april_PRIOLF.tsv")
 
-d <- rbind_list(d1,d2,d3) 
+d <- rbind_list(d1a,d1b,d1c,d1d,d2,d3) 
 d$cond <- factor(d$ling.cond)
 levels(d$cond) <- c("favorite","least favorite","favorite prior","least favorite prior")
 ```
 
-Counts and exclusions. Note that MANY workers in this experiment misinterpreted and counted the familiarization stimuli, so there are a LOT of exclusions (28.5%)
+Counts and exclusions.
 
 ```{r}
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
@@ -197,22 +218,94 @@ Now get averages and CIs.
 ```{r}
 ms <- dc %>% 
   group_by(cond) %>%
-  summarise(correct = mean(choice == "target"),             
+  summarise(correct = mean(choice == "target"),
+            foil = mean(choice == "logical"), 
+            dist = mean(choice == "foil"),
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-pdf("plots/2-prior-ling.pdf", width=6, height=3.5)
+pdf("../../plots/2-prior-valence.pdf", width=6, height=3.5)
 qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, fill=factor(cond),
-      data=ms) + 
+      data=filter(ms, !grepl("prior",cond))) + 
   ylim(c(0,1)) + 
   ylab("Proportion correct") + 
   xlab("Base rate of target")
 dev.off()
 ```
 
+Output for models.
+
+```{r}
+dc %>%  
+  group_by(cond, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n)
+```
 
 
+Perceptual salience (color) manipulation
+----
 
+Files:
 
+* forced_choice_no_fam_6random_2count_oneword_4mar2015_COLORBASE
+* forced_choice_no_fam_6random_2count_oneword_23feb2015_COLORSALIENCE
 
+```{r}
+d1 <- read.turk("../../data/2-prior/color/forced_choice_no_fam_6random_2count_oneword_4mar2015_COLORBASE.tsv")
+d2 <- read.turk("../../data/2-prior/color/forced_choice_no_fam_6random_2count_oneword_23feb2015_COLORSALIENCE.tsv")
+
+d <- rbind_list(d1,d2) 
+d$cond <- factor(d$ling.cond)
+levels(d$cond) <- c("inference","prior")
+```
+
+Counts and exclusions.
+
+```{r}
+dc <- d %>% filter(as.numeric(mc.targ) == 2,
+                   as.numeric(mc.dist) == 1,
+                   mc.name == "TRUE")
+
+d %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+dc %>% group_by(cond) %>%
+  summarise(n=length(workerid))
+
+d %>% summarise(n=length(workerid))
+dc %>% summarise(n=length(workerid))
+```
+
+Now get averages and CIs.
+
+```{r}
+ms <- dc %>% 
+  group_by(cond, referent_with_color) %>%
+  summarise(correct = mean(choice == "target"),
+            foil = mean(choice == "logical"), 
+            dist = mean(choice == "foil"),
+            cih = ci.high(choice == "target"),
+            cil = ci.low(choice == "target"))
+
+pdf("../../plots/2-prior-color.pdf", width=6, height=3.5)
+qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
+      ymin=correct - cil, ymax=correct + cih, 
+      position=position_dodge(width=.9),
+      fill=referent_with_color,
+      data=filter(ms, !grepl("prior",cond))) + 
+  ylim(c(0,1)) + 
+  ylab("Proportion correct") + 
+  xlab("Referent displayed in color")
+dev.off()
+```
+
+Output for models.
+
+```{r}
+dc %>%  
+  group_by(cond, referent_with_color, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n)
+```
