@@ -23,9 +23,7 @@
 \setcounter{Experiment}{0}
 \newcommand{\expt}[1]{\protect\refstepcounter{Experiment}\arabic{Experiment}\label{#1}}
 \newcommand{\exptref}[1]{Experiment\,\ref{#1}}
-\newcommand{\Exptref}[1]{Experiment\,\ref{#1}}
 \newcommand{\exptrefrange}[2]{Experiments\,\ref{#1}--\ref{#2}}
-\newcommand{\Exptrefrange}[2]{Experiments\,\ref{#1}--\ref{#2}}
 \newcommand{\exptrefnoexpt}[1]{\ref{#1}}
 
 
@@ -34,7 +32,7 @@
 % \newcommand{\secref}[1]{section\,\ref{#1}}
 % \newcommand{\dashsecref}[2]{sections\,\ref{#1}--\ref{#2}}
 
-\acknowledgements{\singlespace Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \Exptrefrange{exp:seqs-1}{exp:prod-2seq}. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \Exptref{exp:levels-level} were presented in \citeA{vogel2014}. We gratefully acknowledge funding from ONR and the Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
+\acknowledgements{\singlespace Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \exptrefrange{exp:seqs-1}{exp:prod-2seq}. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \exptref{exp:levels-level} were presented in \citeA{vogel2014}. We gratefully acknowledge funding from ONR and the Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
 
 ~\\
 }
@@ -44,7 +42,6 @@
 
 \begin{document}
 \maketitle                            
-
 
 \input{section-intro}
 
@@ -63,16 +60,16 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \expt{exp:prelims-frame} & & Linguistic frame & 100  & 89 & No difference\\
 \expt{exp:prior-frame} & Prior & Elicitation frame & 200 & 175 & No difference \\
 \expt{exp:prior-baserate} &  & Base rate & 800 & 488 & Base rate affects inference \\
-\expt{exp:prior-valence} &  & Linguistic framing & 690 & 627 & Linguistic valence affects inference\\
-\expt{exp:prior-salience} &  & Perceptual salience & & CHECK & \\
+\expt{exp:prior-valence} &  & Linguistic framing & 550 & 502 & Linguistic valence affects inference\\
+\expt{exp:prior-color} &  & Perceptual salience & 300 & 267 & \\
 \expt{exp:levels-level} & Levels & Level of inference & 320 & 280 & Level 2 difficult for participants \\
-\expt{exp:levels-prior} &    & Levels prior & & CHECK  & \\
+% \expt{exp:levels-prior} &    & Levels prior & & CHECK  & \\
 \expt{exp:levels-twins}  &    & Twins & 120 & 106  & Hard to get non-literal readings\\
 \expt{exp:levels-oddman} &    & Oddman & 200 & 182  & Hard to get non-literal readings\\
-\expt{exp:levels-twinsprior} &    & Twins prior & & CHECK \\
-\expt{exp:levels-oddmanprior}&    & Oddman prior & & CHECK \\
-\expt{exp:size-dists} & Size  & Distractors & 1300 & 1224 & Model captures matrix layout\\
-\expt{exp:size-distsprior} &  & Distractors prior & TODO & & \\
+% \expt{exp:levels-twinsprior} &    & Twins prior & & CHECK \\
+% \expt{exp:levels-oddmanprior}&    & Oddman prior & & CHECK \\
+\expt{exp:levels-dists} &  & Distractors & 1300 & 1224 & Model captures matrix layout\\
+% \expt{exp:size-distsprior} &  & Distractors prior & TODO & & \\
 \expt{exp:seqs-1} & Sequences & Level 1 & 200 & 191 & Limited sequential effect, no transfer \\
 \expt{exp:seqs-1x3} & & Level 1 x3 & 200 & 193 & No repetion effects \\
 \expt{exp:seqs-2} & & Level 2 & 100 & 93 & Strong sequence effect for L2 \\
@@ -90,7 +87,7 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 
 \input{section-levels}
 
-\input{section-size}
+% \input{section-size}
 
 \input{section-sequences}
 
