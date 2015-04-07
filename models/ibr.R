@@ -1,5 +1,5 @@
-source('models/util.R')
-source('models/agents.R')
+source('util.R')
+source('agents.R')
 
 ######################################################################
 ## CLASSICAL IBR

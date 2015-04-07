@@ -62,6 +62,15 @@ qplot(choice, prop, geom=c("bar","linerange"), stat="identity",
 dev.off()
 ```
 
+Models
+
+```{r}
+dc %>%  
+  group_by(cond, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n)
+```
+
 Stats
 
 ```{r}
