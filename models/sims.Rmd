@@ -1,0 +1,118 @@
+---
+title: "Model Simulations"
+author: "Mike Frank"
+date: "April 8, 2015"
+output: pdf_document
+---
+
+Modeling approach: use experiments in series `prior` and `levels` as exploratory data, then use the `levels-size` experiment as validation data. 
+
+
+```{r}
+library(binom)
+rm(list=ls())
+source("../analysis/useful_dplyr.R")
+source("agents.R")
+source("util.R")
+source("matrices.R")
+```
+
+Load data. 
+
+```{r}
+d <- read.csv("model_data.csv") %>%
+  select(-notes) %>%
+  gather(object, count, ends_with("prior"), ends_with("inference")) %>%
+  separate(object, c("object", "measure"), sep="_") %>%
+  group_by(expt, cond, measure) %>%
+  mutate(p = count / sum(count), 
+         cil = binom.bayes(count, sum(count))$lower,
+         cih = binom.bayes(count, sum(count))$upper) 
+```
+
+Set up helper function to run model. 
+
+```{r}
+do.model <- function(matrix, 
+                     model = "LSLS",
+                     query_feature, 
+                     query_target, 
+                     prior = NULL, 
+                     debug = FALSE) {
+  
+  mat <- eval(parse(text=as.character(matrix)))  
+  mod <- eval(parse(text=paste(as.character(model), 
+                               "(mat, prior = prior)", 
+                               sep="")))
+  
+  if (debug) {
+    print(model)
+    print(matrix)
+    print(prior)
+    print(query_feature)
+    print(query_target)
+    print(mod)
+  }
+
+  return(mod[as.character(query_feature), as.character(query_target)])
+}
+```
+
+Now run models by merging in priors. 
+
+```{r}
+## add prior on every row
+d <- left_join(d %>% 
+                 filter(measure=="inference" & object == "target"), 
+               d %>% 
+                 ungroup() %>%
+                 filter(measure == "prior") %>%
+                 select(expt, cond, object, p) %>%
+                 spread(object, p)) 
+  
+models <- factor(c("L0","LS","LSL","LSLS","LSLSLS"))
+md <- data.frame()
+
+for (i in 1:length(models)) {
+  md.new <- d %>%  
+    group_by(expt, cond, object) %>%
+    mutate(model = as.character(models[i]),
+           prediction = do.model(matrix = matrix, 
+                                 model = model, 
+                                 query_feature = query_feature, 
+                                 query_target = query_target,
+                                 prior = c(foil,target,logical)))
+  md <- bind_rows(md, md.new)
+}
+```
+
+Plot. 
+
+```{r}
+qplot(prediction, p, 
+      ymin = cil, ymax = cih, 
+      label = cond, 
+      geom = c("text", "linerange"), 
+      colour = expt, 
+      data = md) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~model) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+Testing block. 
+
+```{r}
+f <- d$expt == "prior-color" & d$cond == "foil"
+
+do.model(model = "LSLS", 
+         matrix = d$matrix[f], 
+         query_feature = d$query_feature[f], 
+         query_target = d$query_target[f], 
+         prior = c(d$foil[f], d$target[f], d$logical[f]), 
+         debug = TRUE)
+```
+
