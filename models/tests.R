@@ -1,5 +1,5 @@
-source('models/ibr.R')
-source('models/viz_img.R')
+source('ibr.R')
+source('viz_img.R')
 
 ######################################################################
 ## SCENARIOS:
@@ -49,14 +49,6 @@ stiller.noscales = matrix(
     c('r1', 'r2', 'r3'), # Row names; referents.
     c('hat', 'glasses', 'mustache','tie'))) # Column names; messages.
 
-## Stiller no-scales, but with the ballcap left null:
-stiller.noscales.mod = matrix(
-  c(0,   0,   1,
-    0,   1,   1,
-    1,   1,   0), byrow=T, nrow=3,
-  dimname=list(
-    c('r1', 'r2', 'r3'), # Row names; referents.
-    c('hat', 'glasses', 'mustache'))) # Column names; messages.
 
 ## Science paper referential game:
 fg = matrix(
@@ -77,10 +69,14 @@ mason = matrix(
     c('r1', 'r2', 'r3'), # Row names; referents.
     c('hat', 'glasses', 'mustache'))) # Column names; messages.
 
-# note: try this - IBR(mason,prior=c(.5,.3,.1))
-# could be interesting and useful for testing argmax claims because this
-# setting totally destroys us
-
+## Mason Chua matrix
+mason = matrix(
+  c(1,   1,   1,
+    1,   1,   0,
+    1,   0,   1), byrow=T, nrow=3,
+  dimname=list(
+    c('r1', 'r2', 'r3'), # Row names; referents.
+    c('hat', 'glasses', 'mustache'))) # Column names; messages.
 
 ## The Horn division of labor game (makes crucial use of the costs)
 hornnames = list(
@@ -92,6 +88,62 @@ hornutil = matrix(
   c(1,1,
     1,1), byrow=T, nrow=2,
   dimnames=hornnames)
+
+## For experiment levels-levels
+complex = matrix(
+  c(0,   0,   1,
+    0,   1,   1,
+    1,   1,   0), byrow=T, nrow=3,
+  dimname=list(
+    c('r1', 'r2', 'r3'), # Row names; referents.
+    c('hat', 'glasses', 'mustache'))) # Column names; messages.
+
+## For experiment levels-oddman
+oddman = matrix(
+  c(1,   1,   0,
+    1,   0,   1,
+    0,   1,   1), byrow=T, nrow=3,
+  dimname=list(
+    c('r1', 'r2', 'r3'), # Row names; referents.
+    c('hat', 'glasses', 'mustache'))) # Column names; messages.
+
+## For experiment levels-twins
+twins = matrix(
+  c(0,   1,   1,
+    1,   0,   1,
+    1,   0,   1), byrow=T, nrow=3,
+  dimname=list(
+    c('r1', 'r2', 'r3'), # Row names; referents.
+    c('hat', 'glasses', 'mustache'))) # Column names; messages.
+
+######################################################################
+## CREATE FIGURES
+
+pdf("../writeup/figures/hatglasses.pdf", width=5.75, height=2)
+ImageViz(stiller.scales)
+dev.off()
+
+
+pdf("../writeup/figures/levels-levels-stim.pdf", width=5.75, height=2)
+ImageViz(complex)
+dev.off()
+
+pdf("../writeup/figures/levels-twins-stim.pdf", width=5.75, height=2)
+ImageViz(twins)
+dev.off()
+
+pdf("../writeup/figures/levels-oddman-stim.pdf", width=5.75, height=2)
+ImageViz(oddman)
+dev.off()
+
+
+
+# note: try this - IBR(mason,prior=c(.5,.3,.1))
+# could be interesting and useful for testing argmax claims because this
+# setting totally destroys us
+
+
+
 
 ## Costs:
 horncosts = list()

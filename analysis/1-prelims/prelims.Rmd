@@ -16,7 +16,7 @@ Preliminary CI analysis
 
 ```{r}
 ms <- seq(.1,.9,.1)
-ns <- c(10,20,50,100)
+ns <- c(10,20,50,100, 200 , 400)
 
 n.samps <- 10000
 d <- data.frame()
@@ -34,7 +34,8 @@ ms <- d %>%
   group_by(m,n) %>%
   summarise(em = mean(p/n),
             ymin = quantile(p/n, .025),
-            ymax = quantile(p/n, .975))
+            ymax = quantile(p/n, .975), 
+            width = ymax - ymin)
 
 qplot(x=m, y=em, ymin=ymin, ymax=ymax, col=factor(n), 
       position=position_dodge(.03), group=factor(n),

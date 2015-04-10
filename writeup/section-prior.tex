@@ -1,9 +1,9 @@
 \section{Measuring and manipulating prior expectations}
+\label{sec:prior}
 
-Our second set of experiments, \exptrefrange{exp:prior-frame}{exp:prior-salience}, examine the role of prior expectations in the RSA model's pragmatic computations. These experiments serve two goals. First, they create a set of quantitative measurements of prior expectations combined with listener inferences; these measurements can be used for model comparison and assessment, a topic that we return to in \secref{sec:modelcomp}. Second, they allow causal inferences about the role of the prior in participants' pragmatic inferences. While \citeA{frank2012} \emph{measured} prior expectations and showed that they improved model fit, that work did not \emph{manipulate} prior expectations, so it was in principle possible that improvements in model fit did not result from a causal role played by prior expectations. We address this issue in the studies below. We begin by comparing methods for eliciting prior expectations (\exptref{exp:prior-frame}). We then investigate three ways of manipulating prior expectations: via base-rates (\exptref{exp:prior-baserate}), via linguistic valence (\exptref{exp:prior-valence}), and via perceptual salience (\exptref{exp:prior-salience}). 
+Our second set of experiments, \exptrefrange{exp:prior-frame}{exp:prior-color}, examine the role of prior expectations in the RSA model's pragmatic computations. These experiments serve two goals. First, they create a set of quantitative measurements of prior expectations combined with listener inferences; these measurements can be used for model comparison and assessment, a topic that we return to in \secref{sec:modelcomp}. Second, they allow causal inferences about the role of the prior in participants' pragmatic inferences. While \citeA{frank2012} \emph{measured} prior expectations and showed that they improved model fit, that work did not \emph{manipulate} prior expectations, so it was in principle possible that improvements in model fit did not result from a causal role played by prior expectations. We address this issue in the studies below. We begin by comparing methods for eliciting prior expectations (\exptref{exp:prior-frame}). We then investigate three ways of manipulating prior expectations: via base-rates (\exptref{exp:prior-baserate}), via linguistic valence (\exptref{exp:prior-valence}), and via perceptual salience (\exptref{exp:prior-salience}). 
 
 It is not immediately clear what the best way is to measure prior expectations for purposes of communication. One particular conceptual issue seems important, though: does the term $p(r_s)$ refer to a prior over \emph{reference}, that is, over things that a speaker would talk about? Or does it instead represent a prior over \emph{actions}, that is, over the things that a speaker would do? This is a fairly deep philosophical issue; but it also has important empirical consequences for our current project. If these two kinds of priors differ substantially, then our estimates of $p(r_S)$ might lead to incorrect conclusions. In particular, \citeA{frank2012} introduced a method in which priors were measured identically to listener judgements, with the exception that participants in the prior measurement condition were not given any linguistic information. They were told that the speaker could utter one word to signal their target referent, but that they (the listener) hadn't heard it. This method yielded reliable measurements, but presupposed that the prior was over reference, rather than action. 
-
 
 \begin{figure}[t]
   \centering
@@ -23,10 +23,23 @@ In \exptref{expt:baserate}, we attempted to manipulate participants' prior expec
 
 Figure \ref{fig:prior-baserate} shows the results of this manipulation.\footnote{This experiment had unusually high rates of exclusion due to participants' confusion about whether they should report  familiarization frequencies for the manipulation check. We maintain our strict inclusion criterion here but note that the results are largely unchanged if we include these participants.}  The base rate had a strong effect on the prior elicitation, but it also boosted levels of pragmatic inferences. To quantify these effects preliminary to model fitting, we used a logistic regression model (no hierarchical model was warranted because judgments are from independent participants). This model showed highly significant effects of base rate ($\beta = .27,~p = .004$) and condition  (with prior as the dummy-coded predictor, $\beta = -.57,~p < .0001$), as well as a marginal interaction of the two  ($\beta = .29,~p = .06$). Critically, the main effect of base rate remained reliable in a similar logistic regression for just the inference trials ($\beta = .28,~p = .0001$), indicating a highly reliable (and graded) effect of the base-rate manipulation on the strength of the pragmatic inference.
 
-Our next experiment, \exptref{exp:prior-valence}, investigated 
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{../plots/2-prior-valence.pdf}
+  \caption{\label{fig:prior-valence} Data from \exptref{exp:prior-valence} in the inference conditions.}
+\end{figure}
+
+Our next experiment, \exptref{exp:prior-valence}, investigated the effects of linguistic manipulations on participants' priors and their resulting inferences. In this experiment, we framed judgments as being about determining Bob's \emph{favorite} or \emph{least favorite} item.\footnote{This experiment had four items: faces, boats, pizzas, and snowmen.'} We reasoned that, all else being equal, his favorite item would likely have more features, while his least favorite friend would likely have more. Prior measurements supported this conclusion: The logical option, which had the most features, was chosen as ``favorite'' 70\% of the time, while the distractor option, which had zero features, was chosen as ``least favorite'' 77\% of the time. Pragmatic inferences reflected these changing expectations, with participants far less likely to choose the pragmatic target in the inference condition with a ``favorite'' frame than with a ``least favorite'' frame (Figure \ref{fig:prior-valence}).  
 
 
-Our final experiment in this sequence, \exptref{exp:prior-salience}, investigated the role of salience 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{../plots/2-prior-color.pdf}
+  \caption{\label{fig:prior-color} Data from \exptref{exp:prior-color} in the inference conditions.}
+\end{figure}
 
+Our final experiment in this sequence, \exptref{exp:prior-color}, attempted to manipulate prior expectations about reference by changing the salience of the different referents. In particular, we presented all but one of the images in grayscale, varying which of the images (pragmatic target, logical target, or foil) was shown in color.\footnote{To ensure that participants still made the inference more generally, we included a condition where none of the referents was shown in color, notated by ``none.''} This manipulation had a strong effect on both prior expectations and pragmatic inferences. In particular, when the logical target was shown in color, inferences to the pragmatic target dropped substantially (Figure \ref{fig:prior-color}). 
 
-In sum, these experiments show strong evidence that a variety of manipulations can affect prior expectations about reference.  
+In sum, Experiments \exptrefrange{exp:prior-baserate}{exp:prior-color} show strong evidence that a variety of manipulations can affect prior expectations about reference. In \secref{sec:models}, we return to these data and test the stronger hypothesis that \emph{all} variation in inference levels in these three experiments can be accounted for by variation in prior expectations. 
+ 
