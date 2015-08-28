@@ -38,7 +38,7 @@
 }
 
 
-\abstract{Human communication is almost always underspecified, but it typically takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Consolidating previous modeling work, we describe this process of recursive reasoning---in which listeners reason about speakers and vice versa---through a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of more than 20 experiments using simple one-shot reference-resolution games. Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described within the dynamics of the RSA model.}
+\abstract{Human communication is almost always underspecified, but it typically takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Consolidating previous modeling work, we describe this process of recursive reasoning---in which listeners reason about speakers and vice versa---through a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of experiments using simple one-shot reference-resolution games. Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described within the dynamics of the RSA model.}
 
 \begin{document}
 \maketitle                            
@@ -62,20 +62,20 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \expt{exp:prior-baserate} &  & Base rate & 800 & 488 & Base rate affects inference \\
 \expt{exp:prior-valence} &  & Linguistic framing & 550 & 502 & Linguistic valence affects inference\\
 \expt{exp:prior-color} &  & Perceptual salience & 300 & 267 & \\
-\expt{exp:levels-level} & Levels & Level of inference & 520 & 453 & Level 2 difficult for participants \\
+\expt{exp:levels-level} & Levels & Level of inference & 416 & 362 & Level 2 difficult for participants \\
 % \expt{exp:levels-prior} &    & Levels prior & & CHECK  & \\
-\expt{exp:levels-twins}  &    & Twins & 120 & 106  & Hard to get non-literal readings\\
-\expt{exp:levels-oddman} &    & Oddman & 200 & 182  & Hard to get non-literal readings\\
+\expt{exp:levels-twins}  &    & Twins & 220 & 194  & Few non-literal readings\\
+\expt{exp:levels-oddman} &    & Oddman & 300 & 270  & Few non-literal readings\\
 % \expt{exp:levels-twinsprior} &    & Twins prior & & CHECK \\
 % \expt{exp:levels-oddmanprior}&    & Oddman prior & & CHECK \\
-\expt{exp:levels-dists} &  & Distractors & 1300 & 1224 & Model captures matrix layout\\
+% \expt{exp:levels-size} &  & Distractors & 1750 & 1368 & Model captures matrix layout\\
 % \expt{exp:size-distsprior} &  & Distractors prior & TODO & & \\
-\expt{exp:seqs-1} & Sequences & Level 1 & 200 & 191 & Limited sequential effect, no transfer \\
-\expt{exp:seqs-1x3} & & Level 1 x3 & 200 & 193 & No repetion effects \\
-\expt{exp:seqs-2} & & Level 2 & 100 & 93 & Strong sequence effect for L2 \\
-\expt{exp:prod-1} & Production & Level 1 & 450 & 383 & Cost affects overspecification\\
-\expt{exp:prod-1seq} & & Level 1 sequential & 453 & 394 & Production increases L1 inference\\
-\expt{exp:prod-2seq} & & Level 2 sequential & 450 & 389 & Production doesn't increase L2 inference\\
+% \expt{exp:seqs-1} & Sequences & Level 1 & 200 & 191 & Limited sequential effect, no transfer \\
+% \expt{exp:seqs-1x3} & & Level 1 x3 & 200 & 193 & No repetion effects \\
+% \expt{exp:seqs-2} & & Level 2 & 100 & 93 & Strong sequence effect for L2 \\
+% \expt{exp:prod-1} & Production & Level 1 & 450 & 383 & Cost affects overspecification\\
+% \expt{exp:prod-1seq} & & Level 1 sequential & 453 & 394 & Production increases L1 inference\\
+% \expt{exp:prod-2seq} & & Level 2 sequential & 450 & 389 & Production doesn't increase L2 inference\\
 \hline
 \end{tabular}
 \end{table}
@@ -89,9 +89,9 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 
 % \input{section-size}
 
-\input{section-sequences}
+% \input{section-sequences}
 
-\input{section-production}
+% \input{section-production}
 
 \input{section-model-fits}
 

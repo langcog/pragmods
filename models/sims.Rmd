@@ -1,33 +1,27 @@
 ---
 title: "Model Simulations"
 author: "Mike Frank"
-date: "April 8, 2015"
-output: pdf_document
+date: "August 28, 2015"
+output: html_document
 ---
 
-Modeling approach: use experiments in series `prior` and `levels` as exploratory data, then use the `levels-size` experiment as validation data. 
+Fit vanilla RSA models to the data from prior and levels series experiments. 
 
+## Preliminaries
 
 ```{r}
 library(binom)
+library(magrittr)
 rm(list=ls())
 source("../analysis/useful_dplyr.R")
 source("agents.R")
 source("util.R")
 source("matrices.R")
-```
 
-Load data. 
-
-```{r}
-d <- read.csv("model_data.csv") %>%
-  select(-notes) %>%
-  gather(object, count, ends_with("prior"), ends_with("inference")) %>%
-  separate(object, c("object", "measure"), sep="_") %>%
-  group_by(expt, cond, measure) %>%
-  mutate(p = count / sum(count), 
-         cil = binom.bayes(count, sum(count))$lower,
-         cih = binom.bayes(count, sum(count))$upper) 
+knitr::opts_chunk$set(fig.width=12, cache=TRUE,
+                      warning=FALSE, message=FALSE)
+library(dplyr, warn.conflicts = FALSE, quietly=TRUE)
+library(tidyr, warn.conflicts = FALSE, quietly=TRUE)
 ```
 
 Set up helper function to run model. 
@@ -49,8 +43,6 @@ do.model <- function(matrix,
     print(model)
     print(matrix)
     print(prior)
-    print(query_feature)
-    print(query_target)
     print(mod)
   }
 
@@ -58,19 +50,82 @@ do.model <- function(matrix,
 }
 ```
 
+## Load data. 
+
+Note: `levels_mod.csv` has the levels of the "levels" complex experiment manually modified, because while we are using terms like "target" here as an absolute reference, it was used as a relative reference in that experiment design. Meaning, "target" for level 0 was actually what we refer to here as "logical," and "target" for level 1 was "foil" here.
+
+`priors_mod.csv` just has some levels renamed forso they are terser and more informative.
+
+```{r}
+d.prior <- read.csv("data/prior_mod.csv") 
+d.levels <- read.csv("data/levels_mod.csv")
+```
+
+Make sure that each experiment is tagged with its appropriate matrix. 
+
+```{r}
+d.raw <- bind_rows(d.prior, d.levels) %>%
+  mutate(matrix = ifelse(expt == "color" | expt == "prior" | 
+           expt == "lang" | expt == "baserate", "simple", expt))
+```
+
+split priors and inference, and make sure that each inference is tagged with its prior. Some of this has to be manual AFAIK.
+
+```{r}
+prior <- filter(d.raw, question == "prior") %>%
+  mutate(prior = str_c(cond, "-", expt)) %>%
+  select(-cond, -expt, -matrix, -question)
+
+inference <- filter(d.raw, question == "inference") %>%
+  mutate(prior = str_c(cond, "-", expt),
+         query = "glasses")
+
+inference$prior[inference$expt == "complex"] <- "0-complex"
+inference$prior[inference$expt == "oddman"] <- "prior-oddman"
+inference$prior[inference$expt == "twins"] <- "prior-twins"
+inference$prior[inference$expt == "simple"] <- "prior-prior"
+inference$prior[inference$prior == "none-color"] <- "prior-prior"
+
+inference$query[inference$cond == "0" & inference$matrix == "simple"] <- "hat"
+inference$query[inference$cond == "0" & inference$matrix == "complex"] <- "hat"
+inference$query[inference$cond == "1" & inference$matrix == "complex"] <- "mustache"
+inference$query[inference$cond == "2" & inference$matrix == "complex"] <- "glasses"
+inference$query[inference$cond == "twin" & inference$matrix == "twins"] <- "hat"
+inference$query[inference$cond == "uniform" & inference$matrix == "twins"] <- "mustache"
+```
+
+Get CIs, etc. 
+
+Critically, this is where we add $\epsilon$, a smoothing parameter on the prior. 
+
+```{r}
+inference %<>%
+  select(-question) %>%
+  gather(object, count, foil, logical, target) %>%
+  mutate(count = ifelse(is.na(count), 
+                        0, count)) %>%
+  group_by(expt, cond) %>%
+  mutate(p = count / sum(count), 
+         cil = binom.bayes(count, sum(count))$lower,
+         cih = binom.bayes(count, sum(count))$upper) 
+
+eps <- 1
+prior %<>% 
+  mutate(normalizer = foil + target + logical + 3*eps,
+         foil = (foil + eps) / normalizer, 
+         target = (target + eps) / normalizer,
+         logical = (logical + eps) / normalizer) %>% 
+  select(foil, logical, target, prior)
+```
+
 Now run models by merging in priors. 
 
 ```{r}
 ## add prior on every row
-d <- left_join(d %>% 
-                 filter(measure=="inference" & object == "target"), 
-               d %>% 
-                 ungroup() %>%
-                 filter(measure == "prior") %>%
-                 select(expt, cond, object, p) %>%
-                 spread(object, p)) 
+d <- left_join(inference, prior)            
+write.csv(d, "data/models.csv", row.names=FALSE)
   
-models <- factor(c("L0","LS","LSL","LSLS","LSLSLS"))
+models <- factor(c("L0","LS","LSLS","LSLSLS"))
 md <- data.frame()
 
 for (i in 1:length(models)) {
@@ -79,40 +134,90 @@ for (i in 1:length(models)) {
     mutate(model = as.character(models[i]),
            prediction = do.model(matrix = matrix, 
                                  model = model, 
-                                 query_feature = query_feature, 
-                                 query_target = query_target,
-                                 prior = c(foil,target,logical)))
+                                 query_feature = query, 
+                                 query_target = object,
+                                 prior = c(foil, 
+                                           target, 
+                                           logical))) 
   md <- bind_rows(md, md.new)
 }
+
+md$prior <- "prior"
+
+for (i in 1:length(models)) {
+  md.new <- d %>%  
+    group_by(expt, cond, object) %>%
+    mutate(model = as.character(models[i]),
+           prediction = do.model(matrix = matrix, 
+                                 model = model, 
+                                 query_feature = query, 
+                                 query_target = object,
+                                 prior = c(.333, .333, .333)))
+  md.new$prior <- "uniform"
+  md <- bind_rows(md, md.new)
+}
+
 ```
 
-Plot. 
+Investigate/debug sample model runs
 
 ```{r}
-qplot(prediction, p, 
-      ymin = cil, ymax = cih, 
-      label = cond, 
-      geom = c("text", "linerange"), 
-      colour = expt, 
-      data = md) + 
+this_row <- d[d$expt == "color" & d$object == "target" & d$cond == "logical",]
+this_row %>% data.frame
+with(this_row, 
+     do.model(matrix = matrix, 
+              model = "LSLS", 
+              query_feature = query, 
+              query_target = object,
+              prior = c(foil, target, logical),
+              debug=TRUE))
+```
+
+## Plots
+
+First, all points.
+
+```{r}
+ggplot(md, aes(x = prediction, y = p, col = expt, pch = object)) + 
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  geom_text(aes(label = cond, x = prediction + .02), size=3, hjust=0) +
   xlim(c(0,1)) + ylim(c(0,1)) + 
-  facet_wrap(~model) + 
+  facet_grid(prior~model) + 
   ylab("Proportion choosing target") + 
   xlab("Model Predictions") + 
   geom_smooth(method="lm", aes(group=1)) + 
   geom_abline(slope = 1, intercept = 0, lty=2)
 ```
 
-Testing block. 
+Plot just those with non-0/1 values.
 
 ```{r}
-f <- d$expt == "prior-color" & d$cond == "foil"
-
-do.model(model = "LSLS", 
-         matrix = d$matrix[f], 
-         query_feature = d$query_feature[f], 
-         query_target = d$query_target[f], 
-         prior = c(d$foil[f], d$target[f], d$logical[f]), 
-         debug = TRUE)
+ggplot(filter(md, prediction > 0 & prediction < 1),  
+       aes(x = prediction, y = p, col = expt, pch = object)) + 
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  geom_text(aes(label = cond, x = prediction + .02), size=3, hjust=0) +
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_grid(prior~model) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2)
 ```
 
+Stats.
+
+```{r}
+md %>% 
+  group_by(prior, model) %>%
+  summarise(r_pearson = cor.test(p, prediction, method = "pearson")$estimate,
+            r_spearman = cor.test(p, prediction, method = "spearman")$estimate,
+            MSE = mean((prediction-p)^2))
+
+md %>% 
+  filter(prediction > 0 & prediction < 1) %>%
+  group_by(prior, model) %>%
+  summarise(r_pearson = cor.test(p, prediction, method = "pearson")$estimate,
+            r_spearman = cor.test(p, prediction, method = "spearman")$estimate,
+            MSE = mean((prediction-p)^2))
+
+```
