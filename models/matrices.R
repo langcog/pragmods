@@ -38,10 +38,76 @@ twins = matrix(
     c('hat', 'glasses', 'mustache'))) # Column names; messages.
 
 
+##### For for size experiments ####
+## sizeMN notation refers to M extra objects, N extra features
+## 4-size
+# notation is size(num referents).(num features)
+size2.2 = matrix(c(0, 1, 
+                   1, 1),
+                 byrow=TRUE, nrow=2, ncol=2, 
+                 dimname=list(c('ref1', 'ref2'), 
+                              c('hat', 'glasses')))
+
+size3.2 = matrix(c(0, 0, 
+                   0, 1, 
+                   1, 1), 
+                 byrow=TRUE, nrow=3, ncol=2, 
+                 dimname=list(c('ref1', 'ref2', 'ref3'), 
+                              c('hat', 'glasses')))
+
+size4.2 = matrix(c(0, 0, 
+                   0, 0, 
+                   0, 1, 
+                   1, 1), 
+                 byrow=TRUE, nrow=4, ncol=2, 
+                 dimname=list(c('ref1', 'ref2', 'ref3', 'ref4'), 
+                              c('hat', 'glasses')))
+
+size2.3 = matrix(c(0, 1, 1, 
+                   1, 1, 1), 
+                 byrow=TRUE, nrow=2, ncol=3, 
+                 dimname=list(c('ref1', 'ref2'), c
+                              ('hat', 'glasses', 'moustache')))
+
+size3.3 = matrix(c(0, 0, 1, 
+                   0, 1, 1, 
+                   1, 1, 1),
+                 byrow=TRUE, nrow=3, ncol=3, 
+                 dimname=list(c('ref1', 'ref2', 'ref3'), 
+                              c('hat', 'glasses', 'moustache')))
+
+size4.3 = matrix(c(0, 0, 1, 
+                   0, 0, 1, 
+                   0, 1, 1, 
+                   1, 1, 1), 
+                 byrow=TRUE, nrow=4, ncol=3, 
+                 dimname=list(c('ref1', 'ref2', 'ref3','ref4'), 
+                              c('hat', 'glasses', 'moustache')))
+
+size2.4 = matrix(c(0, 1, 1, 1, 
+                   1, 1, 1, 1), 
+                 byrow=TRUE, nrow=2, ncol=4, 
+                 dimname=list(c('ref1', 'ref2'), 
+                              c('hat', 'glasses', 'moustache', 'bowtie')))
+
+size3.4 = matrix(c(0, 0, 1, 1, 
+                   0, 1, 1, 1, 
+                   1, 1, 1, 1), 
+                 byrow=TRUE, nrow=3, ncol=4, 
+                 dimname=list(c('ref1', 'ref2', 'ref3'), 
+                              c('hat', 'glasses', 'moustache', 'bowtie')))
+
+size4.4 = matrix(c(0, 0, 1, 1, 
+                   0, 0, 1, 1, 
+                   0, 1, 1, 1, 
+                   1, 1, 1, 1), 
+                 byrow=TRUE, nrow=4, ncol=4, 
+                 dimname=list(c('ref1', 'ref2', 'ref3', 'ref4'), 
+                              c('hat', 'glasses', 'moustache', 'bowtie')))
+
+
 ######################################################################
 ## OTHER SCENARIOS
-
-
 
 ## A standard scalar implicature case:
 scalars = matrix(

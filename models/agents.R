@@ -126,7 +126,7 @@ Speaker = function(m, sem=m, costs=NULL, prior=NULL, argmax=TRUE, resort.to.unif
 ##
 ## For additional details on the arguments, see Listener
 
-L = function(m, sem, costs=NULL, prior=NULL) {
+L = function(m, sem=NULL, costs=NULL, prior=NULL) {
   m = Listener(m, sem, costs=costs, prior=UniformDistribution(nrow(m)), argmax=FALSE)
   return(m)
 }
@@ -139,7 +139,7 @@ L = function(m, sem, costs=NULL, prior=NULL) {
 ##
 ## For additional details on the arguments, see Listener
 
-Lbayes = function(m, sem, costs=NULL, prior=UniformDistribution(nrow(m))) {
+Lbayes = function(m, sem=NULL, costs=NULL, prior=UniformDistribution(nrow(m))) {
   m = Listener(m, sem, costs=costs, prior=prior, argmax=FALSE)
   return(m)
 } 
@@ -186,7 +186,7 @@ Lstarbayes = function(m, sem, costs=NULL, prior=UniformDistribution(nrow(m))) {
 ## Value:
 ## A matrix with the same dimensions as m.
 
-Listener = function(m, sem, costs=NULL, prior=UniformDistribution(nrow(m)), argmax=TRUE) {  
+Listener = function(m, sem=NULL, costs=NULL, prior=UniformDistribution(nrow(m)), argmax=TRUE) {  
   ## Transpose:
   m = t(m)
   ## Preserve these in case they get lost in processing:
@@ -199,9 +199,11 @@ Listener = function(m, sem, costs=NULL, prior=UniformDistribution(nrow(m)), argm
   ## Replace any surprise rows with the underlying semantics.
   ## We impose costs iff we do not do the all-0s row replacement!
   for (i in 1:nrow(m)) {
+    if (!is.null(sem)) {
     ## Replacement in the all 0s case:
-    if (ZerosVector(m[i, ])) {
-      m[i, ] = t(sem)[i, ]
+      if (ZerosVector(m[i, ])) {
+        m[i, ] = t(sem)[i, ]
+      }
     }
     ## Impose costs otherwise:
     else {
@@ -209,7 +211,7 @@ Listener = function(m, sem, costs=NULL, prior=UniformDistribution(nrow(m)), argm
     }    
   }  
   ## Impose the prior and renormalize:
-  normalizer = function(row){ (row*prior) / sum(row*prior) }
+  normalizer = function(row) { (row*prior) / sum(row*prior) }
   m = t(apply(m, 1, normalizer))  
   ## Maximize:
   if (argmax) {
@@ -284,50 +286,33 @@ FG = function(m, prior=UniformDistribution(nrow(m))) {
 #c("L0","LS","LSL","LSLS","LSLSL","LSLSLS")
 
 L0 <- function(m,prior=UniformDistribution(nrow(m))) {
-  Lbayes(m,prior=prior)
+  Lbayes(m)
 }
 
 LS <- function(m,prior=UniformDistribution(nrow(m))) {
   Lbayes(S0(m),
-         m,prior=prior)
+         m, prior=prior)
 }
 
 LSL <- function(m,prior=UniformDistribution(nrow(m))) {
-  Lbayes(S(Lbayes(m,prior=prior),
-           m,resort.to.uniform=FALSE),
-         m,prior=prior)
+  Lbayes(S(L(m), m,resort.to.uniform=FALSE),
+         m, prior=prior)
 }
 
 LSLS <- function(m,prior=UniformDistribution(nrow(m))) {
-  Lbayes(S(Lbayes(S0(m),
-                  m,prior=prior),
-           m,resort.to.uniform=FALSE),
-         m,prior=prior)
+  Lbayes(S(L(S0(m), m), m,resort.to.uniform=FALSE),
+         m, prior=prior)
 }
 
 LSLSL <- function(m,prior=UniformDistribution(nrow(m))) {
-  Lbayes(S(Lbayes(S(Lbayes(m,prior=prior)),
-                  m,prior=prior),
+  Lbayes(S(L(S(L(m)),
+             m),
            m,resort.to.uniform=FALSE),
-         m,prior=prior)
+         m, prior=prior)
 }
 
 LSLSLS <- function(m,prior=UniformDistribution(nrow(m))) {
-  Lbayes(S(Lbayes(S(Lbayes(S0(m),
-                           m,prior=prior),
-                    m,resort.to.uniform=FALSE),
-                  m,prior=prior),
-           m,resort.to.uniform=FALSE),
-         m,prior=prior)
-}
-
-LSLSLSLS <- function(m,prior=UniformDistribution(nrow(m))) {
-  Lbayes(S(Lbayes(S(Lbayes(S(Lbayes(S0(m),
-                                    m,prior=prior),
-                             m,resort.to.uniform=FALSE),
-                           m,prior=prior),
-                    m,resort.to.uniform=FALSE),
-                  m,prior=prior),
-           m,resort.to.uniform=FALSE),  
-           m,prior=prior)
+  Lbayes(S(L(S(L(S0(m), m), m,resort.to.uniform=FALSE),
+             m), m,resort.to.uniform=FALSE),
+         m, prior=prior)
 }

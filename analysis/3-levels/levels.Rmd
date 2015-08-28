@@ -14,10 +14,16 @@ source("../useful_dplyr.R")
 Level of recursion
 ----
   
+Read in data. 
+
+Note prior experiment also asks the "which one will he DO" question, that's `ques.cond==4` - excluded here. 
+
 ```{r}
 d1 <- read.turk("../../data/3-levels/levels/scale_plus_6stimuli_3levels_no_fam_24_january_SCAL.tsv")
 d2 <- read.turk("../../data/3-levels/levels/scales_6stimuli_3levels_no_fam_25_january_OSCA.tsv")
 d3 <- read.turk("../../data/3-levels/levels/forced_choice_no_fam_6random_count_onewordmumble_22jan2015_SCALESBASE.tsv")
+          
+d3 <- filter(d3, ques.cond == 3) # which one will he **say**
 
 d1$cond <- "complex"
 d2$cond <- "simple"
@@ -50,7 +56,8 @@ d %>% group_by(cond,level) %>%
 
 dc <- d %>% filter(is.na(mc.targ.ans) | as.numeric(mc.targ) == mc.targ.ans,
                    as.numeric(mc.dist) == mc.dist.ans,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid)==FALSE)
 
 dc %>% group_by(cond,level) %>%
   summarise(n=length(workerid))
@@ -68,7 +75,7 @@ ms <- dc %>%
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-ms$cond <- factor(ms$cond, levels=c("simple","complex"))
+ms$cond <- factor(ms$cond, levels=c("simple","complex","complex prior"))
 ms$level <- factor(ms$level)
 
 pdf("../../plots/3-levels-levels.pdf",width=6, height=3.5)
@@ -82,24 +89,35 @@ dev.off()
 Models
 
 ```{r}
-dc %>%  
+m.levels <- dc %>%  
   group_by(cond, level, choice) %>%
   summarise(n = n()) %>%
-  spread(choice, n)
+  spread(choice, n) %>%
+  mutate(question = c("inference","inference","inference",
+                      "prior","inference","inference"), 
+         expt = c("complex","complex","complex",
+                  "complex","simple","simple"),
+         cond = as.character(c(0, 1, 2, 0, 0, 1))) %>%
+  select(-level)
 ```
 
 "Twins" displays
-----
+----------------
   
 Files:
 
 * mistake: used favorite "scaleweird_6stimuli_no_fam_favorite_19_february_WERF.csv"
-* scaleweird_6stimuli_no_fam_oneword_19_february_WERD.csv
+* "scaleweird_6stimuli_no_fam_oneword_19_february_WERD.csv"
   
 ```{r}
-d <- read.turk("data/3-levels/twins/scaleweird_6stimuli_no_fam_oneword_19_february_WERD.csv")
-d <- d %>% rename(cond = scale_and_levels_condition) %>% 
-  mutate(cond = factor(c("twin feature","uniform feature")[cond - 5]))
+d1 <- read.turk("../../data/3-levels/twins/scaleweird_6stimuli_no_fam_oneword_19_february_WERD.tsv")
+
+d2 <- read.turk("../../data/3-levels/twins/forced_choice_no_fam_6random_count_onewordmumble_11feb2015_TWINBASE.tsv")
+d <- bind_rows(d1,d2)
+
+d <- d %>% 
+  rename(cond = scale_and_levels_condition) %>% 
+  mutate(cond = factor(c("prior","twin feature","uniform feature")[cond - 4]))
 ```
 
 Counts and exclusions.
@@ -110,9 +128,9 @@ d %>% group_by(cond) %>%
             mc.targ = mean(as.numeric(mc.targ, na.rm=TRUE)),
             mc.dist = mean(as.numeric(mc.dist, na.rm=TRUE)))
 
-mcs <- data.frame(cond = c("twin feature","uniform feature"), 
-                  mc.targ.ans = c(2, 3),
-                  mc.dist.ans = c(1, 1))
+mcs <- data.frame(cond = factor(c("twin feature","uniform feature","prior")), 
+                  mc.targ.ans = c(2, 3, 1),
+                  mc.dist.ans = c(1, 1, 2))
 
 d <- left_join(d, mcs)
 
@@ -121,7 +139,8 @@ d %>% group_by(cond) %>%
 
 dc <- d %>% filter(is.na(mc.targ.ans) | as.numeric(mc.targ) == mc.targ.ans,
                    as.numeric(mc.dist) == mc.dist.ans,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid)==FALSE)
 
 dc %>% group_by(cond) %>%
   summarise(n=length(workerid))
@@ -139,27 +158,47 @@ ms <- dc %>%
             cih = ci.high(choice == "twin"),
             cil = ci.low(choice == "twin"))
 
-pdf("plots/3-levels-twins.pdf",width=4.5, height=3.5)
+pdf("../../plots/3-levels-twins.pdf",width=4.5, height=3.5)
 qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, fill=cond,
-      data=ms) + 
+      data=filter(ms, cond != "prior")) + 
   ylab("Proportion choosing either twin face") + 
   xlab("Target feature")
 dev.off()
 ```
 
+Models
+
+```{r}
+m.twins <- dc %>%  
+  group_by(cond, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n) %>%
+  mutate(cond = c("prior","twin","uniform"), 
+         expt = "twins", 
+         question = c("prior", "inference", "inference"), 
+         target = single, 
+         logical = twin / 2, 
+         foil = twin / 2) %>%
+  select(-single, -twin)
+```
 
 "Odd man" displays
 ----
   
 Files:
 
-* patch_oddone_no_fam_14_may_PATCH.csv
-  
+* patch_oddone_no_fam_14_may_PATCH.tsv
+* forced_choice_no_fam_6random_3count_onewordmumble_11feb2015_ODDBASE.tsv
+
 ```{r}
-d <- read.turk("data/3-levels/oddman/patch_oddone_no_fam_14_may_PATCH.csv")
+d1 <- read.turk("../../data/3-levels/oddman/patch_oddone_no_fam_14_may_PATCH.tsv")
+d2 <- read.turk("../../data/3-levels/oddman/forced_choice_no_fam_6random_3count_onewordmumble_11feb2015_ODDBASE.tsv")
+d2$ling.cond <- 11 #hack
+
+d <- bind_rows(d1,d2)
 d <- d %>% rename(cond = ling.cond) %>% 
-  mutate(cond = factor(c("patch","word")[cond - 8]))
+  mutate(cond = factor(c("patch","word","prior")[cond - 8]))
 ```
 
 Counts and exclusions.
@@ -167,7 +206,8 @@ Counts and exclusions.
 ```{r}
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 2,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid)==FALSE)
 
 d %>% group_by(cond) %>%
   summarise(n=length(workerid))
@@ -188,10 +228,10 @@ ms <- dc %>%
             cih = ci.high(choice == "odd_one"),
             cil = ci.low(choice == "odd_one"))
 
-pdf("plots/3-levels-oddman.pdf",width=4.5, height=3.5)
+pdf("../../plots/3-levels-oddman.pdf",width=4.5, height=3.5)
 qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, fill=cond,
-      data=ms) + 
+      data=filter(ms, cond!="prior")) + 
   ylab("Proportion choosing non-literal interpretation") + 
   xlab("Target feature") + 
   ylim(c(0,1))
@@ -199,6 +239,20 @@ dev.off()
 ```
 
 
+Models
+
+```{r}
+m.oddman <- dc %>%  
+  group_by(cond, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n) %>%
+  mutate(expt = "oddman",
+         question = c("inference","prior","inference"), 
+         target = odd_one, 
+         logical = twin_1, 
+         foil = twin_2) %>%
+  select(-odd_one, -twin_1, -twin_2)
+```
 
 
 
@@ -212,32 +266,47 @@ Files (representing three differnet data collection sweeps):
 * pragmods_distractions.results1.tsv
 * pragmods_distractions.results2.tsv
 * pragmods_distractions.results3.tsv
+* priors: pragmods_salience_priors.results.tsv
+
+Notes on prior experiment:
+- labeling of options is not reliable (it is determined by random variable called "scale_and_level" but that's not what's used to choose the matrix). Ignore this. 
+
+- We can back the actual choice distribution out of the object_X_items and items_chosen variables. 
+
 
 ```{r}
-d1 <- read.turk("data/4-size/pragmods_distractions.results1.tsv")
-d2 <- read.turk("data/4-size/pragmods_distractions.results2.tsv")
-d3 <- read.turk("data/4-size/pragmods_distractions.results3.tsv")
+d1 <- read.turk("../../data/3-levels/size/pragmods_distractions.results1.tsv")
+d2 <- read.turk("../../data/3-levels/size/pragmods_distractions.results2.tsv")
+d3 <- read.turk("../../data/3-levels/size/pragmods_distractions.results3.tsv")
+d1$cond <- "inference"
+d2$cond <- "inference"
+d3$cond <- "inference"
 
-d <- rbind_list(d1,d2,d3) 
+d4 <- read.turk("../../data/3-levels/size/pragmods_salience_priors.results.tsv")
+d4$cond <- "prior"
+
+d <- rbind_list(d1, d2, d3, d4) 
 ```
 
 Merge condition. 
 
 ```{r}
-conds <- read.csv("data/4-size/scale_and_level.csv")
-
-d <- left_join(d,conds,by="scale_and_levels_condition")
+conds <- read.csv("../../data/3-levels/size/scale_and_level.csv")
+d <- left_join(d, conds, by="scale_and_levels_condition") 
+d[d$cond == "prior",]$matrix <- d[d$cond == "prior",]$matrix_number
 ```
 
 Counts and exclusions. Note that this experiment has no manipulation check (Must check whether it has a manipulation check at all!). 
 
 ```{r}
-d %>% group_by(target.level, objects, features) %>%
+d %>% group_by(cond, matrix, scale_and_levels_condition, objects, features) %>%
   summarise(n=length(workerid), 
             mc.targ = mean(as.numeric(mc.targ, na.rm=TRUE)),
             mc.dist = mean(as.numeric(mc.dist, na.rm=TRUE)))
 
-dc <- d %>% filter(mc.name == "TRUE")
+dc <- d %>% 
+  filter(mc.name == "TRUE", 
+         duplicated(workerid)==FALSE)
 
 d %>% summarise(n=length(workerid))
 dc %>% summarise(n=length(workerid))
@@ -247,7 +316,8 @@ Now get averages and CIs.
 
 ```{r}
 ms <- dc %>% 
-  group_by(scale_and_levels_condition,targ.features, objects, features) %>%
+  group_by(cond, matrix, 
+           scale_and_levels_condition, targ.features, objects, features) %>%
   summarise(correct = mean(choice == "target"),             
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
@@ -258,18 +328,18 @@ ms$features <- factor(ms$features)
 qplot(targ.features, correct, geom=c("bar","linerange"), stat="identity",
       ymin=correct - cil, ymax=correct + cih, fill=targ.features,
       facets = objects ~ features,
-      data=ms) 
+      data=filter(ms, cond=="inference")) 
 # dev.off()
 ```
 
 Another plot:
 
 ```{r}
-pdf("plots/4-size-dists.pdf",width=8, height=4)
+pdf("../../plots/3-levels-dists.pdf",width=8, height=4)
 qplot(objects, correct, geom=c("line","pointrange"), 
       ymin=correct - cil, ymax=correct + cih, col=features,
       position=position_dodge(width=.1),
-      data=ms) + facet_grid(.~ targ.features) +
+      data=filter(ms, cond=="inference")) + facet_grid(.~ targ.features) +
   ylim(c(0,1))
 dev.off()
 ```
@@ -282,4 +352,22 @@ summary(glm(correct ~ objects * features,
             data=filter(d, targ.features == 2)))
 summary(glm(correct ~ objects + features, 
             data=filter(d, targ.features == 2)))
+```
+
+Models
+
+```{r}
+dc %>%  
+  group_by(cond, matrix, targ.features, objects, features, choice) %>%
+  summarise(n = n()) %>%
+  spread(choice, n) %>%
+  as.data.frame()
+```
+
+Aggregate model data
+--------------------
+
+```{r}
+models <- bind_rows(m.levels, m.twins, m.oddman) 
+write.csv(models, "../../models/data/levels.csv", row.names = FALSE)
 ```

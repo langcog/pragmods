@@ -3,37 +3,101 @@
 
 In our next set of experiments, \exptrefrange{exp:levels-levels}{exp:levels-size}, we probed limits on the kind of inferences we could measure in our reference game paradigm. In all of these experiments, we also conducted parallel experiments measuring prior expectations using the methods described in \secref{sec:priors}, but we largely omit discussion of these data until \secref{sec:models}.
 
-In our first experiment, \exptref{exp:levels-level}, we attempted to measure patterns of inference in more complex reference games. Following \citeA{stiller2011} and \citeA{degen2012}, we created a matrix that required a deeper level of reasoning than our previous experiments. In particular, we compared our standard reference game (shown again for reference in Figure \ref{fig:levels-level}A) with a more complex game (Figure \ref{fig:levels-level}B). In the standard game, we measured the level at which participants chose the pragmatic target, which we call a Level 1 inference (we return to this notation in \secref{sec:models}). We also measured the level of choosing the target with the unique feature (e.g. choosing the hat with the word ``hat''; a ``level 0'' inference). In the more complex game, we measured the standard Level 1 inference (the target for this inference was the face with a mustache but no glasses, for the utterance ``mustache''). The contribution of this experiment, however, was our test of a Level 2 inference (``glasses,'' with the presumptive target the face with glasses and mustache, not glasses and hat). This inference depends on having reasoned that while both of the targets have another possible descriptor, for one of those targets, the second descriptor is unique, whereas for the other the second descriptor is also non-unique. 
-
-
-
 
  \begin{figure}[t]
   \centering
   \includegraphics[width=4in]{../plots/3-levels-levels.pdf}\\ 
   A) \includegraphics[width=3in]{figures/hatglasses.pdf}\\
   B) \includegraphics[width=3in]{figures/levels-levels-stim.pdf}
-  \caption{\label{fig:levels-level} Data from \exptref{exp:levels-level} in the inference conditions.}
+  \caption{\label{fig:levels-level} Data from \exptref{exp:levels-level}, plotted by display (A being simple, B being complex) and inference level (see text).}
 \end{figure}
 
 
- \begin{figure}[t]
-  \centering
-  \includegraphics[width=4in]{../plots/3-levels-oddman.pdf}
-  \includegraphics[width=4in]{figures/levels-oddman-stim.pdf}
-  \caption{\label{fig:levels-levels} Data from \exptref{exp:levels-oddman} in the inference conditions.}
-\end{figure}
+In our first experiment, \exptref{exp:levels-level}, we attempted to measure patterns of inference in more complex reference games. Following \citeA{stiller2011} and \citeA{degen2012}, we created a matrix that required a deeper level of reasoning than our previous experiments. In particular, we compared our standard reference game (shown again for reference in Figure \ref{fig:levels-level}A) with a more complex game (Figure \ref{fig:levels-level}B):
+
+
+\begin{equation}
+\left[
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 1\\
+      1 & 1 & 0 
+    \end{array} 
+  \right]
+\end{equation}
+
+
+In the standard game, we measured the level at which participants chose the pragmatic target, which we call a Level 1 inference (we return to this notation in \secref{sec:models}). We also measured the level of choosing the target with the unique feature (e.g. choosing the hat with the word ``hat''; a ``level 0'' inference). In the more complex game, we measured the standard Level 1 inference (the target for this inference was the face with a mustache but no glasses, for the utterance ``mustache''). The contribution of this experiment, however, was our test of a Level 2 inference (``glasses,'' with the presumptive target the face with glasses and mustache, not glasses and hat). This inference depends on having reasoned that while both of the targets have another possible descriptor, for one of those targets, the second descriptor is unique, whereas for the other the second descriptor is also non-unique. 
+
+As shown in Figure \ref{fig:levels-level}, judgments in the Level 1 inference remained very close to 75\%, regardless of display (the level observed across many of our other experiments). Level 0 inferences were of course at ceiling. In contrast, Level 2 inferences were at chance (53\%). The prior for this target was lower than the prior for the logical distractor image, however (23\% vs 39\%). Thus, it may be the case that participants make this inference but it is partially or fully cancelled out by an expectation against it (see Figure 1 of Frank \& Goodman, 2012, for an example of this kind of cancelation). 
 
  \begin{figure}[t]
   \centering
-  \includegraphics[width=4in]{../plots/3-levels-twins.pdf}
   \includegraphics[width=4in]{figures/levels-twins-stim.pdf}
-  \caption{\label{fig:levels-levels} Data from \exptref{exp:levels-twins} in the inference conditions.}
+  \includegraphics[width=4in]{../plots/3-levels-twins.pdf}
+  \caption{\label{fig:levels-twins} Data from \exptref{exp:levels-twins}, along with the display used for this experiment.}
 \end{figure}
+
+\exptref{expt:levels-twins} further considered the scope of the inferences that participants would make by examining displays like the one shown in Figure \ref{fig:levels-twins}:
+
+
+\begin{equation}
+\left[
+    \begin{array}{ccc}
+      0 & 1 & 1 \\
+      1 & 0 & 0\\
+      1 & 1 & 1 
+    \end{array} 
+  \right]
+\end{equation}
+
+\noindent These displays had a uniform feature and another feature that was shared by two of the three objects. Intuitively, naming the unique feature (``glasses'') should reference the object with it. But the predictions for the other features are perhaps less clear. Should the uniform feature also resolve to the unique object (e.g. ``mustache'' means {\sc mustache+glasses})? And should the duplicated feature resolve to the duplicated objects, or to the non-duplicated object, violating the literal semantics? Findings, shown in Figure \ref{fig:levels-oddman} suggest that referencing the twin feature ({\sc hat}) led to a high degree of choice of one of the duplicated referents; choice of the uniform feature ({\sc mustache}) led to more choices of the unique object. These findings suggest a tendency to make an implicature, and no evidence that participants violated the literal semantics of the ambiguous predicate. 
 
  \begin{figure}[t]
   \centering
-  % \includegraphics[width=4in]{../figures/3-levels-size-stim.pdf}
-  \includegraphics[width=4in]{../plots/3-levels-size.pdf}
-  \caption{\label{fig:levels-levels} Data from \exptref{exp:levels-size} in the inference conditions.}
+  \includegraphics[width=4in]{figures/levels-oddman-stim.pdf}
+  \includegraphics[width=4in]{../plots/3-levels-oddman.pdf}
+
+  \caption{\label{fig:levels-oddman} Data from \exptref{exp:levels-oddman}, along with the display used for this experiment.}
 \end{figure}
+
+
+\exptref{expt:levels-oddman} further considered whether participants would reach communicative equilibria that were at odds with those implied by the literal semantics of the words the speaker used. To address this question, we used a display like the one in Figure \ref{fig:levels-oddman}, top:
+
+\begin{equation}
+\left[
+    \begin{array}{ccc}
+      1 & 1 & 0 \\
+      1 & 0 & 1\\
+      0 & 1 & 1 
+    \end{array} 
+  \right]
+\end{equation}
+
+\noindent Although every feature was ambiguous, a potential equilibrium would be the use of a particular feature to describe the target \emph{without} that feature. For example, here ``hat'' could refer to the face without a hat; ``glasses'' to the face without glasses; etc. But participants did not converge on this equilibrium. 
+
+
+%  \begin{figure}[t]
+%   \centering
+
+%   \begin{tabular}{ccc}
+% \includegraphics[scale=.3]{../plots/size2x2.pdf} &     
+% \includegraphics[scale=.3]{../plots/size3x2.pdf} &     
+% \includegraphics[scale=.3]{../plots/size4x2.pdf} \\
+%     \includegraphics[scale=.3]{../plots/size2x3.pdf} &     
+% \includegraphics[scale=.3]{../plots/size3x3.pdf} &     
+% \includegraphics[scale=.3]{../plots/size4x3.pdf} \\
+%     \includegraphics[scale=.3]{../plots/size2x4.pdf} &     
+% \includegraphics[scale=.3]{../plots/size3x4.pdf} &     
+% \includegraphics[scale=.3]{../plots/size4x4.pdf} \\
+
+   
+%   \end{tabular}
+
+%   \includegraphics[width=4in]{../plots/3-levels-size.pdf}
+%   \caption{\label{fig:levels-levels} Data from \exptref{exp:levels-size} in the inference conditions.}
+% \end{figure}
+
+%%% Local Variables: 
+%%% TeX-master: "pragmods"
+%%% End:

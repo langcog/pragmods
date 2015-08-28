@@ -65,10 +65,16 @@ dev.off()
 Models
 
 ```{r}
-dc %>%  
-  group_by(cond, choice) %>%
+m.prior <- dc %>%  
+  group_by(choice, cond) %>%
   summarise(n = n()) %>%
-  spread(choice, n)
+  spread(choice, n) %>%
+  summarise(foil = sum(foil), 
+            logical = sum(logical), 
+            target = sum(target)) %>%
+  mutate(question = "prior",
+         cond = "prior",
+         expt = "prior")
 ```
 
 Stats
@@ -169,10 +175,14 @@ summary(glm(correct ~ baserate, data=filter(dc, cond=="inference")))
 Output for models.
 
 ```{r}
-dc %>%  
+m.baserate <- dc %>%  
   group_by(cond, baserate, choice) %>%
   summarise(n = n()) %>%
-  spread(choice, n) 
+  spread(choice, n) %>%
+  mutate(expt = "baserate") %>%
+  rename(question = cond, 
+         cond = baserate) %>%
+  mutate(cond = as.character(cond))
 ```
 
 Linguistic Manipulation
@@ -210,7 +220,8 @@ Counts and exclusions.
 ```{r}
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 1,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE",
+                   duplicated(workerid)==FALSE)
 
 d %>% group_by(cond) %>%
   summarise(n=length(workerid))
@@ -246,12 +257,14 @@ dev.off()
 Output for models.
 
 ```{r}
-dc %>%  
+m.lang <- dc %>%  
   group_by(cond, choice) %>%
   summarise(n = n()) %>%
-  spread(choice, n)
+  spread(choice, n) %>%
+  mutate(expt = "lang") %>%
+  mutate(question = c("inference","inference","prior","prior"), 
+         cond = c("favorite","least favorite","favorite","least favorite"))
 ```
-
 
 Perceptual salience (color) manipulation
 ----
@@ -275,7 +288,8 @@ Counts and exclusions.
 ```{r}
 dc <- d %>% filter(as.numeric(mc.targ) == 2,
                    as.numeric(mc.dist) == 1,
-                   mc.name == "TRUE")
+                   mc.name == "TRUE", 
+                   duplicated(workerid)==FALSE)
 
 d %>% group_by(cond) %>%
   summarise(n=length(workerid))
@@ -313,8 +327,19 @@ dev.off()
 Output for models.
 
 ```{r}
-dc %>%  
+m.color <- dc %>%  
   group_by(cond, referent_with_color, choice) %>%
   summarise(n = n()) %>%
-  spread(choice, n)
+  spread(choice, n) %>% 
+  mutate(expt = "color") %>%
+  rename(question = cond, 
+         cond = referent_with_color)
+```
+
+Model join
+----------
+
+```{r}
+m.join <- bind_rows(m.prior, m.color, m.lang, m.baserate)
+write.csv(m.join, "../../models/data/prior.csv", row.names=FALSE)
 ```
