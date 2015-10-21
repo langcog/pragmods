@@ -1,119 +1,159 @@
 \section{Formal Framework}
 \label{sec:models}
 
-In this section, we describe formal details of the ``rational speech act'' model. As described above, this model has been presented previously \cite{frank2012,goodman2013}. Our goal here is to provide a more comprehensive formal presentation. This presentation allows us to highlight choice-points in the model that we test below; in addition, it illuminates parallels and differences with other formal models in this space (specific comparisons are given in Appendix \ref{app:equivalences}).
+In this section, we describe formal details of the ``rational speech act'' model. As described above, this model has been presented previously \cite{frank2012,goodman2013}. Our goal here is to provide a more comprehensive formal presentation. This presentation allows us to highlight choice-points in the model that we test below; in addition, it illuminates parallels and differences with other formal models in this space.
+% . (specific comparisons are given in Appendix \ref{app:equivalences}).
 
 % We introduce a notation for signaling games and other recursive reasoning problems \cite{golland2010,franke2012,frank2012,goodman2013}. This notation system allows us to define a set of recursive models; we show that a set of recent systems for pragmatic reasoning can be written within this system. As a consequence, they are equivalent to one another modulo three design decisions: 
 
 
 \subsection{Preliminaries}
 
-A reference game under our definition is a game in which a speaker $S$ and listener $L$ collaborate in a context $C$ to identify a particular object in the context, known as the speaker's intended referent $r_S \in C$. The game has two parts. First the speaker chooses an utterance $w$ based on vocabulary $V$; this process can be as simple as selection from a list or as complex as generation from a grammar. Next the listener guesses a referent $r_L \in C$ after hearing $w$. The game is won if $r_S=r_L$.
+A reference game under our definition is a game in which a speaker $S$ and listener $L$ collaborate in a context $C$ to identify a particular object in the context, known as the speaker's intended referent $r_S \in C$. The game has two parts. First the speaker chooses an utterance $w$ based on vocabulary $V$; this process can be as simple as selection from a list or as complex as generation from a grammar. Next the listener guesses a referent $r_L \in C$ after hearing $w$. The game is won if $r_S=r_L$. Although these game-theoretic foundations of RSA allow for definition of more complex payoff schemes (as in e.g., \citeNP{franke2009}), here we assume the simplest possible payoff, which is positive if the game is won and zero otherwise.
 
-There is a ``contextual salience'' distribution $\sigma$ over the objects ${o_1 ... o_n} \in C$, which is mutually known to both speaker and hearer. This distribution picks out those objects in the context which are more or less likely to be talked about, either because of their intrinsic perceptual or conceptual noteworthiness, or because of some prior history between speaker and listener (e.g. one object having been talked about previously). 
+We assume that the world consists of a set of objects, some subset of which are present in $C$. There is a distribution $\sigma$ over the objects ${o_1 ... o_n} \in C$, which is mutually known to both speaker and hearer. This distribution picks out those objects in the context which are more or less likely to be talked about, either because of their intrinsic perceptual or conceptual noteworthiness, or because of some prior history between speaker and listener (e.g. one object having been talked about previously). Although in previous work we described it as a ``contextual salience'' distribution, we now refer to this distribution as the ``prior'' to avoid bias in our interpretation.
 
-There is also a mutually-known semantics for the vocabulary of possible words (messages) $w$ that a speaker can send.  Each message can be described as a Kronecker $\delta$ function that applies to referents and returns 1 if the message is true of that referent, 0 otherwise. 
+There is also a mutually-known semantics for the vocabulary of possible words $w$ that a speaker can send. Although in principle these words could be composed (see \citeNP{potts2015} for an example of this approach), here we examine only single words. Each word can be described as a Kronecker $\delta$ function that applies to objects and returns 1 if the message is true of that object, 0 otherwise. When applied to a context, a word specifies a uniform distribution over those objects of which it is true. 
 
 \subsection{The model}
 
-We define the RSA model in terms of two agents, a listener $L$ and a speaker $S$. Their goals are to reason about one another so that they are able to transmit information efficiently. $L$ reasons abut what word $S$ would have said to describe a particular referent; $S$ reasons about what interpretation $L$ would give to a particular message. Each of these agents uses Bayesian inference to reason about the other's likely actions. 
+We define the RSA model in terms of sub-agents, listeners $L$ and speakers $S$. Their goals are to reason about one another so that they are able to transmit information efficiently. $L$s reason abut what word $S$s would have said to describe a particular referent; $S$s reason about what interpretation $L$s would give to a particular message. Each agent uses Bayesian inference to reason about the other's likely actions. 
 
-So we can define:
+So, beginning our recursion, we can define:
 
 \begin{equation}
   \begin{array}{r@{}l}
     \label{eq:agents}
-    P_L(r_S | w, C) & \propto P_S (w | r_S, C) P(r_S)\\
-    P_S(w | r, C) & \propto P_L (r_S | w, C)  
+    P_{L_0}(r_S \mid w, C) & \propto \begin{cases} 1 &\mbox{if } \delta_w(r_s) = 1 \\ 
+0 & \mbox{otherwise.} \end{cases} \\
+    P_{S_n}(w \mid r, C) & \propto P_{L_n-1} (r_S \mid w, C)  \\
+    P_{L_n}(r_S \mid w, C) & \propto P_{S_n} (w \mid r_S, C)\\
   \end{array}
 \end{equation}
 
-\noindent where $P(r_S)$ is a prior distribution over referents, which we discuss extensively below. In principle, we could also add a prior on words, $P(w)$, but for simplicity here we assume that $P(w) \propto 1$ and do not discuss it further. 
+The two agents are defined recursively and so individual probabilities are undefined unless the recursion ends.  Agent $L_0$, the ``literal listener,'' grounds the recursion by choosing an interpretation uniformly between available referents that are consistent with $w$. So then $L_1$ reasons about $S_1$, who in turn reasons about $L_0$. But $L_1$ and $S_1$ are not special. By analogy we can define $L_n$, a listener whose inferences reflect $n$ full cycles of listener-speaker recursion. Clearly the level of recursion $n$ is an important parameter, and it is one we discuss below in considerable depth. 
 
-The two agents in Equation \ref{eq:agents} are defined recursively and so individual probabilities are undefined unless the recursion ends. Thus, we define a further agent, $L_0$, the ``literal listener,'' who grounds the recursion:
+We then define a top-level agent for the purposes of decision-making, $L$:
 
 \begin{equation}
-P_{L_0} (r_S | w, C) \propto \begin{cases} \frac{1}{\sum_{r \in C} \delta_w(r)} &\mbox{if } \delta_w(r_s) = 1 \\ 
-0 & \mbox{otherwise.} \end{cases} 
+P_L (r_s \mid w, C) \propto P_{L_n} (r_s \mid w, C) P(r_s)
 \end{equation}
 
-\noindent In other words, agent $L_0$ simply chooses uniformly between available referents that are consistent with $w$. 
+\noindent where $P(r_S)$ is the prior distribution over referents $\sigma$, which we discuss extensively below. In principle, we could also add a prior on words, $P(w)$, but for simplicity here we assume that $P(w) \propto 1$ and do not discuss it further.
 
-With these agents defined, we can then imagine variations on this model where $L$ reasons about $S$, who in turn reasons about $L_0$. 
+\subsection{Utility-theoretic definition}
 
-See Appendix \ref{app:alternative}
-
-\subsection{Choice-points}
-
-\begin{enumerate}
-\item The depth of the recursion between speaker and listener,
-\item Whether the recursion starts with speaker or listener,
-\item The decision rule chosen by speaker and listener (soft vs. hard maximization), and 
-\item Whether the model includes a term indicating the prior probability of a referent being talked about.
-\end{enumerate}
-
-\noindent We show equivalences of various special cases of this notation to the systems described in these prior reports.
-
-\subsection{An example}
-
-% \begin{figure}[t]
-%   \begin{center} 
-%     \includegraphics[width=4.5in]{figures/bugs.jpg} 
-%     \caption{\label{fig:ex} An example stimulus for our 3 objects, 3 features experiment. Inferring that ``tail'' referred to C is a depth-0 computation, inferring that ``feet'' referred to A is a depth-1 computation, and inferring that ``horns'' referred to B is a depth-2 computation.} 
-%   \end{center} 
-% \end{figure}
-
-We work through an example computation on the stimulus shown in Figure \ref{fig:ex}, using the J\"ager \cite{jaegerinpress} version of the model described above (for simplicity and finite convergence): $L^*(S^*(L^*(S(C^T))))$. The object by feature matrix $C$ has as its columns the messages ``tail,'' ``horns,'' and ``feet'' and the objects A, B, and C as its rows.:
+An alternative definition of our model can be posed in terms of rational action based on speakers' utilities, following the game-theoretic definition above. Consider a speaker who weighs a message $w$ in terms of its informational benefit $I(w)$ and cost $D(w)$:
 
 \begin{equation}
-C= \left(
+U(w; r_S; D) = I(w; C) - D(w)
+\end{equation}
+
+\noindent The speaker should then choose rationally between messages as a function of a choice rule, e.g.:
+
+\begin{equation}
+P_S(w \mid r_S, C) \propto e^{-\alpha U(w;r_S; C)}
+\end{equation}
+
+\noindent where $\alpha$ is a ``greed'' parameter; if $\alpha=0$, choices are random, as $\alpha \rightarrow \infty$, she always chooses the option with greater utility.
+
+We define informational benefit with respect to the recursively lower listener's surprisal, such that the speaker's utility decreases as the listener (at the level they are assuming, namely $n-1$) has more uncertainty: $I(w; C) = -(-log(L_{n-1}))$. If we assume that cost is constant, that $\alpha=1$, and $n=1$, then the log in surprisal and the exponent in the choice rule cancel, as in the the derivation in \citeA{frank2012}. 
+% We follow that derivation and do not consider cost or greed parameters, though we briefly return to them in the discussion of our modeling results. 
+
+\subsection{Matrix definition}
+
+This probabilistic notation emphasizes individual interpretation probabilities; here we briefly describe how these models can be applied to entire signaling game matrices. This way of writing the models also highlights some of the similarities to iterated best response models \cite{jager2010}. Write a signaling game is as a binary context matrix $M$ with indices $w$ and $o$ corresponding to words and objects. If $M_{w,o} = 1$, then that word can be named with that object ($w(o) = 1$). 
+
+Now define our listener and speaker agents as two functions over signaling game matrices. (As above, for simplicity we consider the case where there are no costs and $\alpha=1$). The first function, $L(x)$, is the listener function; for a particular object word pair, it returns the probability of that object, given the word. 
+
+\begin{equation}
+L(x_{w,o}) = \frac{x_{w,o}}{\displaystyle\sum_{o' \in C} x_{w,o'} } 
+\end{equation}
+
+\noindent Applying $L$ to each element of matrix $M$ results in the literal listener $L_0$. 
+
+$S(x)$ is then the speaker function, which captures the intuition that the speaker chooses the best word to describe a particular object (from those that are available in the vocabulary). $S(x)$ takes an object-word pair from the matrix and returns the probability of speaking this word, normalized over the other possible words:
+
+\begin{equation}
+S(x_{w,o}) = \frac{x_{w,o}}{\displaystyle \sum_{w' \in V(C)} x_{w',o}}
+\end{equation}
+
+So now, if we successively apply these functions to matrix $M$, we can define agents with the same recursive depth as in the description above. For example, $L(S(L(M)))$ is equivalent to the $L_1$ agent above. In essence, repeated applications of the $L$ and $S$ functions is equivalent to iterated renormalization, first by columns and then by rows. 
+
+\subsection{Worked example}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{figures/hatglasses.pdf}
+  \caption{\label{fig:ex} An example stimulus item showing our canonical inferential context. The prompt in this case would be ``glasses,'' and the pragmatic target item would be the face with glasses but not a hat (the logical target item would be the face with a hat and glasses). In all experiments reported here, position and identity of all features is randomized across displays; the target was not always the face with glasses nor was it always positioned in the middle.}
+\end{figure}
+
+We work through an example computation on the stimulus shown in Figure \ref{fig:ex}. The object by feature matrix $M$ is
+
+\begin{equation}
+M = \left[
     \begin{array}{ccc}
       0 & 0 & 1 \\
       0 & 1 & 1\\
-      1 & 1 & 0 
     \end{array} 
-  \right)
+  \right]
 \end{equation}
 
-The corresponding speaker matrix $S(C^T)$ is inverted, with messages as rows and objects as columns: 
+\noindent where the two rows are the messages ``hat'' and ``glasses'' respectively, and the columns correspond to the three faces. So then
+
 
 \begin{equation}
-E = \left(
+L(M) = \left[
     \begin{array}{ccc}
       0 & 0 & 1 \\
       0 & .5 & .5\\
-      .5 & .5 & 0 
     \end{array} 
-  \right)
+  \right]
 \end{equation}
 
-It is already clear that ``tail'' is true only of object C, thus the interpretation of ``tail'' reaches depth 0. Now we perform a set of renormalizations to lead to the next level of recursion:
+and 
 
 \begin{equation}
-L^*(S(C^T)) = \left(
+S(L(M)) = \left[
     \begin{array}{ccc}
-      0 & 0 & 1 \\
-      0 & .5 & .5\\
-      1 & 0 & 0 
+      0 & 0 & .66 \\
+      0 & 1 & .33\\
     \end{array} 
-  \right)
+  \right]
 \end{equation}
 
-Now, at depth 1, the message ``feet'' is found to refer to object A. A final round of recursion leads to depth 2, where ``horns'' is found to refer to object B:
+and then,
+
 
 \begin{equation}
-L^*(S^*(L^*(S(C^T)))) = \left(
+L(S(L(M))) = \left[
     \begin{array}{ccc}
       0 & 0 & 1 \\
-      0 & 1 & 0\\
-      1 & 0 & 0 
+      0 & .75 & .25\\
     \end{array} 
-  \right)
+  \right]
 \end{equation}
 
-We now say that the model has ``converged''---that is, further iteration will not lead to changes in state.
+\noindent Thus, at $L_1$, the message ``glasses'' refers to the face with only glasses.
 
-\subsection{Status of the model}
+\subsection{Relationship to other models}
+
+As reviewed above, a wide range of models in many different traditions have explored similar ideas to those in RSA. Here we highlight a few formal connections that are more apparent after having worked through the formal definition of RSA.
+
+In a seminal early paper, \citeA{rosenberg1964} studied simple communication games much like the ones we study here. They model speakers and listeners as non-recursive agents who nevertheless make symmetric choices using a \citeA{luce1963} choice rule. 
+
+In a study of referring-expression production, \citeA{golland2010} describe a speaker-centric model in which an agent like $S(M)$ is the ``reflex speaker'' (producing true messages with equal probability) and $S(L(M))$ is called the ``reasoned speaker.'' 
+
+\citeA{jager2010} describes an iterated best response (IBR) model in which each agent takes the highest probability alternative, e.g. 
+
+\begin{equation}
+L(x_{w,o}) = \begin{cases} 
+1 &\mbox{if } x_{w,o} = \max_{o' \in C}{x_{w,o'}}  \\
+0 &\mbox{otherwise}
+\end{cases}
+\end{equation}
+
+\noindent This max operation can lead to a number of undesirable results such as ties or rows/columns with no non-zero elements; the model thus includes some ad-hoc procedures for dealing with these cases. Otherwise, RSA and the IBR model are quite similar in spirit, although RSA does not produce discrete results. 
 
 %%% Local Variables: 
 %%% TeX-master: "pragmods"
