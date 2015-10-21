@@ -12,6 +12,7 @@ Fit vanilla RSA models to the data from prior and levels series experiments.
 ```{r}
 library(binom)
 library(magrittr)
+library(langcog)
 rm(list=ls())
 source("../analysis/useful_dplyr.R")
 source("agents.R")
@@ -54,7 +55,7 @@ do.model <- function(matrix,
 
 Note: `levels_mod.csv` has the levels of the "levels" complex experiment manually modified, because while we are using terms like "target" here as an absolute reference, it was used as a relative reference in that experiment design. Meaning, "target" for level 0 was actually what we refer to here as "logical," and "target" for level 1 was "foil" here.
 
-`priors_mod.csv` just has some levels renamed forso they are terser and more informative.
+`priors_mod.csv` just has some levels renamed so they are terser and more informative.
 
 ```{r}
 d.prior <- read.csv("data/prior_mod.csv") 
@@ -106,6 +107,7 @@ inference %<>%
                         0, count)) %>%
   group_by(expt, cond) %>%
   mutate(p = count / sum(count), 
+         n = sum(count), 
          cil = binom.bayes(count, sum(count))$lower,
          cih = binom.bayes(count, sum(count))$upper) 
 
@@ -125,7 +127,7 @@ Now run models by merging in priors.
 d <- left_join(inference, prior)            
 write.csv(d, "data/models.csv", row.names=FALSE)
   
-models <- factor(c("L0","LS","LSLS","LSLSLS"))
+models <- factor(c("L0","L1","L2","L3", "L4","L5"))
 md <- data.frame()
 
 for (i in 1:length(models)) {
@@ -166,7 +168,7 @@ this_row <- d[d$expt == "color" & d$object == "target" & d$cond == "logical",]
 this_row %>% data.frame
 with(this_row, 
      do.model(matrix = matrix, 
-              model = "LSLS", 
+              model = "L1", 
               query_feature = query, 
               query_target = object,
               prior = c(foil, target, logical),
@@ -220,4 +222,37 @@ md %>%
             r_spearman = cor.test(p, prediction, method = "spearman")$estimate,
             MSE = mean((prediction-p)^2))
 
+```
+
+Plots by experiment.
+
+```{r}
+ggplot(filter(md, prior == "prior"), 
+       aes(x = prediction, y = p, col = expt, pch = object)) + 
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_grid(expt~model) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+## Simulate forward from the model 
+
+Strategy here is to figure out how different model predictions are in this matrix set anyway. 
+
+```{r}
+models <- md %>%
+  mutate(modelcond = interaction(model, prior)) %>%
+  select(cond, expt, matrix, object, prediction, modelcond) %>%
+  spread(modelcond, prediction)
+
+ggcorplot(models)
+```
+
+Now with the removal of 0/1 predictions. This makes much more of a difference.
+
+```{r}
+ggcorplot(filter(models, L0.uniform > 0 & L0.uniform < 1))
 ```

@@ -6,11 +6,21 @@
 \usepackage{pslatex}
 \usepackage{amssymb}
 \usepackage{setspace}
+\usepackage{xr}
+\externaldocument{section-intro}
+\externaldocument{section-models}
+\externaldocument{section-general-methods}
+\externaldocument{section-prelims}
+\externaldocument{section-prior}
+\externaldocument{section-levels}
+\externaldocument{section-model-fits}
+\externaldocument{section-discussion}
 
-\title{\vspace{-16ex} Rational speech act models of pragmatic reasoning in reference games}
+\title{Rational speech act models of pragmatic reasoning in reference games}
 
-\sixauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Alex J. Stiller}{Benjamin Gittelson}{Christopher G. Potts}{Noah D. Goodman}
-\sixaffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, University of California, San Diego}{Department of Linguistics, Columbia University}{Department of Linguistics, Stanford University}{Department of Psychology, Stanford University}
+
+\fourauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Noah D. Goodman}{Christopher G. Potts}
+\fouraffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, Stanford University}
 
 \shorttitle{Rational speech act models}
 \rightheader{Rational speech act models}
@@ -32,13 +42,14 @@
 % \newcommand{\secref}[1]{section\,\ref{#1}}
 % \newcommand{\dashsecref}[2]{sections\,\ref{#1}--\ref{#2}}
 
-\acknowledgements{\singlespace Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \exptrefrange{exp:seqs-1}{exp:prod-2seq}. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \exptref{exp:levels-level} were presented in \citeA{vogel2014}. We gratefully acknowledge funding from ONR and the Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
+% Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \exptrefrange{exp:seqs-1}{exp:prod-2seq}. 
+\acknowledgements{\singlespace Thanks to Alex Stiller for valuable work on a previous version of the ``base rate'' sequence of experiments. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \exptref{exp:levels-level} were presented in \citeA{vogel2014}. We gratefully acknowledge funding from ONR and the Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
 
 ~\\
 }
 
 
-\abstract{Human communication is almost always underspecified, but it typically takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Consolidating previous modeling work, we describe this process of recursive reasoning---in which listeners reason about speakers and vice versa---through a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of experiments using simple one-shot reference-resolution games. Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described within the dynamics of the RSA model.}
+\abstract{Human communication is almost always underspecified, but it typically takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Following previous work, we describe this process of recursive reasoning---in which listeners reason about speakers and vice versa---using a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of experiments using simple one-shot reference-resolution games. Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described by the RSA framework.}
 
 \begin{document}
 \maketitle                            
@@ -61,7 +72,7 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \expt{exp:prior-frame} & Prior & Elicitation frame & 200 & 175 & No difference \\
 \expt{exp:prior-baserate} &  & Base rate & 800 & 488 & Base rate affects inference \\
 \expt{exp:prior-valence} &  & Linguistic framing & 550 & 502 & Linguistic valence affects inference\\
-\expt{exp:prior-color} &  & Perceptual salience & 300 & 267 & \\
+\expt{exp:prior-color} &  & Perceptual salience & 300 & 267 & Perceptual salience affects inference \\
 \expt{exp:levels-level} & Levels & Level of inference & 416 & 362 & Level 2 difficult for participants \\
 % \expt{exp:levels-prior} &    & Levels prior & & CHECK  & \\
 \expt{exp:levels-twins}  &    & Twins & 220 & 194  & Few non-literal readings\\
@@ -104,11 +115,11 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 
 \newpage
 
-\theappendix
+% \theappendix
 
-\input{section-equivalences}
+% \input{section-equivalences}
 
-\input{section-matrix}
+% \input{section-matrix}
 
 \end{document}
 

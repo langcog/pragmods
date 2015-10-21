@@ -43,7 +43,7 @@ S0 = function(m) {
 ##
 ## For additional details on the arguments, see Speaker
 
-S = function(m, sem=m, costs=NULL, prior=NULL, resort.to.uniform=TRUE) {
+S = function(m, sem=m, costs=NULL, prior=NULL, resort.to.uniform=FALSE) {
   m = Speaker(m, sem=sem, costs=costs, prior=NULL, argmax=FALSE, resort.to.uniform=resort.to.uniform)
   return(m)
 }
@@ -60,7 +60,7 @@ S = function(m, sem=m, costs=NULL, prior=NULL, resort.to.uniform=TRUE) {
 ##
 ## For additional details on the arguments, see Speaker
 
-Sstar = function(m, sem=m, costs=NULL, prior=NULL, resort.to.uniform=TRUE) {
+Sstar = function(m, sem=m, costs=NULL, prior=NULL, resort.to.uniform=FALSE) {
   m = Speaker(m, sem=sem, costs=costs, prior=NULL, argmax=TRUE, resort.to.uniform=resort.to.uniform)
   return(m)    
 }
@@ -79,7 +79,7 @@ Sstar = function(m, sem=m, costs=NULL, prior=NULL, resort.to.uniform=TRUE) {
 ## Value
 ## A matrix with the same dimensions as m.
 
-Speaker = function(m, sem=m, costs=NULL, prior=NULL, argmax=TRUE, resort.to.uniform=TRUE) {
+Speaker = function(m, sem=m, costs=NULL, prior=NULL, argmax=TRUE, resort.to.uniform=FALSE) {
   m = t(m)
   ## Preserve these in case they get lost in processing:
   row.names = rownames(m)
@@ -315,4 +315,41 @@ LSLSLS <- function(m,prior=UniformDistribution(nrow(m))) {
   Lbayes(S(L(S(L(S0(m), m), m,resort.to.uniform=FALSE),
              m), m,resort.to.uniform=FALSE),
          m, prior=prior)
+}
+
+LSLSLSLS <- function(m,prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L(S(L(S(L(S0(m), m), m,resort.to.uniform=FALSE),
+                 m), m,resort.to.uniform=FALSE),
+             m), m,resort.to.uniform=FALSE),
+         m, prior=prior)
+}
+
+
+LSLSLSLSLS <- function(m,prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L(S(L(S(L(S(L(S0(m), m), m,resort.to.uniform=FALSE),
+                     m), m,resort.to.uniform=FALSE),
+                 m), m,resort.to.uniform=FALSE),
+             m), m,resort.to.uniform=FALSE),
+         m, prior=prior)
+}
+
+### NEW AGENTS THAT MATCH FG2012's LSL0
+L1 <- function(m, prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L0(m)), prior = prior) 
+}
+
+L2 <- function(m, prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L(S(L0(m)))), prior = prior) 
+}
+
+L3 <- function(m, prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L(S(L(S(L0(m)))))), prior = prior) 
+}
+
+L4 <- function(m, prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L(S(L(S(L(S(L0(m)))))))), prior = prior) 
+}
+
+L5 <- function(m, prior=UniformDistribution(nrow(m))) {
+  Lbayes(S(L(S(L(S(L(S(L(S(L0(m)))))))))), prior = prior) 
 }
