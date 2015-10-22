@@ -55,7 +55,7 @@ do.model <- function(matrix,
 
 Note: `levels_mod.csv` has the levels of the "levels" complex experiment manually modified, because while we are using terms like "target" here as an absolute reference, it was used as a relative reference in that experiment design. Meaning, "target" for level 0 was actually what we refer to here as "logical," and "target" for level 1 was "foil" here.
 
-`priors_mod.csv` just has some levels renamed so they are terser and more informative.
+`prior_mod.csv` just has some levels renamed so they are terser and more informative.
 
 ```{r}
 d.prior <- read.csv("data/prior_mod.csv") 
@@ -111,7 +111,7 @@ inference %<>%
          cil = binom.bayes(count, sum(count))$lower,
          cih = binom.bayes(count, sum(count))$upper) 
 
-eps <- 1
+eps <- 0
 prior %<>% 
   mutate(normalizer = foil + target + logical + 3*eps,
          foil = (foil + eps) / normalizer, 
@@ -177,7 +177,23 @@ with(this_row,
 
 ## Plots
 
-First, all points.
+First, all points, with no prior split points.
+
+```{r}
+ggplot(filter(md, prior == "prior",
+              model %in% c("L0","L1","L2")), 
+       aes(x = prediction, y = p, col = expt, pch = object)) + 
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  # geom_text(aes(label = cond, x = prediction + .02), size=3, hjust=0) +
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~model) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+Now show the difference between prior and no prior.
 
 ```{r}
 ggplot(md, aes(x = prediction, y = p, col = expt, pch = object)) + 
@@ -250,6 +266,19 @@ models <- md %>%
 
 ggcorplot(models)
 ```
+
+With no prior. 
+
+```{r}
+models.np <- md %>%
+  filter(prior == "prior") %>%
+  select(cond, expt, matrix, object, prediction, model) %>%
+  spread(model, prediction)
+
+quartz()
+ggcorplot(filter(models.np, L0 > 0 & L0 < 1))
+```
+
 
 Now with the removal of 0/1 predictions. This makes much more of a difference.
 
