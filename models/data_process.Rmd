@@ -1,0 +1,25 @@
+---
+title: "Model Simulations"
+author: "Ben Peloquin"
+date: "April 7, 2016"
+output: html_document
+---
+
+Prelim set-up
+```{r}
+rm(list = ls())
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+source("matrices.R")
+```
+
+```{r}
+## This is `d` df from line 128 in sims.Rmd
+d <- read.csv("data/models.csv")
+View(d)
+```
+
