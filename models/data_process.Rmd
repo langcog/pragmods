@@ -159,8 +159,6 @@ KEEP OLD NOTE:: HERE'S A PROBLEM to work with rrrsa::runDf we need each matrix t
 Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
 Practice rsa run with one group
 ```{r}
-str(d)
-
 ## Initial pre-processing before adding in new cols and then adding literal semantics
 processedD <- d %>%
   ## Gather priors - we're only interested in prior for current object
@@ -188,7 +186,7 @@ rrrsa::rsa.runDf(baserate_63,
 # debug(rrrsa::rsa.runDf)
 ```
 
-Full simulation
+Full simulations
 ```{r}
 rsaRun <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
@@ -196,12 +194,17 @@ rsaRun <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
   
-keepIndices <- c("keep", "throwout")
-compareIndices  <- which(rsaRun$tuningData %in% keepIndices)
-rsaRun %>%
-  rowwise %>%
-  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
-  rrrsa::rsa.tuneDepthAlpha(., quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", priorsVarName = "priorValue", compareDataName = )
+# keepIndices <- c("keep", "throwout")
+# compareIndices  <- which(rsaRun$tuningData %in% keepIndices)
+# rsaRun %>%
+#   rowwise %>%
+#   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
+#   rrrsa::rsa.tuneDepthAlpha(., quantityVarName = "object", semanticsVarName = "speaker.p",
+#             itemVarName = "query", priorsVarName = "priorValue", compareDataName = )
+  
+rsa.bestFit(fullData, quantityVarName = "object", semanticsVarName = "speaker.p",
+            itemVarName = "query", priorsVarName = "priorValue", groupName = "grouper",
+            alphas = seq(1, 5, by=0.1), depth = seq(1,3), compareDataName = "p")
+debug(rsa.bestFit)
 ```
 
