@@ -11,12 +11,11 @@ rm(list = ls())
 ```
 
 ```{r}
-library(plyr)
+source("matrices.R")
+library(rrrsa)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(rrrsa)
-source("matrices.R")
 ```
 
 Generic helpers
@@ -68,6 +67,51 @@ getLiteralSemantics <- function(matrixName, object, query) {
     stop("Error in getLiteralSemantics()")
   }
 }
+
+#####
+##### completeQueries()
+##### ---------------------
+##### add "query" words for each expt
+##### this is necessary for running with rrrsa::runDf
+#####
+completeQueries <- function(d) {
+  newD <- d
+  
+  currMatrix <- unique(as.character(d$matrix))
+  
+  
+  ## meta-data
+  allQueries <- c("glasses", "hat", "mustache")
+  allObjects <- c("foil", "logical", "target")
+  
+  ## The current query
+  currQuery <- unique(as.character(d$query))
+  neededQueries <- setdiff(allQueries, currQuery)
+  
+  ## Add in new queries
+  for (q in neededQueries) {
+    df <- data.frame(cond = as.vector(d$cond),
+                     expt = as.vector(d$expt),
+                     matrix = as.vector(d$matrix),
+                     prior = as.vector(d$prior),
+                     query = rep(q, 3),
+                     object = as.vector(d$object),
+                     count = rep(NA, 3),
+                     p = rep(NA, 3),
+                     n = as.vector(d$n),
+                     cil = rep(NA, 3), 
+                     cih = rep(NA, 3),
+                     priorType = as.vector(d$priorType),
+                     priorValue = as.vector(d$priorValue),
+                     grouper = as.vector(d$grouper))
+    newD <- rbind(newD, df)
+    if (currMatrix == "simple") return(newD)
+  }
+  newD
+}
+# undebug(completeQueries)
+# debug(completeQueries)
+# completeQueries(baserate_63)
 ```
 
 Get the data
@@ -110,33 +154,54 @@ Focus on simple
 ```
 
 Add literal semantics information from matrices
+
+KEEP OLD NOTE:: HERE'S A PROBLEM to work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
+Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
+Practice rsa run with one group
 ```{r}
+str(d)
+
+## Initial pre-processing before adding in new cols and then adding literal semantics
 processedD <- d %>%
   ## Gather priors - we're only interested in prior for current object
   gather(priorType, priorValue, c(foil, logical, target)) %>%
   ## Filter out an mismatches between current object and priorType
-  # filter(object == priorType) %>%
-  ## Each row gets a unique literal semantics from getLiteraSemantics() helper
+  filter(object == priorType) %>%
   rowwise %>%
-  mutate(speaker.p = getLiteralSemantics(matrix, query = query, object = object)) %>%
-  arrange(expt, n) %>%
   ## Grouping variable concatenates experiment type and sample size (expt-n)
   mutate(grouper = paste0(as.character(expt), "-", as.character(n)))
 
-View(processedD)
+fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQueries) %>%
+  rowwise %>%
+  ## Each row gets a unique literal semantics from getLiteraSemantics() helper
+  mutate(speaker.p = getLiteralSemantics(matrix, query = query, object = object)) %>%
+  arrange(expt, n)
 ```
 
-
-NOTE:: HERE'S A PROBLEM to work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
-Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
-Practice rsa run with one group
+Subset run
 ```{r}
-baserate_63 <- processedD %>% filter(grouper == "baserate-63")
+baserate_63 <- fullData %>% filter(grouper == "baserate-63")
 rrrsa::rsa.runDf(baserate_63,
-                 quantityVarName = "query", semanticsVarName = "speaker.p",
-                 itemVarName = "object")
-
-debug(rrrsa::rsa.runDf)
-
-head(peloquinFrank_2Alts)
+                 quantityVarName = "object", semanticsVarName = "speaker.p",
+                 itemVarName = "query", priorsVarName = "priorValue")
+# undebug(rrrsa::rsa.runDf)
+# debug(rrrsa::rsa.runDf)
 ```
+
+Full simulation
+```{r}
+rsaRun <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+            quantityVarName = "object", semanticsVarName = "speaker.p",
+            itemVarName = "query", priorsVarName = "priorValue") %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
+  
+keepIndices <- c("keep", "throwout")
+compareIndices  <- which(rsaRun$tuningData %in% keepIndices)
+rsaRun %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
+  rrrsa::rsa.tuneDepthAlpha(., quantityVarName = "object", semanticsVarName = "speaker.p",
+            itemVarName = "query", priorsVarName = "priorValue", compareDataName = )
+```
+
