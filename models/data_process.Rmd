@@ -11,15 +11,132 @@ rm(list = ls())
 ```
 
 ```{r}
+library(plyr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(rrrsa)
 source("matrices.R")
 ```
 
+Generic helpers
+```{r}
+#####
+##### normalizeBy()
+##### -------------
+##### normaze matrix by rows or cols, maintain naming
+#####
+normalizeBy <- function(m, rows = TRUE) {
+  colNames <- colnames(m)
+  rowNames <- rownames(m)
+  normedM <- t(apply(m, MARGIN = ifelse(rows, 1, 2), rrrsa::rsa.normVec))
+  colnames(normedM) <- colNames
+  rownames(normedM) <- rowNames
+  normedM
+}
+
+#####
+##### inGlobalEnv()
+##### -------------
+##### boolean object presence in global env
+#####
+inGlobalEnv <- function(item) {
+  item %in% ls(envir = .GlobalEnv)
+}
+
+#####
+##### getLiteralSemantics()
+##### ---------------------
+##### literal semantics mapper between 
+##### normalized matrices and dataframe
+##### called in mutate() within dplyr chain
+#####
+getLiteralSemantics <- function(matrixName, object, query) {
+  if (!(inGlobalEnv("simpleM") | inGlobalEnv("complexM") | inGlobalEnv("oddmanM") | inGlobalEnv("twinsM"))) {
+    stop("Missing normalized matrices, please run data pre-processing block")
+  }
+  
+  if (matrixName == "simple") {
+    simpleM[as.character(object), as.character(query)]
+  } else if (matrixName == "complex") {
+    complexM[as.character(object), as.character(query)]
+  } else if (matrixName == "oddman") {
+    oddmanM[as.character(object), as.character(query)]
+  } else if (matrixName == "twins") {
+    twinsM[as.character(object), as.character(query)]
+  } else {
+    stop("Error in getLiteralSemantics()")
+  }
+}
+```
+
+Get the data
 ```{r}
 ## This is `d` df from line 128 in sims.Rmd
 d <- read.csv("data/models.csv")
-View(d)
+# View(d)
 ```
 
+Data pre-processing
+```{r}
+## Subsetted dfs
+# simpleD <- d %>%
+#   filter(matrix == "simple")
+# complexD <- d %>%
+#   filter(matrix == "complex")
+# oddmanD <- d %>%
+#   filter(matrix == "oddman")
+# twinsD <- d %>%
+#   filter(matrix == "twins")
+
+## Renamed, normalized matrices from matrices.R
+simpleM <- normalizeBy(simple, rows = TRUE)
+complexM <- normalizeBy(complex, rows = TRUE)
+twinsM <- normalizeBy(twins, rows = TRUE)
+oddmanM <- normalizeBy(oddman, rows = TRUE)
+```
+
+Focus on simple
+```{r}
+## Here are the sceneriors - sort by expt and n
+## Now we can match the query (word), object (meaning) combinations to matrices
+## This code populates a new literal listener column
+# simpleD2 <- simpleD %>% 
+#   arrange(expt, n) %>% 
+#   gather(priorType, priorValue, c(foil, logical, target)) %>%
+#   filter(object == priorType) %>%
+#   rowwise %>%
+#   mutate(speaker.p = simpleM[as.character(object), as.character(query)])
+```
+
+Add literal semantics information from matrices
+```{r}
+processedD <- d %>%
+  ## Gather priors - we're only interested in prior for current object
+  gather(priorType, priorValue, c(foil, logical, target)) %>%
+  ## Filter out an mismatches between current object and priorType
+  # filter(object == priorType) %>%
+  ## Each row gets a unique literal semantics from getLiteraSemantics() helper
+  rowwise %>%
+  mutate(speaker.p = getLiteralSemantics(matrix, query = query, object = object)) %>%
+  arrange(expt, n) %>%
+  ## Grouping variable concatenates experiment type and sample size (expt-n)
+  mutate(grouper = paste0(as.character(expt), "-", as.character(n)))
+
+View(processedD)
+```
+
+
+NOTE:: HERE'S A PROBLEM to work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
+Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
+Practice rsa run with one group
+```{r}
+baserate_63 <- processedD %>% filter(grouper == "baserate-63")
+rrrsa::rsa.runDf(baserate_63,
+                 quantityVarName = "query", semanticsVarName = "speaker.p",
+                 itemVarName = "object")
+
+debug(rrrsa::rsa.runDf)
+
+head(peloquinFrank_2Alts)
+```
