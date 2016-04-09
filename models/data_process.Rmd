@@ -2,10 +2,12 @@
 title: "Model Simulations"
 author: "Ben Peloquin"
 date: "April 7, 2016"
-output: html_document
+output:
+  html_document:
+    toc: true
 ---
 
-Prelim set-up
+# Prelim set-up
 ```{r}
 rm(list = ls())
 ```
@@ -18,7 +20,7 @@ library(tidyr)
 library(ggplot2)
 ```
 
-Generic helpers
+## Generic helpers
 ```{r}
 #####
 ##### normalizeBy()
@@ -114,25 +116,15 @@ completeQueries <- function(d) {
 # completeQueries(baserate_63)
 ```
 
-Get the data
+## Read in data
 ```{r}
 ## This is `d` df from line 128 in sims.Rmd
 d <- read.csv("data/models.csv")
 # View(d)
 ```
 
-Data pre-processing
+## Matrices from matrices.R
 ```{r}
-## Subsetted dfs
-# simpleD <- d %>%
-#   filter(matrix == "simple")
-# complexD <- d %>%
-#   filter(matrix == "complex")
-# oddmanD <- d %>%
-#   filter(matrix == "oddman")
-# twinsD <- d %>%
-#   filter(matrix == "twins")
-
 ## Renamed, normalized matrices from matrices.R
 simpleM <- normalizeBy(simple, rows = TRUE)
 complexM <- normalizeBy(complex, rows = TRUE)
@@ -140,24 +132,10 @@ twinsM <- normalizeBy(twins, rows = TRUE)
 oddmanM <- normalizeBy(oddman, rows = TRUE)
 ```
 
-Focus on simple
-```{r}
-## Here are the sceneriors - sort by expt and n
-## Now we can match the query (word), object (meaning) combinations to matrices
-## This code populates a new literal listener column
-# simpleD2 <- simpleD %>% 
-#   arrange(expt, n) %>% 
-#   gather(priorType, priorValue, c(foil, logical, target)) %>%
-#   filter(object == priorType) %>%
-#   rowwise %>%
-#   mutate(speaker.p = simpleM[as.character(object), as.character(query)])
-```
+# Data pre-processing
 
-Add literal semantics information from matrices
-
-KEEP OLD NOTE:: HERE'S A PROBLEM to work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
+NOTE:: To work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
 Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
-Practice rsa run with one group
 ```{r}
 ## Initial pre-processing before adding in new cols and then adding literal semantics
 processedD <- d %>%
@@ -176,7 +154,7 @@ fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQue
   arrange(expt, n)
 ```
 
-Subset run
+Temporarily keep: Subset run
 ```{r}
 baserate_63 <- fullData %>% filter(grouper == "baserate-63")
 rrrsa::rsa.runDf(baserate_63,
@@ -186,7 +164,7 @@ rrrsa::rsa.runDf(baserate_63,
 # debug(rrrsa::rsa.runDf)
 ```
 
-Full simulations
+Temporarily keep: Tuning code
 ```{r}
 rsaRun <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
@@ -201,10 +179,62 @@ rsaRun <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
 #   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
 #   rrrsa::rsa.tuneDepthAlpha(., quantityVarName = "object", semanticsVarName = "speaker.p",
 #             itemVarName = "query", priorsVarName = "priorValue", compareDataName = )
-  
-rsa.bestFit(fullData, quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", priorsVarName = "priorValue", groupName = "grouper",
-            alphas = seq(1, 5, by=0.1), depth = seq(1,3), compareDataName = "p")
-debug(rsa.bestFit)
+head(
+  rsa.bestFit(fullData, quantityVarName = "object", semanticsVarName = "speaker.p",
+              itemVarName = "query", priorsVarName = "priorValue", groupName = "grouper",
+              alphas = seq(1, 5, by=0.1), depth = seq(1,3), compareDataName = "p")
+)
 ```
 
+# Simulation data (recursive depth 0-5)
+```{r}
+## Base data frame of L0
+sims <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+            quantityVarName = "object", semanticsVarName = "speaker.p",
+            itemVarName = "query", priorsVarName = "priorValue", depth = 0) %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+         depth = 0) %>%
+  filter(tuningData == "keep")
+## Iterate through recursive depth 1 - 5
+Ls <- seq(1, 5)
+for (L in Ls) {
+  d <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+            quantityVarName = "object", semanticsVarName = "speaker.p",
+            itemVarName = "query", priorsVarName = "priorValue", depth = L) %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+         depth = L) %>%
+  filter(tuningData == "keep")
+  sims <- rbind(sims, d)
+}
+
+```
+
+# Simulation plots
+
+## Recursive depth 0-2
+```{r}
+sims %>%
+  filter(depth < 3) %>%
+  ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    facet_wrap(~depth) +
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+## Recursive depth 0-5
+```{r}
+ggplot(sims, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2)
+```
