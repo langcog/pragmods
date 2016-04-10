@@ -186,10 +186,12 @@ head(
 )
 ```
 
-# Simulation data (recursive depth 0-5)
+# Simulations with priors (recursive depth 0-5)
+
+## Sim data
 ```{r}
 ## Base data frame of L0
-sims <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+sims_prior <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
             itemVarName = "query", priorsVarName = "priorValue", depth = 0) %>%
   rowwise %>%
@@ -206,16 +208,16 @@ for (L in Ls) {
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
          depth = L) %>%
   filter(tuningData == "keep")
-  sims <- rbind(sims, d)
+  sims_prior <- rbind(sims_prior, d)
 }
 
 ```
 
-# Simulation plots
+## Simulation plots
 
-## Recursive depth 0-2
+### Recursive depth 0-2
 ```{r}
-sims %>%
+sims_prior %>%
   filter(depth < 3) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
     geom_pointrange(aes(ymin = cil, ymax = cih)) + 
@@ -227,9 +229,9 @@ sims %>%
     geom_abline(slope = 1, intercept = 0, lty=2)
 ```
 
-## Recursive depth 0-5
+### Recursive depth 0-5
 ```{r}
-ggplot(sims, aes(x = preds, y = p, col = expt, pch = object)) +
+ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_pointrange(aes(ymin = cil, ymax = cih)) + 
   xlim(c(0,1)) + ylim(c(0,1)) + 
   facet_wrap(~depth) +
@@ -238,3 +240,118 @@ ggplot(sims, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_smooth(method="lm", aes(group=1)) + 
   geom_abline(slope = 1, intercept = 0, lty=2)
 ```
+
+## Correlations
+```{r}
+for (model in seq(0, 5)) {
+  print(
+    paste0("Model", model, " cor: " ,
+      sims_prior %>%
+        filter(depth == model) %>%
+        with(., cor(p, preds))
+    )
+  )
+}
+```
+
+## Inter-model correlations
+```{r}
+
+```
+
+## Fitting alpha
+```{r}
+fullData <- fullData %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
+keepIndices <- c("keep", "throwout")
+compareIndices  <- which(fullData$tuningData == "keep")
+
+## Gather tuning data
+aggregateTuneData <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+                               semanticsVarName = "speaker.p", itemVarName = "query",
+                               priorsVarName = "priorValue", groupName = "grouper",
+                               compareDataName = "p", compareIndices = compareIndices, 
+                               depth = 0, alphas = seq(1, 6, by = 0.1))
+for (model in seq(1, 5)) {
+  currTune <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+                               semanticsVarName = "speaker.p", itemVarName = "query",
+                               priorsVarName = "priorValue", groupName = "grouper",
+                               compareDataName = "p", compareIndices = compareIndices, 
+                               depth = model, alphas = seq(1, 6, by = 0.1))
+  aggregateTuneData <- rbind(aggregateTuneData, currTune)
+}
+```
+
+## Model performance
+```{r}
+## Get best model performance by alpha, depth
+maxCors <- aggregateTuneData %>%
+  group_by(depth) %>%
+  summarize(maxCor = max(cor),
+            alpha = alpha[which.max(cor)])
+maxCors
+```
+
+## Plot tuning
+```{r}
+## Plot tuning
+ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
+  geom_point() +
+  ylim(0.75, 1) +
+  geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50")
+```
+
+```{r}
+# L0_alphas <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+#                                semanticsVarName = "speaker.p", itemVarName = "query",
+#                                priorsVarName = "priorValue", groupName = "grouper",
+#                                compareDataName = "p", compareIndices = compareIndices, 
+#                                depth = 0, alphas = seq(1, 6, by = 0.1))
+# 
+# L1_alphas <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+#                                semanticsVarName = "speaker.p", itemVarName = "query",
+#                                priorsVarName = "priorValue", groupName = "grouper",
+#                                compareDataName = "p", compareIndices = compareIndices, 
+#                                depth = 1, alphas = seq(1, 6, by = 0.1))
+# 
+# L2_alphas <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+#                                semanticsVarName = "speaker.p", itemVarName = "query",
+#                                priorsVarName = "priorValue", groupName = "grouper",
+#                                compareDataName = "p", compareIndices = compareIndices, 
+#                                depth = 2, alphas = seq(1, 6, by = 0.1))
+# 
+# L3_alphas <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+#                                semanticsVarName = "speaker.p", itemVarName = "query",
+#                                priorsVarName = "priorValue", groupName = "grouper",
+#                                compareDataName = "p", compareIndices = compareIndices, 
+#                                depth = 3, alphas = seq(1, 6, by = 0.1))
+# 
+# L4_alphas <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+#                                semanticsVarName = "speaker.p", itemVarName = "query",
+#                                priorsVarName = "priorValue", groupName = "grouper",
+#                                compareDataName = "p", compareIndices = compareIndices, 
+#                                depth = 4, alphas = seq(1, 6, by = 0.1))
+# L4_alphas <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+#                                semanticsVarName = "speaker.p", itemVarName = "query",
+#                                priorsVarName = "priorValue", groupName = "grouper",
+#                                compareDataName = "p", compareIndices = compareIndices, 
+#                                depth = 4, alphas = seq(1, 6, by = 0.1))
+# 
+# debug(rsa.tuneDepthAlpha)
+# undebug(rsa.tuneDepthAlpha)
+#   
+#   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+#             quantityVarName = "object", semanticsVarName = "speaker.p",
+#             itemVarName = "query", priorsVarName = "priorValue", depth = 0) %>%
+# 
+# 
+# sims_prior <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+#             quantityVarName = "object", semanticsVarName = "speaker.p",
+#             itemVarName = "query", priorsVarName = "priorValue", depth = 0) %>%
+#   rowwise %>%
+#   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+#          depth = 0) %>%
+#   filter(tuningData == "keep")
+```
+
