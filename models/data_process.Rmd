@@ -255,11 +255,6 @@ for (model in seq(0, 5)) {
 }
 ```
 
-## Inter-model correlations
-```{r}
-
-```
-
 ## Fitting alpha
 ```{r}
 fullData <- fullData %>%
@@ -269,7 +264,7 @@ keepIndices <- c("keep", "throwout")
 compareIndices  <- which(fullData$tuningData == "keep")
 
 ## Parallelize fitting
-depths <- seq(0, 5)
+depths <- seq(0, 5) ## parallelize over depths
 mclapply(depths, function(i) {
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
                                semanticsVarName = "speaker.p", itemVarName = "query",
@@ -278,13 +273,6 @@ mclapply(depths, function(i) {
                                depth = i, alphas = seq(1, 6, by = 0.1))
   },
   mc.cores = detectCores())
-```
-
-Parallelize
-```{r}
-
-
-
 ```
 
 ## Model performance
@@ -373,33 +361,27 @@ for (model in seq(0, 5)) {
 }
 ```
 
-## Inter-model correlations
-```{r}
-
-```
-
 ## Fitting alpha
 ```{r}
-fullData <- fullData %>%
+## Check that we have fullData and compareIndices for tuning
+if (!(inGlobalEnv("fullData") & inGlobalEnv("compareIndices"))) {
+  fullData <- fullData %>%
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
-keepIndices <- c("keep", "throwout")
-compareIndices  <- which(fullData$tuningData == "keep")
-
-## Gather tuning data
-aggregateTuneData <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
-                               semanticsVarName = "speaker.p", itemVarName = "query",
-                               groupName = "grouper",
-                               compareDataName = "p", compareIndices = compareIndices, 
-                               depth = 0, alphas = seq(1, 6, by = 0.1))
-for (model in seq(1, 5)) {
-  currTune <- rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
-                               semanticsVarName = "speaker.p", itemVarName = "query",
-                               groupName = "grouper",
-                               compareDataName = "p", compareIndices = compareIndices, 
-                               depth = model, alphas = seq(1, 6, by = 0.1))
-  aggregateTuneData <- rbind(aggregateTuneData, currTune)
+  keepIndices <- c("keep", "throwout")
+  compareIndices  <- which(fullData$tuningData == "keep")  
 }
+
+## Parallelize fitting
+depths <- seq(0, 5) ## parallelize over depths
+noPriorFit <- mclapply(depths, function(i) {
+  rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+                               semanticsVarName = "speaker.p", itemVarName = "query",
+                               groupName = "grouper",
+                               compareDataName = "p", compareIndices = compareIndices, 
+                               depth = i, alphas = seq(1, 6, by = 0.1))
+  },
+  mc.cores = detectCores())
 ```
 
 ## Model performance
