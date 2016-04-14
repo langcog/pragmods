@@ -114,6 +114,23 @@ completeQueries <- function(d) {
 # undebug(completeQueries)
 # debug(completeQueries)
 # completeQueries(baserate_63)
+
+
+#####
+##### convertListToDf()
+##### -----------------
+##### Convert a list where each element represents
+##### data for a different grouping variable
+##### useful with simulations run below
+#####
+convertListToDF <- function(li) {
+  df <- data.frame()
+  nItems <- seq(1, length(li))
+  for (i in nItems) {
+    df <- rbind(df, as.data.frame(li[[i]]))
+  }
+  df
+}
 ```
 
 ## Read in data
@@ -161,8 +178,8 @@ temp <- rrrsa::rsa.runDf(baserate_63,
                  quantityVarName = "object", semanticsVarName = "speaker.p",
                  itemVarName = "query", priorsVarName = "priorValue", alpha = 10, depth = 1)
 cor(temp$p, temp$preds, use = "pairwise.complete.obs")
-undebug(rrrsa::rsa.runDf)
-debug(rrrsa::rsa.runDf)
+# undebug(rrrsa::rsa.runDf)
+# debug(rrrsa::rsa.runDf)
 ```
 
 Temporarily keep: Tuning code
@@ -189,29 +206,19 @@ Temporarily keep: Tuning code
 
 # Simulations with priors (recursive depth 0-5)
 
-## Sim data
+## Recursive depth sims
 ```{r}
-## Base data frame of L0
-sims_prior <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+depths <- seq(0, 5)
+sims_prior_temp <- lapply(depths, function(depth) {
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", priorsVarName = "priorValue", depth = 0) %>%
+            itemVarName = "query", priorsVarName = "priorValue", depth = depth) %>%
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
-         depth = 0) %>%
+         depth = depth) %>%
   filter(tuningData == "keep")
-## Iterate through recursive depth 1 - 5
-Ls <- seq(1, 5)
-for (L in Ls) {
-  d <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
-            quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", priorsVarName = "priorValue", depth = L) %>%
-  rowwise %>%
-  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
-         depth = L) %>%
-  filter(tuningData == "keep")
-  sims_prior <- rbind(sims_prior, d)
-}
-
+})
+sims_prior <- convertListToDF(sims_prior_temp)
 ```
 
 ## Simulation plots
@@ -244,15 +251,9 @@ ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
 
 ## Correlations
 ```{r}
-for (model in seq(0, 5)) {
-  print(
-    paste0("Model", model, " cor: " ,
-      sims_prior %>%
-        filter(depth == model) %>%
-        with(., cor(p, preds))
-    )
-  )
-}
+sims_prior %>%
+  group_by(depth) %>%
+  summarise("cor" = cor(p, preds))
 ```
 
 ## Fitting alpha
@@ -273,12 +274,7 @@ priorFit <- mclapply(depths, function(i) { ## parallelize over depths
                                depth = i, alphas = seq(1, 6, by = 0.1))
   },
   mc.cores = detectCores())
-
-## Aggregate data hold
-aggregateTuneData <- data.frame()
-for (i in seq(1, 6)) {
-  aggregateTuneData <- rbind(aggregateTuneData, as.data.frame((priorFit[[i]])))
-}
+aggregateTuneData <- convertListToDF(priorFit)
 ```
 
 ## Model performance
@@ -304,28 +300,19 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
 
 # Simulations WITHOUT priors (recursive depth 0-5)
 
-## Sim data
+## Recursive depth sims
 ```{r}
-## Base data frame of L0
-sims_NoPrior <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+depths <- seq(0, 5)
+sims_NoPrior_temp <- lapply(depths, function(depth) {
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", depth = 0) %>%
+            itemVarName = "query", depth = depth) %>%
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
-         depth = 0) %>%
+         depth = depth) %>%
   filter(tuningData == "keep")
-## Iterate through recursive depth 1 - 5
-Ls <- seq(1, 5)
-for (L in Ls) {
-  d <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
-            quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", priorsVarName = "priorValue", depth = L) %>%
-  rowwise %>%
-  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
-         depth = L) %>%
-  filter(tuningData == "keep")
-  sims_NoPrior <- rbind(sims_NoPrior, d)
-}
+})
+sims_NoPrior <- convertListToDF(sims_NoPrior_temp)
 ```
 
 ## Simulation plots
@@ -358,15 +345,9 @@ ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
 
 ## Correlations
 ```{r}
-for (model in seq(0, 5)) {
-  print(
-    paste0("Model", model, " cor: " ,
-      sims_NoPrior %>%
-        filter(depth == model) %>%
-        with(., cor(p, preds))
-    )
-  )
-}
+sims_NoPrior %>%
+  group_by(depth) %>%
+  summarise("cor" = cor(p, preds))
 ```
 
 ## Fitting alpha
@@ -382,7 +363,7 @@ if (!(inGlobalEnv("fullData") & inGlobalEnv("compareIndices"))) {
 
 ## Parallelize fitting
 depths <- seq(0, 5)
-priorFit <- mclapply(depths, function(i) { ## parallelize over depths
+noPriorFit <- mclapply(depths, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
                                semanticsVarName = "speaker.p", itemVarName = "query",
                                groupName = "grouper",
@@ -390,12 +371,7 @@ priorFit <- mclapply(depths, function(i) { ## parallelize over depths
                                depth = i, alphas = seq(1, 6, by = 0.1))
   },
   mc.cores = detectCores())
-
-## Aggregate data hold
-aggregateTuneData <- data.frame()
-for (i in seq(1, 6)) {
-  aggregateTuneData <- rbind(aggregateTuneData, as.data.frame((priorFit[[i]])))
-}
+aggregateTuneData <- convertListToDF(noPriorFit)
 ```
 
 ## Model performance
