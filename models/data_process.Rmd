@@ -394,3 +394,39 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   scale_x_continuous(breaks = round(seq(1, 6, by = 0.1)), "alpha") +
   ggtitle("Model performance - no priors")
 ```
+
+# Propogating errors into model...
+
+## Sims with prior
+```{r}
+sims_prior %>%
+  mutate(errorH = cih - p,
+         errorL = p - cil) %>%
+  ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    facet_wrap(~depth) +
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+## Sims without prior
+
+```{r}
+sims_NoPrior %>%
+  mutate(errorH = cih - p,
+         errorL = p - cil) %>%
+  ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    facet_wrap(~depth) +
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
