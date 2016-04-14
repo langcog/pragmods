@@ -264,8 +264,8 @@ keepIndices <- c("keep", "throwout")
 compareIndices  <- which(fullData$tuningData == "keep")
 
 ## Parallelize fitting
-depths <- seq(0, 5) ## parallelize over depths
-mclapply(depths, function(i) {
+depths <- seq(0, 5)
+priorFit <- mclapply(depths, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
                                semanticsVarName = "speaker.p", itemVarName = "query",
                                priorsVarName = "priorValue", groupName = "grouper",
@@ -273,6 +273,12 @@ mclapply(depths, function(i) {
                                depth = i, alphas = seq(1, 6, by = 0.1))
   },
   mc.cores = detectCores())
+
+## Aggregate data hold
+aggregateTuneData <- data.frame()
+for (i in seq(1, 6)) {
+  aggregateTuneData <- rbind(aggregateTuneData, as.data.frame((priorFit[[i]])))
+}
 ```
 
 ## Model performance
@@ -291,7 +297,9 @@ maxCors
 ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   geom_point() +
   ylim(0.75, 1) +
-  geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50")
+  geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50") +
+  scale_x_continuous(breaks = round(seq(1, 6, by = 0.1)), "alpha") +
+  ggtitle("Model performance - priors incorporated")
 ```
 
 # Simulations WITHOUT priors (recursive depth 0-5)
@@ -373,8 +381,8 @@ if (!(inGlobalEnv("fullData") & inGlobalEnv("compareIndices"))) {
 }
 
 ## Parallelize fitting
-depths <- seq(0, 5) ## parallelize over depths
-noPriorFit <- mclapply(depths, function(i) {
+depths <- seq(0, 5)
+priorFit <- mclapply(depths, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
                                semanticsVarName = "speaker.p", itemVarName = "query",
                                groupName = "grouper",
@@ -382,6 +390,12 @@ noPriorFit <- mclapply(depths, function(i) {
                                depth = i, alphas = seq(1, 6, by = 0.1))
   },
   mc.cores = detectCores())
+
+## Aggregate data hold
+aggregateTuneData <- data.frame()
+for (i in seq(1, 6)) {
+  aggregateTuneData <- rbind(aggregateTuneData, as.data.frame((priorFit[[i]])))
+}
 ```
 
 ## Model performance
@@ -400,5 +414,7 @@ maxCors
 ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   geom_point() +
   ylim(0.75, 1) +
-  geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50")
+  geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50") +
+  scale_x_continuous(breaks = round(seq(1, 6, by = 0.1)), "alpha") +
+  ggtitle("Model performance - no priors")
 ```
