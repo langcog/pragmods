@@ -13,7 +13,9 @@ rm(list = ls())
 ```
 
 ```{r warning = FALSE, message = FALSE}
+setwd('/Users/benpeloquin/Desktop/Projects/Pragmods/models/')
 source("matrices.R")
+source("agents.R")
 library(rrrsa)
 library(dplyr)
 library(tidyr)
@@ -31,7 +33,7 @@ library(parallel)
 normalizeBy <- function(m, rows = TRUE) {
   colNames <- colnames(m)
   rowNames <- rownames(m)
-  normedM <- t(apply(m, MARGIN = ifelse(rows, 1, 2), rrrsa::rsa.normVec))
+  normedM <- apply(m, MARGIN = ifelse(rows, 1, 2), rrrsa::rsa.normVec)
   colnames(normedM) <- colNames
   rownames(normedM) <- rowNames
   normedM
@@ -143,10 +145,10 @@ d <- read.csv("data/models.csv")
 ## Matrices from matrices.R
 ```{r}
 ## Renamed, normalized matrices from matrices.R
-simpleM <- normalizeBy(simple, rows = TRUE)
-complexM <- normalizeBy(complex, rows = TRUE)
-twinsM <- normalizeBy(twins, rows = TRUE)
-oddmanM <- normalizeBy(oddman, rows = TRUE)
+simpleM <- normalizeBy(simple, rows = FALSE)
+complexM <- normalizeBy(complex, rows = FALSE)
+twinsM <- normalizeBy(twins, rows = FALSE)
+oddmanM <- normalizeBy(oddman, rows = FALSE)
 ```
 
 # Data pre-processing
@@ -172,7 +174,7 @@ fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQue
 ```
 
 Temporarily keep: Subset run
-```{r}
+```{r eval = FALSE}
 baserate_63 <- fullData %>% filter(grouper == "baserate-63")
 temp <- rrrsa::rsa.runDf(baserate_63,
                  quantityVarName = "object", semanticsVarName = "speaker.p",
@@ -180,28 +182,6 @@ temp <- rrrsa::rsa.runDf(baserate_63,
 cor(temp$p, temp$preds, use = "pairwise.complete.obs")
 # undebug(rrrsa::rsa.runDf)
 # debug(rrrsa::rsa.runDf)
-```
-
-Temporarily keep: Tuning code
-```{r}
-# rsaRun <- plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
-#             quantityVarName = "object", semanticsVarName = "speaker.p",
-#             itemVarName = "query", priorsVarName = "priorValue") %>%
-#   rowwise %>%
-#   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
-#   
-# # keepIndices <- c("keep", "throwout")
-# # compareIndices  <- which(rsaRun$tuningData %in% keepIndices)
-# # rsaRun %>%
-# #   rowwise %>%
-# #   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
-# #   rrrsa::rsa.tuneDepthAlpha(., quantityVarName = "object", semanticsVarName = "speaker.p",
-# #             itemVarName = "query", priorsVarName = "priorValue", compareDataName = )
-# head(
-#   rsa.bestFit(fullData, quantityVarName = "object", semanticsVarName = "speaker.p",
-#               itemVarName = "query", priorsVarName = "priorValue", groupName = "grouper",
-#               alphas = seq(1, 5, by=0.1), depth = seq(1,3), compareDataName = "p")
-# )
 ```
 
 # Simulations with priors (recursive depth 0-5)
@@ -212,7 +192,7 @@ depths <- seq(0, 5)
 sims_prior_temp <- lapply(depths, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
-            itemVarName = "query", priorsVarName = "priorValue", depth = depth) %>%
+            itemVarName = "query", priorsVarName = "priorValue", depth = depth, usePriorEveryRecurse = FALSE) %>%
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
          depth = depth) %>%
@@ -350,6 +330,36 @@ sims_NoPrior %>%
   summarise("cor" = cor(p, preds))
 ```
 
+## Intermodel corrs
+```{r eval = FALSE}
+library(Deducer)
+sims_prior %>%
+  # select(cond, expt, matrix, object, preds, grouper, depth) %>%
+  spread(depth, preds) %>%
+  select("0", "1", "2", "3", "4", "5") %>%
+  ggcorplot()
+
+  models <- md %>%
+  mutate(modelcond = interaction(model, prior)) %>%
+  select(cond, expt, matrix, object, prediction, modelcond) %>%
+  spread(modelcond, prediction)
+  
+# corr.mat <- cor.matrix(variables = d(preds, as.factor(depth)),
+#                        data = sims_prior,
+#                        test = cor.test,
+#                        method = "spearman",
+#                        alternative = "two.sided", exact = FALSE)
+# ggcorplot(corr.mat, data = sims_prior)
+# 
+# data(mtcars)
+# corr.mat1<-cor.matrix(variables=d(mpg,carb,carb+rnorm(length(carb))),,
+# 	 data=mtcars,
+# 	 test=cor.test,
+# 	 method='spearman',
+# 	alternative="two.sided",exact=FALSE)
+```
+
+
 ## Fitting alpha
 ```{r}
 ## Check that we have fullData and compareIndices for tuning
@@ -430,3 +440,25 @@ sims_NoPrior %>%
     geom_abline(slope = 1, intercept = 0, lty=2)
 ```
 
+
+# Explicit comparisons with MF sims.Rmd
+```{r}
+## combine priors and uniform
+sims_prior <- sims_prior %>%
+  mutate(prior = "prior")
+sims_NoPrior <- sims_NoPrior %>%
+  mutate(prior = "uniform")
+allData <- rbind(sims_prior, sims_NoPrior) %>%
+  mutate(model = paste0("L", depth)) %>%
+  arrange(prior, query, object, matrix, cond, expt, model)
+
+## Compare with MFs data
+mfD <- read.csv("data/modelRuns.csv") %>%
+  arrange(prior, query, object, matrix, cond, expt, model)
+
+## Add in MF preds check correlation
+allData$mdPreds <- mfD$prediction
+allData %>%
+  ggplot(aes(x = preds, y = mdPreds, fill = expt, size = depth)) +
+  geom_point(shape = 21, alpha = 0.30)
+```
