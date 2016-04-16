@@ -117,7 +117,6 @@ completeQueries <- function(d) {
 # debug(completeQueries)
 # completeQueries(baserate_63)
 
-
 #####
 ##### convertListToDf()
 ##### -----------------
@@ -173,18 +172,7 @@ fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQue
   arrange(expt, n)
 ```
 
-Temporarily keep: Subset run
-```{r eval = FALSE}
-baserate_63 <- fullData %>% filter(grouper == "baserate-63")
-temp <- rrrsa::rsa.runDf(baserate_63,
-                 quantityVarName = "object", semanticsVarName = "speaker.p",
-                 itemVarName = "query", priorsVarName = "priorValue", alpha = 10, depth = 1)
-cor(temp$p, temp$preds, use = "pairwise.complete.obs")
-# undebug(rrrsa::rsa.runDf)
-# debug(rrrsa::rsa.runDf)
-```
-
-# Simulations with priors (recursive depth 0-5)
+# Simulations WITH priors (recursive depth 0-5)
 
 ## Recursive depth sims
 ```{r}
@@ -248,10 +236,10 @@ compareIndices  <- which(fullData$tuningData == "keep")
 depths <- seq(0, 5)
 priorFit <- mclapply(depths, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
-                               semanticsVarName = "speaker.p", itemVarName = "query",
-                               priorsVarName = "priorValue", groupName = "grouper",
-                               compareDataName = "p", compareIndices = compareIndices, 
-                               depth = i, alphas = seq(1, 6, by = 0.1))
+                     semanticsVarName = "speaker.p", itemVarName = "query",
+                     priorsVarName = "priorValue", groupName = "grouper",
+                     compareDataName = "p", compareIndices = compareIndices,
+                     depth = i, alphas = seq(1, 6, by = 0.1), usePriorEveryRecurse = FALSE)
   },
   mc.cores = detectCores())
 aggregateTuneData <- convertListToDF(priorFit)
@@ -330,36 +318,6 @@ sims_NoPrior %>%
   summarise("cor" = cor(p, preds))
 ```
 
-## Intermodel corrs
-```{r eval = FALSE}
-library(Deducer)
-sims_prior %>%
-  # select(cond, expt, matrix, object, preds, grouper, depth) %>%
-  spread(depth, preds) %>%
-  select("0", "1", "2", "3", "4", "5") %>%
-  ggcorplot()
-
-  models <- md %>%
-  mutate(modelcond = interaction(model, prior)) %>%
-  select(cond, expt, matrix, object, prediction, modelcond) %>%
-  spread(modelcond, prediction)
-  
-# corr.mat <- cor.matrix(variables = d(preds, as.factor(depth)),
-#                        data = sims_prior,
-#                        test = cor.test,
-#                        method = "spearman",
-#                        alternative = "two.sided", exact = FALSE)
-# ggcorplot(corr.mat, data = sims_prior)
-# 
-# data(mtcars)
-# corr.mat1<-cor.matrix(variables=d(mpg,carb,carb+rnorm(length(carb))),,
-# 	 data=mtcars,
-# 	 test=cor.test,
-# 	 method='spearman',
-# 	alternative="two.sided",exact=FALSE)
-```
-
-
 ## Fitting alpha
 ```{r}
 ## Check that we have fullData and compareIndices for tuning
@@ -375,10 +333,10 @@ if (!(inGlobalEnv("fullData") & inGlobalEnv("compareIndices"))) {
 depths <- seq(0, 5)
 noPriorFit <- mclapply(depths, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
-                               semanticsVarName = "speaker.p", itemVarName = "query",
-                               groupName = "grouper",
-                               compareDataName = "p", compareIndices = compareIndices, 
-                               depth = i, alphas = seq(1, 6, by = 0.1))
+                     semanticsVarName = "speaker.p", itemVarName = "query",
+                     compareIndices = compareIndices, compareDataName = "p",
+                     groupName = "grouper",
+                     depth = i, alphas = seq(1, 6, by = 0.1))
   },
   mc.cores = detectCores())
 aggregateTuneData <- convertListToDF(noPriorFit)
@@ -459,6 +417,6 @@ mfD <- read.csv("data/modelRuns.csv") %>%
 ## Add in MF preds check correlation
 allData$mdPreds <- mfD$prediction
 allData %>%
-  ggplot(aes(x = preds, y = mdPreds, fill = expt, size = depth)) +
+  ggplot(aes(x = preds, y = mdPreds, fill = matrix, size = depth)) +
   geom_point(shape = 21, alpha = 0.30)
 ```
