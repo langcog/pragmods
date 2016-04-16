@@ -125,7 +125,7 @@ Now run models by merging in priors.
 ```{r}
 ## add prior on every row
 d <- left_join(inference, prior)            
-write.csv(d, "data/models.csv", row.names=FALSE)
+# write.csv(d, "data/models.csv", row.names=FALSE)
   
 models <- factor(c("L0","L1","L2","L3", "L4","L5"))
 md <- data.frame()
