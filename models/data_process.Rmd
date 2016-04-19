@@ -134,6 +134,12 @@ convertListToDF <- function(li) {
 }
 ```
 
+## Tuning data
+```{r}
+ALPHAS <- seq(0, 5, by = 0.1)
+DEPTHS <- seq(0, 5)
+```
+
 ## Read in data
 ```{r}
 ## This is `d` df from line 128 in sims.Rmd
@@ -176,8 +182,7 @@ fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQue
 
 ## Recursive depth sims
 ```{r}
-depths <- seq(0, 5)
-sims_prior_temp <- lapply(depths, function(depth) {
+sims_prior_temp <- lapply(DEPTHS, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
             itemVarName = "query", priorsVarName = "priorValue", depth = depth, usePriorEveryRecurse = FALSE) %>%
@@ -233,13 +238,12 @@ keepIndices <- c("keep", "throwout")
 compareIndices  <- which(fullData$tuningData == "keep")
 
 ## Parallelize fitting
-depths <- seq(0, 5)
-priorFit <- mclapply(depths, function(i) { ## parallelize over depths
+priorFit <- mclapply(DEPTHS, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
                      semanticsVarName = "speaker.p", itemVarName = "query",
                      priorsVarName = "priorValue", groupName = "grouper",
                      compareDataName = "p", compareIndices = compareIndices,
-                     depth = i, alphas = seq(1, 6, by = 0.1), usePriorEveryRecurse = FALSE)
+                     depth = i, alphas = ALPHAS, usePriorEveryRecurse = FALSE)
   },
   mc.cores = detectCores())
 aggregateTuneData <- convertListToDF(priorFit)
@@ -262,7 +266,7 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   geom_point() +
   ylim(0.75, 1) +
   geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50") +
-  scale_x_continuous(breaks = round(seq(1, 6, by = 0.1)), "alpha") +
+  scale_x_continuous(breaks = round(seq(0, 6, by = 0.1)), "alpha") +
   ggtitle("Model performance - priors incorporated")
 ```
 
@@ -270,8 +274,7 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
 
 ## Recursive depth sims
 ```{r}
-depths <- seq(0, 5)
-sims_NoPrior_temp <- lapply(depths, function(depth) {
+sims_NoPrior_temp <- lapply(DEPTHS, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
             itemVarName = "query", depth = depth) %>%
@@ -330,13 +333,12 @@ if (!(inGlobalEnv("fullData") & inGlobalEnv("compareIndices"))) {
 }
 
 ## Parallelize fitting
-depths <- seq(0, 5)
-noPriorFit <- mclapply(depths, function(i) { ## parallelize over depths
+noPriorFit <- mclapply(DEPTHS, function(i) { ## parallelize over depths
   rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
                      semanticsVarName = "speaker.p", itemVarName = "query",
                      compareIndices = compareIndices, compareDataName = "p",
                      groupName = "grouper",
-                     depth = i, alphas = seq(1, 6, by = 0.1))
+                     depth = i, alphas = ALPHAS)
   },
   mc.cores = detectCores())
 aggregateTuneData <- convertListToDF(noPriorFit)
