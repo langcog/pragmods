@@ -21,19 +21,11 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(parallel)
+library(stats)
 ```
 
 ## Helpers
 ```{r}
-#####
-##### rrrsa_ready_d
-##### -------------
-##### process data for use with rrrsa
-##### NOTE :: this is not a generic fn
-##### an makes certain assumptions about column naming
-#####
-
-
 #####
 ##### normalizeBy()
 ##### -------------
@@ -183,8 +175,9 @@ rrrsa_ready_df <- function(d, foil_name = "foil", logical_name = "logical", targ
 
 ```
 
-## Tuning data
+## Global data / settings
 ```{r}
+set.seed(1)
 ALPHAS <- seq(0, 5, by = 0.1)
 DEPTHS <- seq(0, 5)
 ```
@@ -437,22 +430,18 @@ allData %>%
   geom_point(shape = 21, alpha = 0.30)
 ```
 
-
 # Propogating errors into model...
 
-## Sims with prior
+## Bootstrap se helpers
 ```{r}
-library(stats)
-set.seed(1)
-
 #####
-##### boot_priors()
+##### boot_vec()
 ##### -------------
-##### multinomila bootstrap
+##### multinomial bootstrap
 ##### given vector of counts return n boostrap 
 ##### estimates of proportions
 #####
-boot_priors <- function(countsVec, n = 1) {
+boot_vec <- function(countsVec, n = 1) {
   t(normalizeBy(rmultinom(n, sum(countsVec), countsVec), rows = FALSE))
 }
 #####
@@ -462,7 +451,7 @@ boot_priors <- function(countsVec, n = 1) {
 ##### used with mapply() to create new prior estimates
 #####
 pragmods_priors_boot <- function(c1, c2, c3, n = 1) {
-  boot_priors(c("foil_cnts" = c1, "logical_cnts" = c2, "target_cnts" = c3), n)
+  boot_vec(c("foil_cnts" = c1, "logical_cnts" = c2, "target_cnts" = c3), n)
 }
 
 #####
@@ -479,59 +468,100 @@ add_booted_priors <- function(df) {
   cbind(df, res)  
 }
 
-## Get prior counts data
-priorCounts <- read.csv("data/prior_counts.csv")
-names(priorCounts)[1:3] <- c("foil_cnts", "logical_cnts", "target_cnts")
-## Merge with our original data set
-d_priorCounts <- merge(d, priorCounts, by = "prior", all = TRUE)
-d_booted_priors <- rrrsa_ready_df(add_booted_priors(d_priorCounts), foil_name = "foil_bt", logical_name = "logical_bt", target_name = "target_bt")
-
-## Add good data indices (which queries were actually queried)
-# ptm <- proc.time()
-## Currenly runs 500 sims in 90 seconds
-bstrap_sims <- mclapply(seq(1, 500), FUN = function(i) {
-    d_booted_priors <-
-      rrrsa_ready_df(add_booted_priors(d_priorCounts),
-                     foil_name = "foil_bt", logical_name = "logical_bt", target_name = "target_bt")
-    res <- plyr::ddply(d_booted_priors, .variables = c("grouper"), rsa.runDf,
-              quantityVarName = "object", semanticsVarName = "speaker.p",
-              itemVarName = "query", priorsVarName = "priorValue", usePriorEveryRecurse = FALSE) %>%
-    rowwise %>%
-    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
-           depth = 1) %>%
-    filter(tuningData == "keep")
-    res$preds
-  }, 
-  mc.cores = detectCores())
-pred_sims <- convertListToDF(bstrap_sims, rows = FALSE)
-# proc.time() - ptm
-
+#####
+##### se()
+##### ----------------------
+##### given a numeric vector calcuate std error :: sqrt(var(v))
+#####
 se <- function(v) {
   sqrt(var(v))
 }
 
-get_se <- function(df) {
-  apply(as.matrix(df), 1, se)  
+#####
+##### get_se()
+##### ----------------------
+##### given a df of bootstrapped estimates return std error
+#####
+get_se <- function(boot_ests) {
+  apply(as.matrix(boot_ests), 1, se)  
 }
 
-sims_prior2 <- sims_prior
-sims_prior2$boot_se <- get_se(pred_sims)
-View(sims_prior2)
-sims_prior2 %>%
+#####
+##### run_boot_sims()
+##### ---------------------
+##### Run `n_sims` simulations with `alhpa`, `depth` 
+##### Expects a df `d_prior_counts` that contains prior counts data
+#####
+run_boot_sims <- function(d_prior_counts, alpha = 1, depth = 1, n_sims = 500, verbose = TRUE) {
+  ## Display run
+  if (verbose) {
+    cat(paste("Running ", n_sims, " simulations with alpha = ", alpha, ""))
+  }
+  
+  ## Store n boostrapped simulations 
+  bstrap_sims <- mclapply(seq(1, n_sims), FUN = function(i) {
+    ## Convert to rrrsa df
+    d_booted_priors <-
+      rrrsa_ready_df(add_booted_priors(d_prior_counts),
+                     foil_name = "foil_bt", logical_name = "logical_bt", target_name = "target_bt")
+    ## Run rrrsa
+    res <- plyr::ddply(d_booted_priors, .variables = c("grouper"), rsa.runDf,
+              quantityVarName = "object", semanticsVarName = "speaker.p",
+              itemVarName = "query", alpha = alpha, depth = depth,
+              priorsVarName = "priorValue", usePriorEveryRecurse = FALSE) %>%
+    rowwise %>%
+    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+           depth = depth) %>%
+    filter(tuningData == "keep")
+    ## Return predictions
+    res$preds
+  }, 
+  mc.cores = detectCores())
+  
+  ## Convert simulations to df
+  pred_sims <- convertListToDF(bstrap_sims, rows = FALSE)
+  pred_sims
+}
+```
+
+## Boostrapped runs
+```{r}
+## Get prior counts data (from sims.R)
+priorCounts <- read.csv("data/prior_counts.csv")
+names(priorCounts)[1:3] <- c("foil_cnts", "logical_cnts", "target_cnts")
+## Merge with our original data set
+d_prior_counts <- merge(d, priorCounts, by = "prior", all = TRUE)
+
+## NOTE :: running time was ~26 min for 1000 sims depth (0-5)
+##      :: running time was ~ 2min for 100 sims depth(0-5)
+# ptm <- proc.time()
+depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
+  run_boot_sims(d_prior_counts, depth = depth, n_sims = 500, verbose = FALSE)
+  }, mc.cores = detectCores())
+# proc.time() - ptm
+
+## Add in booted se's
+sims_prior$boot_se <- get_se(convertListToDF(depth_sims))
+
+## Plot
+sims_prior %>%
   rowwise %>%
   mutate(errorH = boot_se,
          errorL = boot_se) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
-    geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH)) +
-    geom_errorbar(aes(ymin = cil, ymax = cih)) + 
+    # geom_jitter() +
+    geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH, height = 0.05)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
     xlim(c(0,1)) + ylim(c(0,1)) + 
-    # facet_wrap(~depth) +
+    facet_wrap(~depth) +
     ylab("Proportion choosing target") + 
     xlab("Model Predictions") + 
     geom_smooth(method="lm", aes(group=1)) + 
     geom_abline(slope = 1, intercept = 0, lty=2)
+```
 
-
+Save this for future generations of rsa pirates
+```{r eval = FALSE}
 ############################################################################
 #### SAVE - ORIGINAL DATA PROCESSING
 ####
@@ -553,31 +583,7 @@ fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQue
 #### SAVE - ORIGINAL DATA PROCESSING
 ############################################################################
 
-
-
-
-
-
-d_priorCounts[57,]
-
 # sims_prior %>%
-#   mutate(errorH = cih - p,
-#          errorL = p - cil) %>%
-#   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
-#     geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH)) +
-#     geom_errorbar(aes(ymin = cil, ymax = cih)) + 
-#     xlim(c(0,1)) + ylim(c(0,1)) + 
-#     facet_wrap(~depth) +
-#     ylab("Proportion choosing target") + 
-#     xlab("Model Predictions") + 
-#     geom_smooth(method="lm", aes(group=1)) + 
-#     geom_abline(slope = 1, intercept = 0, lty=2)
-```
-
-## Sims without prior
-
-```{r}
-# sims_NoPrior %>%
 #   mutate(errorH = cih - p,
 #          errorL = p - cil) %>%
 #   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
