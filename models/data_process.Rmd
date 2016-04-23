@@ -514,20 +514,18 @@ get_se <- function(df) {
   apply(as.matrix(df), 1, se)  
 }
 
-
 sims_prior2 <- sims_prior
 sims_prior2$boot_se <- get_se(pred_sims)
 View(sims_prior2)
 sims_prior2 %>%
   rowwise %>%
-  mutate(errorH = preds + boot_se,
-         errorL = preds - boot_se) %>%
-  View()
+  mutate(errorH = boot_se,
+         errorL = boot_se) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
     geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH)) +
     geom_errorbar(aes(ymin = cil, ymax = cih)) + 
     xlim(c(0,1)) + ylim(c(0,1)) + 
-    facet_wrap(~depth) +
+    # facet_wrap(~depth) +
     ylab("Proportion choosing target") + 
     xlab("Model Predictions") + 
     geom_smooth(method="lm", aes(group=1)) + 
