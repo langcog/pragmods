@@ -8,11 +8,11 @@ output:
 ---
 
 # Prelim set-up
-```{r}
+```{r setup1}
 rm(list = ls())
 ```
 
-```{r warning = FALSE, message = FALSE}
+```{r setup2, warning = FALSE, message = FALSE}
 setwd('/Users/benpeloquin/Desktop/Projects/Pragmods/models/')
 source("matrices.R")
 source("agents.R")
@@ -25,7 +25,7 @@ library(stats)
 ```
 
 ## Helpers
-```{r}
+```{r helpers}
 #####
 ##### normalizeBy()
 ##### -------------
@@ -176,21 +176,21 @@ rrrsa_ready_df <- function(d, foil_name = "foil", logical_name = "logical", targ
 ```
 
 ## Global data / settings
-```{r}
+```{r globals}
 set.seed(1)
 ALPHAS <- seq(0, 5, by = 0.1)
 DEPTHS <- seq(0, 5)
 ```
 
 ## Read in data
-```{r}
+```{r main_df}
 ## This is `d` df from line 128 in sims.Rmd
 d <- read.csv("data/models.csv")
 # View(d)
 ```
 
 ## Matrices from matrices.R
-```{r}
+```{r matrix_data}
 ## Renamed, normalized matrices from matrices.R
 simpleM <- normalizeBy(simple, rows = FALSE)
 complexM <- normalizeBy(complex, rows = FALSE)
@@ -202,29 +202,14 @@ oddmanM <- normalizeBy(oddman, rows = FALSE)
 
 NOTE:: To work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
 Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
-```{r}
-# ## Initial pre-processing before adding in new cols and then adding literal semantics
-# processedD <- d %>%
-#   ## Gather priors - we're only interested in prior for current object
-#   gather(priorType, priorValue, c(foil, logical, target)) %>%
-#   ## Filter out any mismatches between current object and priorType
-#   filter(object == priorType) %>%
-#   rowwise %>%
-#   ## Grouping variable concatenates experiment type and sample size (expt-n)
-#   mutate(grouper = paste0(as.character(expt), "-", as.character(n)))
-# 
-# fullData <- plyr::ddply(processedD, .variables = ("grouper"), .fun = completeQueries) %>%
-#   rowwise %>%
-#   ## Each row gets a unique literal semantics from getLiteraSemantics() helper
-#   mutate(speaker.p = getLiteralSemantics(matrix, query = query, object = object)) %>%
-#   arrange(expt, n)
+```{r data_processing}
 fullData <- rrrsa_ready_df(d)
 ```
 
 # Simulations WITH priors (recursive depth 0-5)
 
 ## Recursive depth sims
-```{r}
+```{r sims_priors}
 sims_prior_temp <- lapply(DEPTHS, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
@@ -240,7 +225,7 @@ sims_prior <- convertListToDF(sims_prior_temp)
 ## Simulation plots
 
 ### Recursive depth 0-2
-```{r}
+```{r sims_priors_plot1}
 sims_prior %>%
   filter(depth < 3) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
@@ -254,7 +239,7 @@ sims_prior %>%
 ```
 
 ### Recursive depth 0-5
-```{r}
+```{r sims_priors_plot2}
 ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_pointrange(aes(ymin = cil, ymax = cih)) + 
   xlim(c(0,1)) + ylim(c(0,1)) + 
@@ -266,14 +251,14 @@ ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
 ```
 
 ## Correlations
-```{r}
+```{r sims_priors_cors}
 sims_prior %>%
   group_by(depth) %>%
   summarise("cor" = cor(p, preds))
 ```
 
 ## Fitting alpha
-```{r}
+```{r sims_priors_fitting}
 fullData <- fullData %>%
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
@@ -293,7 +278,7 @@ aggregateTuneData <- convertListToDF(priorFit)
 ```
 
 ## Model performance
-```{r}
+```{r sims_priors_fitted_cors}
 ## Get best model performance by alpha, depth
 maxCors <- aggregateTuneData %>%
   group_by(depth) %>%
@@ -303,7 +288,7 @@ maxCors
 ```
 
 ## Plot tuning
-```{r}
+```{r sims_priors_tuning_plot}
 ## Plot tuning
 ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   geom_point() +
@@ -316,7 +301,7 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
 # Simulations WITHOUT priors (recursive depth 0-5)
 
 ## Recursive depth sims
-```{r}
+```{r sims_no_priors}
 sims_NoPrior_temp <- lapply(DEPTHS, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
@@ -332,7 +317,7 @@ sims_NoPrior <- convertListToDF(sims_NoPrior_temp)
 ## Simulation plots
 
 ### Recursive depth 0-2
-```{r}
+```{r sims_no_priors_plot1}
 sims_NoPrior %>%
   filter(depth < 3) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
@@ -346,7 +331,7 @@ sims_NoPrior %>%
 ```
 
 ### Recursive depth 0-5
-```{r}
+```{r sims_no_priors_plot2}
 ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_pointrange(aes(ymin = cil, ymax = cih)) + 
   xlim(c(0,1)) + ylim(c(0,1)) + 
@@ -358,14 +343,14 @@ ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
 ```
 
 ## Correlations
-```{r}
+```{r sims_no_priors_cors}
 sims_NoPrior %>%
   group_by(depth) %>%
   summarise("cor" = cor(p, preds))
 ```
 
 ## Fitting alpha
-```{r}
+```{r sims_no_priors_fitting}
 ## Check that we have fullData and compareIndices for tuning
 if (!(inGlobalEnv("fullData") & inGlobalEnv("compareIndices"))) {
   fullData <- fullData %>%
@@ -388,7 +373,7 @@ aggregateTuneData <- convertListToDF(noPriorFit)
 ```
 
 ## Model performance
-```{r}
+```{r sims_no_priors_fitted_cors}
 ## Get best model performance by alpha, depth
 maxCors <- aggregateTuneData %>%
   group_by(depth) %>%
@@ -398,7 +383,7 @@ maxCors
 ```
 
 ## Plot tuning
-```{r}
+```{r sims_no_priors_tuning}
 ## Plot tuning
 ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   geom_point() +
@@ -409,7 +394,9 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
 ```
 
 # Explicit comparisons with MF sims.Rmd
-```{r}
+
+## Combine priors and unif priors
+```{r MF_compare}
 ## combine priors and uniform
 sims_prior <- sims_prior %>%
   mutate(prior = "prior")
@@ -418,7 +405,10 @@ sims_NoPrior <- sims_NoPrior %>%
 allData <- rbind(sims_prior, sims_NoPrior) %>%
   mutate(model = paste0("L", depth)) %>%
   arrange(prior, query, object, matrix, cond, expt, model)
+```
 
+## Compare with MF data
+```{r}
 ## Compare with MFs data
 mfD <- read.csv("data/modelRuns.csv") %>%
   arrange(prior, query, object, matrix, cond, expt, model)
@@ -430,10 +420,10 @@ allData %>%
   geom_point(shape = 21, alpha = 0.30)
 ```
 
-# Propogating errors into model...
+# Propagating errors into model
 
 ## Bootstrap se helpers
-```{r}
+```{r bootstrap_helpers}
 #####
 ##### boot_vec()
 ##### -------------
@@ -525,7 +515,7 @@ run_boot_sims <- function(d_prior_counts, alpha = 1, depth = 1, n_sims = 500, ve
 ```
 
 ## Boostrapped runs
-```{r}
+```{r run_bootstrap}
 ## Get prior counts data (from sims.R)
 priorCounts <- read.csv("data/prior_counts.csv")
 names(priorCounts)[1:3] <- c("foil_cnts", "logical_cnts", "target_cnts")
@@ -542,14 +532,15 @@ depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
 
 ## Add in booted se's
 sims_prior$boot_se <- get_se(convertListToDF(depth_sims))
+```
 
-## Plot
+### Bootstrap with depths 0-5
+```{r boostrap_all_depths_plot}
 sims_prior %>%
   rowwise %>%
   mutate(errorH = boot_se,
          errorL = boot_se) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
-    # geom_jitter() +
     geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH, height = 0.05)) +
     geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
     xlim(c(0,1)) + ylim(c(0,1)) + 
@@ -558,6 +549,60 @@ sims_prior %>%
     xlab("Model Predictions") + 
     geom_smooth(method="lm", aes(group=1)) + 
     geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+# Prior vs No Prior performance by experiment
+
+## Plot preds by experiment
+```{r boot_plot, fig.width=12}
+ggplot(allData, aes(x = preds, y = p, col = prior)) +
+  geom_point(shape = 21, alpha = 0.85) +
+  facet_grid(model ~ grouper)
+```
+
+## Plot prior's wonkiness
+```{r wonky_preds}
+allData %>%
+  filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
+  ggplot(aes(x = preds, y = p, col = prior, shape = as.factor(object))) +
+    geom_point(alpha = 0.5, size = 4) +
+    facet_grid(model ~ grouper) +
+    geom_abline(slope = 1, intercept = 0, lty=2)
+```
+Almost looks like `target` and `logical` could be swapped... But with more recursions, the priors-model begins to improve...
+
+## Wonky priors vs unif priors
+```{r}
+temp_d <- sims_prior %>% filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
+  arrange(cond, expt, matrix, prior, object, count, p)
+
+temp_d$unif_preds <- sims_NoPrior %>% filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
+  arrange(cond, expt, matrix, prior, object, count, p) %>%
+  mutate(unif_preds = preds) %>%
+  select(unif_preds) %>%
+  unlist()
+
+temp_d <- temp_d %>%
+  mutate(delta = preds - unif_preds) %>%
+  arrange(-abs(delta))
+
+## uniform vs priors
+ggplot(temp_d, aes(x = unif_preds, y = preds, col = factor(grouper), size = factor(depth), shape = as.factor(object))) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, lty=2)
+
+## Take a look at the data
+temp_d
+```
+Still looks like these might have been swapped...
+
+## Wonky priors data
+```{r wonky_priors}
+allData %>%
+  filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
+  mutate(delta = p - preds) %>%
+  arrange(delta, model, grouper) %>%
+  select(cond, delta, p, preds, grouper, query, object, model, priorType, priorValue)
 ```
 
 Save this for future generations of rsa pirates
