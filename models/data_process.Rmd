@@ -186,7 +186,6 @@ DEPTHS <- seq(0, 5)
 ```{r main_df}
 ## This is `d` df from line 128 in sims.Rmd
 d <- read.csv("data/models.csv")
-# View(d)
 ```
 
 ## Matrices from matrices.R
@@ -468,12 +467,37 @@ se <- function(v) {
 }
 
 #####
+##### ci()
+##### ----------------------
+##### given a numeric vector calculate confidence intervals of width, `width`
+#####
+ci <- function(mu, sd, n, width = 0.95) {
+  interval <- (1 - width) / 2
+  error <- (qnorm(1 - interval) * sd) / sqrt(n)
+  return(c(mu - error, mu + error))
+}
+
+#####
 ##### get_se()
 ##### ----------------------
 ##### given a df of bootstrapped estimates return std error
 #####
 get_se <- function(boot_ests) {
   apply(as.matrix(boot_ests), 1, se)  
+}
+
+#####
+##### get_ci()
+##### ----------------------
+##### given a df of bootstrapped estimates return `width` confidence intervals
+#####
+get_ci <- function(boot_ests, width = 0.95) {
+  apply(as.matrix(boot_ests), 1, FUN = function(ests) {
+    mu <- mean(ests)
+    sd <- sd(ests)
+    n <- length(ests)
+    return(ci(mu, sd, n, width))
+  })
 }
 
 #####
@@ -526,22 +550,26 @@ d_prior_counts <- merge(d, priorCounts, by = "prior", all = TRUE)
 ##      :: running time was ~ 2min for 100 sims depth(0-5)
 # ptm <- proc.time()
 depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
-  run_boot_sims(d_prior_counts, depth = depth, n_sims = 500, verbose = FALSE)
+  run_boot_sims(d_prior_counts, depth = depth, n_sims = 10, verbose = FALSE)
   }, mc.cores = detectCores())
 # proc.time() - ptm
 
 ## Add in booted se's
 sims_prior$boot_se <- get_se(convertListToDF(depth_sims))
+
+cis <- t(as.data.frame(get_ci(convertListToDF(depth_sims))))
+colnames(cis) <- c('low', 'hi')
+sims_prior <- cbind(sims_prior, cis)
 ```
 
 ### Bootstrap with depths 0-5
 ```{r boostrap_all_depths_plot}
 sims_prior %>%
   rowwise %>%
-  mutate(errorH = boot_se,
-         errorL = boot_se) %>%
+#   mutate(errorH = boot_se,
+#          errorL = boot_se) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
-    geom_errorbarh(aes(xmin = preds - errorL, xmax = preds + errorH, height = 0.05)) +
+    geom_errorbarh(aes(xmin = low, xmax = hi, height = 0.05)) +
     geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
     xlim(c(0,1)) + ylim(c(0,1)) + 
     facet_wrap(~depth) +
@@ -557,7 +585,7 @@ sims_prior %>%
 ```{r boot_plot, fig.width=12}
 ggplot(allData, aes(x = preds, y = p, col = prior)) +
   geom_point(shape = 21, alpha = 0.85) +
-  facet_grid(model ~ grouper)
+  facet_grid(model ~ cond)
 ```
 
 ## Plot prior's wonkiness
@@ -597,7 +625,7 @@ temp_d
 Still looks like these might have been swapped...
 
 ## Wonky priors data
-```{r wonky_priors}
+``z`{r wonky_priors}
 allData %>%
   filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   mutate(delta = p - preds) %>%
