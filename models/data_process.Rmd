@@ -204,18 +204,16 @@ NOTE:: To work with rrrsa::runDf we need each matrix to include the literal sema
 Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
 ```{r data_processing}
 fullData <- rrrsa_ready_df(d)
-original_fullData <- fullData
-
-original_fullData
-
-
-which(sims_prior_temp[[1]]$grouper != original_fullData %>% filter(!is.na(count)) %>% select(grouper))
-
-original2 <- original_fullData[which(!is.na(original_fullData$count)), ]
-original2[seq(34, 39), ]
-sims_prior_temp[[1]][seq(34, 39),]
-
-
+# original_fullData <- fullData
+# 
+# original_fullData
+# 
+# 
+# which(sims_prior_temp[[1]]$grouper != original_fullData %>% filter(!is.na(count)) %>% select(grouper))
+# 
+# original2 <- original_fullData[which(!is.na(original_fullData$count)), ]
+# original2[seq(34, 39), ]
+# sims_prior_temp[[1]][seq(34, 39),]
 ```
 
 # Simulations WITH priors (recursive depth 0-5)
@@ -524,7 +522,7 @@ se <- function(v) {
 ci <- function(mu, sd, n, width = 0.95) {
   interval <- (1 - width) / 2
   error <- (qnorm(1 - interval) * sd) / sqrt(n)
-  return(c(bstrp_mu, bstrp_err))
+  return(c("bstrp_mu" = mu, "bstrp_err" = error))
 }
 
 #####
@@ -640,7 +638,7 @@ depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
 
 
 ## Add in booted se's
-sims_prior$boot_se <- get_se(convertListToDF(depth_sims))
+# sims_prior$boot_se <- get_se(convertListToDF(depth_sims))
 
 cis <- t(as.data.frame(get_ci(convertListToDF(depth_sims))))
 colnames(cis) <- c('bstrp_mu', 'bstrp_err')
@@ -664,8 +662,8 @@ boots_df_long %>%
 ```
 
 
-### Temp analysis of bstrp
-```{r eval = FALSE}
+### Temp analysis of bstrp trying to debug different means
+```{r debugin_bstrap, eval = FALSE}
 depth <- 2
 temp_sims <- run_boot_sims(d_prior_counts, depth = 5, n_sims = 100, verbose = FALSE)
 temp_df_sims <- as.data.frame(temp_sims)
@@ -696,8 +694,6 @@ temp_sims_cis[which(temp_sims_cis$low > temp_sims_cis$preds),]
 ```{r boostrap_all_depths_plot}
 sims_prior %>%
   rowwise %>%
-#   mutate(errorH = boot_se,
-#          errorL = boot_se) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
     geom_errorbarh(aes(xmin = preds - bstrp_err, xmax = preds + bstrp_err, height = 0.05)) +
     geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
@@ -712,17 +708,20 @@ sims_prior %>%
 # Prior vs No Prior performance by experiment
 
 ## Facet for experiment intent
+```{r eval = FALSE}
+
+```
 
 
 ## Plot preds by experiment
-```{r boot_plot, fig.width=12}
+```{r boot_plot, fig.width=12, eval = FALSE}
 ggplot(allData, aes(x = preds, y = p, col = prior)) +
   geom_point(shape = 21, alpha = 0.85) +
   facet_grid(model ~ cond)
 ```
 
 ## Plot prior's wonkiness
-```{r wonky_preds}
+```{r wonky_preds, eval = FALSE}
 allData %>%
   filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   ggplot(aes(x = preds, y = p, col = prior, shape = as.factor(object))) +
@@ -733,7 +732,7 @@ allData %>%
 Almost looks like `target` and `logical` could be swapped... But with more recursions, the priors-model begins to improve...
 
 ## Wonky priors vs unif priors
-```{r}
+```{r, eval = FALSE}
 temp_d <- sims_prior %>% filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   arrange(cond, expt, matrix, prior, object, count, p)
 
@@ -758,7 +757,7 @@ temp_d
 Still looks like these might have been swapped...
 
 ## Wonky priors data
-``z`{r wonky_priors}
+```{r wonky_priors, , eval = FALSE}
 allData %>%
   filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   mutate(delta = p - preds) %>%
