@@ -247,7 +247,8 @@ sims_prior %>%
     ylab("Proportion choosing target") + 
     xlab("Model Predictions") + 
     geom_smooth(method="lm", aes(group=1)) + 
-    geom_abline(slope = 1, intercept = 0, lty=2)
+    geom_abline(slope = 1, intercept = 0, lty=2) +
+    ggtitle("Priors model sims, alpha = 1")
 ```
 
 ### Recursive depth 0-5
@@ -259,18 +260,21 @@ ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
   ylab("Proportion choosing target") + 
   xlab("Model Predictions") + 
   geom_smooth(method="lm", aes(group=1)) + 
-  geom_abline(slope = 1, intercept = 0, lty=2)
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle("Priors model sims, alpha = 1")
 ```
 
 ## Correlations
 ```{r sims_priors_cors}
 sims_prior %>%
   group_by(depth) %>%
-  summarise("cor" = cor(p, preds))
+  summarise("cor" = cor(p, preds)) %>%
+  mutate("alpha" = 1)
 ```
 
 ## Fitting alpha
 ```{r sims_priors_fitting}
+## Need to identify indices we want for performance comparisons
 fullData <- fullData %>%
   rowwise %>%
   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
@@ -296,7 +300,6 @@ maxCors <- aggregateTuneData %>%
   group_by(depth) %>%
   summarize(maxCor = max(cor),
             alpha = alpha[which.max(cor)])
-maxCors
 ```
 
 ### Plot performance tuning
@@ -314,7 +317,7 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
 ```{r}
 depths_param_data <- maxCors %>%
   arrange(depth)
-best_prior_models_fitted_alpha <- convertListToDF(lapply(DEPTHS, function(depth) { ## parallelize over depths
+best_prior_models_fitted_alpha <- convertListToDF(lapply(DEPTHS, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
               quantityVarName = "object", semanticsVarName = "speaker.p",
               priors = "priorValue", usePriorEveryRecurse = FALSE,
@@ -393,7 +396,8 @@ ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
 ```{r sims_no_priors_cors}
 sims_NoPrior %>%
   group_by(depth) %>%
-  summarise("cor" = cor(p, preds))
+  summarise("cor" = cor(p, preds)) %>%
+  mutate("alpha" = 1)
 ```
 
 ## Fitting alpha
@@ -426,7 +430,6 @@ maxCors_noPriors <- aggregateTuneData_noPriors %>%
   group_by(depth) %>%
   summarize(maxCor = max(cor),
             alpha = alpha[which.max(cor)])
-maxCors_noPriors
 ```
 
 ## Plot performance tuning
@@ -621,12 +624,111 @@ run_boot_sims <- function(d_prior_counts, alpha = 1, depth = 1, n_sims = 100, ve
 ```
 
 ## Boostrapped runs
-```{r run_bootstrap}
+
+### Prior counts data
+```{r}
 ## Get prior counts data (from sims.R)
 priorCounts <- read.csv("data/prior_counts.csv")
 names(priorCounts)[1:3] <- c("foil_cnts", "logical_cnts", "target_cnts")
 ## Merge with our original data set
 d_prior_counts <- merge(d, priorCounts, by = "prior", all = TRUE)
+```
+
+
+
+### Boostrap at depth 1
+```{r}
+## get depth 1 bstrap cis
+d1 <- run_boot_sims(d_prior_counts, depth = 1, n_sims = 500, verbose = FALSE)
+
+depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
+  run_boot_sims(d_prior_counts, depth = depth, n_sims = 100, verbose = FALSE)
+  }, mc.cores = detectCores())
+sims_prior_d1 <- sims_prior[which(sims_prior$depth == 1), ]
+
+
+
+## For each simulation level
+errs <- data.frame()
+
+# fn <- function() {
+for (depth in seq(1, length(depth_sims))) {
+  ## Current depth data
+  curr_data <- data.frame(depth_sims[depth])
+  cis <- data.frame() ## Hold ci diffs
+  ## For each simulation (row) in the current data frame
+  for (sim_row in seq(1, nrow(curr_data))) {
+    ## Get diff with our estimate
+    diffs <- unlist(curr_data[sim_row, ]) - sims_prior[which(sims_prior$depth == depth - 1), ]$preds[sim_row]
+    cis <- rbind(cis, diffs)
+  }
+  errs <- rbind(errs, data.frame(t(apply(cis, MARGIN = 1, FUN = quantile, c(0.05, 0.95)))))
+}
+# }
+
+names(errs) <- c('low', 'hi')
+sims_prior_bstrap_errs <- cbind(sims_prior, errs)
+sims_prior_bstrap_errs <- sims_prior_bstrap_errs %>%
+  mutate(ci_low = preds - low,
+         ci_hi = preds - hi)
+
+
+ggplot(sims_prior_bstrap_errs, aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_errorbarh(aes(xmin = ci_low, xmax = ci_hi, height = 0.05)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    facet_wrap(~depth) +
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+
+
+names(errs) <- c('hi', 'low')
+sims_prior_d1 <- cbind(sims_prior_d1, errs)
+sims_prior_d1 <- sims_prior_d1 %>%
+  mutate(ci_low = preds - low,
+         ci_hi = preds - hi)
+
+ggplot(sims_prior_d1, aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_errorbarh(aes(xmin = ci_low, xmax = ci_hi, height = 0.05)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+
+
+
+cis <- t(as.data.frame(get_ci(d1)))
+colnames(cis) <- c('bstrp_mu', 'bstrp_err')
+sims_d1_bstrap_cis <- cbind(sims_prior[which(sims_prior$depth == 1), ], cis)
+
+## Check how bstraps look... (appr normal???)
+d1$simNum <- seq(1, nrow(d1))
+d1_long <- d1 %>%
+  gather(itNum, val, -simNum) %>%
+  select(simNum, val)
+d1_long %>%
+  filter(val != 1 & val != 0 & val != 0.5) %>%
+  ggplot(aes(val, fill = simNum)) +
+    geom_density() +
+    facet_wrap(~simNum)
+
+ggplot(sims_d1_bstrap_cis, aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_errorbarh(aes(xmin = bstrp_mu - bstrp_err, xmax = bstrp_mu + bstrp_err, height = 0.05)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+```
+
+### Boostrap all depths
+```{r run_bootstrap}
+
 
 ## NOTE :: running time was ~26 min for 1000 sims depth (0-5)
 ##      :: running time was ~ 2min for 100 sims depth(0-5)
@@ -642,12 +744,12 @@ depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
 
 cis <- t(as.data.frame(get_ci(convertListToDF(depth_sims))))
 colnames(cis) <- c('bstrp_mu', 'bstrp_err')
-sims_prior <- cbind(sims_prior, cis)
+sims_prior_bstrap_cis <- cbind(sims_prior, cis)
 ```
 
 ### Look at boostrapped sims (appr normal?)
 ```{r}
-boots_df <- convertListToDF(depth_sims)
+boots_df <- convertListToDF(depth_sims[5])
 boots_df$simNum <- seq(1, nrow(boots_df))
 boots_df_long <- boots_df %>%
   gather(itNum, val, -simNum) %>%
@@ -659,6 +761,7 @@ boots_df_long %>%
   ggplot(aes(val, fill = simNum)) +
     geom_density() +
     facet_wrap(~simNum)
+
 ```
 
 
@@ -692,7 +795,7 @@ temp_sims_cis[which(temp_sims_cis$low > temp_sims_cis$preds),]
 
 ### Bootstrap with depths 0-5
 ```{r boostrap_all_depths_plot}
-sims_prior %>%
+sims_prior_bstrap_cis %>%
   rowwise %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
     geom_errorbarh(aes(xmin = preds - bstrp_err, xmax = preds + bstrp_err, height = 0.05)) +
