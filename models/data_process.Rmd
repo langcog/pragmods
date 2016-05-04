@@ -203,12 +203,26 @@ NOTE:: To work with rrrsa::runDf we need each matrix to include the literal sema
 Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
 ```{r data_processing}
 fullData <- rrrsa_ready_df(d)
+original_fullData <- fullData
+
+original_fullData
+
+
+which(sims_prior_temp[[1]]$grouper != original_fullData %>% filter(!is.na(count)) %>% select(grouper))
+
+original2 <- original_fullData[which(!is.na(original_fullData$count)), ]
+original2[seq(34, 39), ]
+sims_prior_temp[[1]][seq(34, 39),]
+
+
 ```
 
 # Simulations WITH priors (recursive depth 0-5)
 
 ## Recursive depth sims
 ```{r sims_priors}
+## Pre-sort by grouper
+fullData <- fullData %>% arrange(grouper)
 sims_prior_temp <- lapply(DEPTHS, function(depth) {
   plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
@@ -224,7 +238,7 @@ sims_prior <- convertListToDF(sims_prior_temp)
 ## Simulation plots
 
 ### Recursive depth 0-2
-```{r sims_priors_plot1}
+```{r sims_priors_plot1, eval = FALSE}
 sims_prior %>%
   filter(depth < 3) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
@@ -286,7 +300,7 @@ maxCors <- aggregateTuneData %>%
 maxCors
 ```
 
-## Plot tuning
+### Plot performance tuning
 ```{r sims_priors_tuning_plot}
 ## Plot tuning
 ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
@@ -296,6 +310,41 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   scale_x_continuous(breaks = round(seq(0, 6, by = 0.1)), "alpha") +
   ggtitle("Model performance - priors incorporated")
 ```
+
+## Best model performance with fitted alphas
+```{r}
+depths_param_data <- maxCors %>%
+  arrange(depth)
+best_prior_models_fitted_alpha <- convertListToDF(lapply(DEPTHS, function(depth) { ## parallelize over depths
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+              quantityVarName = "object", semanticsVarName = "speaker.p",
+              priors = "priorValue", usePriorEveryRecurse = FALSE,
+              itemVarName = "query", depth = depths_param_data$depth[depth + 1], alpha = depths_param_data$alpha[depth + 1]) %>%
+    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+           depth = depth) %>%
+    filter(tuningData == "keep")
+  }))
+## Quick check
+## cor(best_prior_models_fitted_alpha[best_prior_models_fitted_alpha$depth == 1, ]$p, best_prior_models_fitted_alpha[best_prior_models_fitted_alpha$depth == 1, ]$preds)
+```
+
+### Plot best model performance with fitted alphas
+```{r}
+print("Model performance for recursive depth 0-5 with fitted alphas")
+maxCors ## performance data
+
+## plots
+ggplot(best_prior_models_fitted_alpha, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth, labeller = label_both) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle("Model performance for recursive depth 0-5 with fitted alphas")
+```
+
 
 # Simulations WITHOUT priors (recursive depth 0-5)
 
