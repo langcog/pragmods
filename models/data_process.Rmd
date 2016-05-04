@@ -170,6 +170,7 @@ rrrsa_ready_df <- function(d, foil_name = "foil", logical_name = "logical", targ
     ## Each row gets a unique literal semantics from getLiteraSemantics() helper
     mutate(speaker.p = getLiteralSemantics(matrix, query = query, object = object)) %>%
     arrange(expt, n)
+  
   fullData
 }
 
@@ -311,7 +312,7 @@ ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
   ggtitle("Model performance - priors incorporated")
 ```
 
-## Best model performance with fitted alphas
+## Best priors model performance with fitted alphas
 ```{r}
 depths_param_data <- maxCors %>%
   arrange(depth)
@@ -365,7 +366,7 @@ sims_NoPrior <- convertListToDF(sims_NoPrior_temp)
 ## Simulation plots
 
 ### Recursive depth 0-2
-```{r sims_no_priors_plot1}
+```{r sims_no_priors_plot1, eval = FALSE}
 sims_NoPrior %>%
   filter(depth < 3) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
@@ -379,7 +380,7 @@ sims_NoPrior %>%
 ```
 
 ### Recursive depth 0-5
-```{r sims_no_priors_plot2}
+```{r sims_no_priors_plot2, eval = FALSE}
 ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_pointrange(aes(ymin = cil, ymax = cih)) + 
   xlim(c(0,1)) + ylim(c(0,1)) + 
@@ -417,28 +418,62 @@ noPriorFit <- mclapply(DEPTHS, function(i) { ## parallelize over depths
                      depth = i, alphas = ALPHAS)
   },
   mc.cores = detectCores())
-aggregateTuneData <- convertListToDF(noPriorFit)
+aggregateTuneData_noPriors <- convertListToDF(noPriorFit)
 ```
 
 ## Model performance
 ```{r sims_no_priors_fitted_cors}
 ## Get best model performance by alpha, depth
-maxCors <- aggregateTuneData %>%
+maxCors_noPriors <- aggregateTuneData_noPriors %>%
   group_by(depth) %>%
   summarize(maxCor = max(cor),
             alpha = alpha[which.max(cor)])
-maxCors
+maxCors_noPriors
 ```
 
-## Plot tuning
+## Plot performance tuning
 ```{r sims_no_priors_tuning}
 ## Plot tuning
-ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
+ggplot(aggregateTuneData_noPriors, aes(x = alpha, y = cor, col = as.factor(depth))) +
   geom_point() +
   ylim(0.75, 1) +
   geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50") +
   scale_x_continuous(breaks = round(seq(1, 6, by = 0.1)), "alpha") +
   ggtitle("Model performance - no priors")
+```
+
+## Best NO-priors model performance with fitted alphas
+```{r}
+depths_param_data <- maxCors_noPriors %>%
+  arrange(depth)
+best_noPrior_models_fitted_alpha <- convertListToDF(lapply(DEPTHS, function(depth) { ## parallelize over depths
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+              quantityVarName = "object", semanticsVarName = "speaker.p",
+              usePriorEveryRecurse = FALSE, itemVarName = "query",
+              depth = depths_param_data$depth[depth + 1], alpha = depths_param_data$alpha[depth + 1]) %>%
+    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+           depth = depth) %>%
+    filter(tuningData == "keep")
+  }))
+## Quick check
+## cor(best_noPrior_models_fitted_alpha[best_noPrior_models_fitted_alpha$depth == 1, ]$p, best_noPrior_models_fitted_alpha[best_noPrior_models_fitted_alpha$depth == 1, ]$preds)
+```
+
+### Plot best No priors model performance with fitted alphas
+```{r}
+print("Model performance for recursive depth 0-5 with fitted alphas no priors")
+maxCors_noPriors ## performance data
+
+## plots
+ggplot(best_noPrior_models_fitted_alpha, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth, labeller = label_both) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle("No-prior model performance for recursive depth 0-5 with fitted alphas")
 ```
 
 # Explicit comparisons with MF sims.Rmd
@@ -472,6 +507,49 @@ allData %>%
 
 ## Bootstrap se helpers
 ```{r bootstrap_helpers}
+#####
+##### se()
+##### ----------------------
+##### given a numeric vector calcuate std error :: sqrt(var(v))
+#####
+se <- function(v) {
+  sqrt(var(v))
+}
+
+#####
+##### ci()
+##### ----------------------
+##### given a numeric vector calculate confidence intervals of width, `width`
+#####
+ci <- function(mu, sd, n, width = 0.95) {
+  interval <- (1 - width) / 2
+  error <- (qnorm(1 - interval) * sd) / sqrt(n)
+  return(c(bstrp_mu, bstrp_err))
+}
+
+#####
+##### get_se()
+##### ----------------------
+##### given a df of bootstrapped estimates return std error
+#####
+get_se <- function(boot_ests) {
+  apply(as.matrix(boot_ests), 1, se)  
+}
+
+#####
+##### get_ci()
+##### ----------------------
+##### given a df of bootstrapped estimates return `width` confidence intervals
+#####
+get_ci <- function(boot_ests, width = 0.95) {
+  apply(as.matrix(boot_ests), 1, FUN = function(ests) {
+    mu <- mean(ests)
+    sd <- sd(ests)
+    n <- length(ests)
+    return(ci(mu, sd, n, width))
+  })
+}
+
 #####
 ##### boot_vec()
 ##### -------------
@@ -507,55 +585,12 @@ add_booted_priors <- function(df) {
 }
 
 #####
-##### se()
-##### ----------------------
-##### given a numeric vector calcuate std error :: sqrt(var(v))
-#####
-se <- function(v) {
-  sqrt(var(v))
-}
-
-#####
-##### ci()
-##### ----------------------
-##### given a numeric vector calculate confidence intervals of width, `width`
-#####
-ci <- function(mu, sd, n, width = 0.95) {
-  interval <- (1 - width) / 2
-  error <- (qnorm(1 - interval) * sd) / sqrt(n)
-  return(c(mu - error, mu + error))
-}
-
-#####
-##### get_se()
-##### ----------------------
-##### given a df of bootstrapped estimates return std error
-#####
-get_se <- function(boot_ests) {
-  apply(as.matrix(boot_ests), 1, se)  
-}
-
-#####
-##### get_ci()
-##### ----------------------
-##### given a df of bootstrapped estimates return `width` confidence intervals
-#####
-get_ci <- function(boot_ests, width = 0.95) {
-  apply(as.matrix(boot_ests), 1, FUN = function(ests) {
-    mu <- mean(ests)
-    sd <- sd(ests)
-    n <- length(ests)
-    return(ci(mu, sd, n, width))
-  })
-}
-
-#####
 ##### run_boot_sims()
 ##### ---------------------
 ##### Run `n_sims` simulations with `alhpa`, `depth` 
 ##### Expects a df `d_prior_counts` that contains prior counts data
 #####
-run_boot_sims <- function(d_prior_counts, alpha = 1, depth = 1, n_sims = 500, verbose = TRUE) {
+run_boot_sims <- function(d_prior_counts, alpha = 1, depth = 1, n_sims = 100, verbose = TRUE) {
   ## Display run
   if (verbose) {
     cat(paste("Running ", n_sims, " simulations with alpha = ", alpha, ""))
@@ -599,17 +634,63 @@ d_prior_counts <- merge(d, priorCounts, by = "prior", all = TRUE)
 ##      :: running time was ~ 2min for 100 sims depth(0-5)
 # ptm <- proc.time()
 depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
-  run_boot_sims(d_prior_counts, depth = depth, n_sims = 10, verbose = FALSE)
+  run_boot_sims(d_prior_counts, depth = depth, n_sims = 100, verbose = FALSE)
   }, mc.cores = detectCores())
 # proc.time() - ptm
+
 
 ## Add in booted se's
 sims_prior$boot_se <- get_se(convertListToDF(depth_sims))
 
 cis <- t(as.data.frame(get_ci(convertListToDF(depth_sims))))
-colnames(cis) <- c('low', 'hi')
+colnames(cis) <- c('bstrp_mu', 'bstrp_err')
 sims_prior <- cbind(sims_prior, cis)
 ```
+
+### Look at boostrapped sims (appr normal?)
+```{r}
+boots_df <- convertListToDF(depth_sims)
+boots_df$simNum <- seq(1, nrow(boots_df))
+boots_df_long <- boots_df %>%
+  gather(itNum, val, -simNum) %>%
+  select(simNum, val)
+
+## How do the sims look (apprx normally distr)?
+boots_df_long %>%
+  filter(val != 1 & val != 0 & val != 0.5) %>%
+  ggplot(aes(val, fill = simNum)) +
+    geom_density() +
+    facet_wrap(~simNum)
+```
+
+
+### Temp analysis of bstrp
+```{r eval = FALSE}
+depth <- 2
+temp_sims <- run_boot_sims(d_prior_counts, depth = 5, n_sims = 100, verbose = FALSE)
+temp_df_sims <- as.data.frame(temp_sims)
+cis <- t(as.data.frame(get_ci(temp_df_sims)))
+colnames(cis) <- c('mu', 'error')
+sims_prior_depth1 <- sims_prior %>% filter(depth == 5)
+temp_sims_cis <- cbind(sims_prior_depth1, cis)
+
+ggplot(temp_sims_cis, aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_errorbarh(aes(xmin = mu - error, xmax = mu + error, height = 0.05)) +
+    geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2)
+
+
+mean(unlist(temp_df_sims[which(temp_sims_cis$low > temp_sims_cis$preds),][1,]))
+
+sims_prior_depth1[which(temp_sims_cis$low > temp_sims_cis$preds),]
+
+temp_sims_cis[which(temp_sims_cis$low > temp_sims_cis$preds),]
+```
+
 
 ### Bootstrap with depths 0-5
 ```{r boostrap_all_depths_plot}
@@ -618,7 +699,7 @@ sims_prior %>%
 #   mutate(errorH = boot_se,
 #          errorL = boot_se) %>%
   ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
-    geom_errorbarh(aes(xmin = low, xmax = hi, height = 0.05)) +
+    geom_errorbarh(aes(xmin = preds - bstrp_err, xmax = preds + bstrp_err, height = 0.05)) +
     geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
     xlim(c(0,1)) + ylim(c(0,1)) + 
     facet_wrap(~depth) +
@@ -629,6 +710,9 @@ sims_prior %>%
 ```
 
 # Prior vs No Prior performance by experiment
+
+## Facet for experiment intent
+
 
 ## Plot preds by experiment
 ```{r boot_plot, fig.width=12}
