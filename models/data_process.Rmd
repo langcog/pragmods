@@ -25,6 +25,8 @@ library(stats)
 ```
 
 ## Helpers
+
+Helper functions of data pre-processing and combining (from sims.R).
 ```{r helpers}
 #####
 ##### normalizeBy()
@@ -177,6 +179,7 @@ rrrsa_ready_df <- function(d, foil_name = "foil", logical_name = "logical", targ
 ```
 
 ## Global data / settings
+
 ```{r globals}
 set.seed(1)
 ALPHAS <- seq(0, 5, by = 0.1)
@@ -204,16 +207,6 @@ NOTE:: To work with rrrsa::runDf we need each matrix to include the literal sema
 Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
 ```{r data_processing}
 fullData <- rrrsa_ready_df(d)
-# original_fullData <- fullData
-# 
-# original_fullData
-# 
-# 
-# which(sims_prior_temp[[1]]$grouper != original_fullData %>% filter(!is.na(count)) %>% select(grouper))
-# 
-# original2 <- original_fullData[which(!is.na(original_fullData$count)), ]
-# original2[seq(34, 39), ]
-# sims_prior_temp[[1]][seq(34, 39),]
 ```
 
 # Simulations WITH priors (recursive depth 0-5)
@@ -252,7 +245,7 @@ sims_prior %>%
 ```
 
 ### Recursive depth 0-5
-```{r sims_priors_plot2}
+```{r sims_priors_plot2, eval=FALSE}
 ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_pointrange(aes(ymin = cil, ymax = cih)) + 
   xlim(c(0,1)) + ylim(c(0,1)) + 
@@ -265,7 +258,7 @@ ggplot(sims_prior, aes(x = preds, y = p, col = expt, pch = object)) +
 ```
 
 ## Correlations
-```{r sims_priors_cors}
+```{r sims_priors_cors, eval=FALSE}
 sims_prior %>%
   group_by(depth) %>%
   summarise("cor" = cor(p, preds)) %>%
@@ -393,7 +386,7 @@ ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
 ```
 
 ## Correlations
-```{r sims_no_priors_cors}
+```{r sims_no_priors_cors, eval=FALSE}
 sims_NoPrior %>%
   group_by(depth) %>%
   summarise("cor" = cor(p, preds)) %>%
@@ -507,6 +500,8 @@ allData %>%
 # Propagating errors into model
 
 ## Bootstrap se helpers
+
+Helpers - calculating bootstrapepd CIs
 ```{r bootstrap_helpers}
 #####
 ##### se()
@@ -635,13 +630,15 @@ d_prior_counts <- merge(d, priorCounts, by = "prior", all = TRUE)
 ```
 
 ### Boostrapped data at depth == 5
-```{r run_bstrap_single_depth}
+
+Let's lookat at bootstrapped levels at a single level of recursion. These next two code blocks are useful for verifying that were measuring the correct quantitites.
+```{r run_bstrap_single_depth, eval = FALSE}
 depth <- 4
 d5_bstrap_sims <- run_boot_sims(d_prior_counts, depth = depth, n_sims = 100, verbose = FALSE)
 ```
 
 #### Plot d5 strap sims
-```{r plot_bstrap_sims_singl_depth}
+```{r plot_bstrap_sims_singl_depth, eval = FALSE}
 d5_bstrap_sims$simNum <- seq(1, nrow(d5_bstrap_sims))
 d5_bstrap_sims_long <- d5_bstrap_sims %>%
   gather(itNum, val, -simNum) %>%
@@ -656,7 +653,7 @@ d5_bstrap_sims_long %>%
 ```
 
 #### Calc d5 bstrap cis
-```{r calc_bstrap_cis_single_depth}
+```{r calc_bstrap_cis_single_depth, eval = FALSE}
 d5_prior_model_sims <- sims_prior[which(sims_prior$depth == depth), ]
 errs <- data.frame()
 for (sim_row in seq(1, nrow(d5_bstrap_sims))) {
@@ -675,7 +672,7 @@ d5_bstrap_cis <- d5_bstrap_cis %>%
 ```
 
 #### Plot d5 bootstrap CIs
-```{r plot_bstrap_cis_single_depth}
+```{r plot_bstrap_cis_single_depth, eval = FALSE}
 ggplot(d5_bstrap_cis, aes(x = preds, y = p, col = expt, pch = object)) +
   geom_errorbarh(aes(xmin = ci_hi, xmax = ci_low, height = 0.05)) +
   geom_errorbar(aes(ymin = cil, ymax = cih, width = 0.05)) + 
@@ -689,42 +686,47 @@ ggplot(d5_bstrap_cis, aes(x = preds, y = p, col = expt, pch = object)) +
 ```
 
 
-### Boostrapped data - all DEPTHS
+### Boostrapped data - all DEPTHS and calculate CIs
 ```{r bstrap_data_all_depths}
 ## Run simulations for each depth
-depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
-  run_boot_sims(d_prior_counts, depth = depth, n_sims = 100, verbose = FALSE)
-  }, mc.cores = detectCores())
-```
+sims_prior_bstrap_errs <- read.csv("sims_prior_bstrap_errs.csv") ## From previous run with set.seed(1)
 
-#### Calculate boostrapped CIs - all depths
-```{r calc_bstrap_cis_all_depths}
-## For each simulation level
-cis <- data.frame() ## df to hold CIs
-# fn <- function() {
-for (depth in seq(1, length(depth_sims))) {
-  ## Current depth data
-  curr_data <- data.frame(depth_sims[depth])
-  errs <- data.frame() ## Hold ci diffs
-  ## For each simulation (row) in the current data frame
-  for (sim_row in seq(1, nrow(curr_data))) {
-    ## Get diff with our estimate
-    diffs <-  sims_prior[which(sims_prior$depth == depth - 1), ]$preds[sim_row] - unlist(curr_data[sim_row, ])
-    errs <- rbind(errs, diffs)
+## Run below code if we don't have saved previous sims
+## ---------------------------------------------------
+if (!inGlobalEnv("sims_prior_bstrap_errs")) {
+  depth_sims <- mclapply(DEPTHS, FUN = function(depth) {
+      run_boot_sims(d_prior_counts, depth = depth, n_sims = 500, verbose = FALSE)
+      }, mc.cores = detectCores()) 
+   
+  ## For each simulation level
+  cis <- data.frame() ## df to hold CIs
+  
+  # fn <- function() {
+  for (depth in seq(1, length(depth_sims))) {
+    ## Current depth data
+    curr_data <- data.frame(depth_sims[depth])
+    errs <- data.frame() ## Hold ci diffs
+    ## For each simulation (row) in the current data frame
+    for (sim_row in seq(1, nrow(curr_data))) {
+      ## Get diff with our estimate
+      diffs <-  sims_prior[which(sims_prior$depth == depth - 1), ]$preds[sim_row] - unlist(curr_data[sim_row, ])
+      errs <- rbind(errs, diffs)
+    }
+    cis <- rbind(cis, data.frame(t(apply(errs, MARGIN = 1, FUN = quantile, c(0.05, 0.95)))))
   }
-  cis <- rbind(cis, data.frame(t(apply(errs, MARGIN = 1, FUN = quantile, c(0.05, 0.95)))))
-}
-# }
-# debug(fn)
-# undebug(fn)
-# cis <- fn()
+  # }
+  # debug(fn)
+  # undebug(fn)
+  # cis <- fn()
 
-names(cis) <- c('low', 'hi')
-sims_prior_bstrap_errs <- cbind(sims_prior, cis)
-## Need to add bounds to CIs
-sims_prior_bstrap_errs <- sims_prior_bstrap_errs %>%
-  mutate(ci_low = preds - hi,
-         ci_hi = preds - low)
+  names(cis) <- c('low', 'hi')
+  sims_prior_bstrap_errs <- cbind(sims_prior, cis)
+  ## Need to add bounds to CIs
+  sims_prior_bstrap_errs <- sims_prior_bstrap_errs %>%
+    mutate(ci_low = preds - hi,
+           ci_hi = preds - low)
+}
+# write.csv(sims_prior_bstrap_errs, "sims_prior_bstrap_errs.csv")
 ```
 
 #### Plot with boostrapped errs - all depths
@@ -738,7 +740,7 @@ ggplot(sims_prior_bstrap_errs, aes(x = preds, y = p, col = expt, pch = object)) 
   facet_wrap(~depth) +
   geom_smooth(method="lm", aes(group=1)) + 
   geom_abline(slope = 1, intercept = 0, lty=2) +
-  ggtitle("Priors model, bootatrapped 95% CIs")
+  ggtitle("Priors model, bootstrapped (500 sims) 95% CIs")
 ```
 
 #### Why do we see more variance with higher recursive depth?
@@ -772,7 +774,8 @@ keepIndices <- c("keep", "throwout")
 compareIndices  <- which(full_data_priors_tests$tuningData == "keep")
 ```
 
-```{r}
+### Prior vs noPrior model preds
+```{r prior_vs_noPrior_model_preds}
 prior_d <- plyr::ddply(full_data_priors_tests, .variables = c("grouper"), .fun = rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
             itemVarName = "query", priorsVarName = "priorValue",
@@ -801,7 +804,6 @@ ggplot(join_priors_noPriors, aes(x = value, y = p, col = prior_type)) +
 #   geom_smooth(method="lm", aes(group=1)) + 
 #   geom_abline(slope = 1, intercept = 0, lty=2) +
 #   ggtitle("Model performance for recursive depth 0-5 with fitted alphas")  
-priorCounts
 ```
 
 
@@ -863,7 +865,7 @@ full_data_depth_tests <- full_data_depth_tests %>%
 keepIndices <- c("keep", "throwout")
 compareIndices  <- which(full_data_depth_tests$tuningData == "keep")
 
-sims_prior_temp <- lapply(DEPTHS, function(depth) {
+sims_prior_temp <- lapply(seq(0, 2), function(depth) {
   plyr::ddply(full_data_depth_tests, .variables = c("grouper"), rsa.runDf,
             quantityVarName = "object", semanticsVarName = "speaker.p",
             itemVarName = "query", priorsVarName = "priorValue", depth = depth, usePriorEveryRecurse = FALSE) %>%
@@ -877,12 +879,12 @@ sims_prior_temp %>% filter(preds != 0, preds != 1) %>%
   ggplot(aes(x = preds, y = p, col = expt, pch = object)) +
   geom_pointrange(aes(ymin = cil, ymax = cih)) + 
   xlim(c(0,1)) + ylim(c(0,1)) + 
-  facet_wrap(expt~depth, labeller = label_both) +
+  facet_wrap(expt~depth, labeller = label_both, ncol = 3) +
   ylab("Proportion choosing target") + 
   xlab("Model Predictions") + 
   geom_smooth(method="lm", aes(group=1)) + 
   geom_abline(slope = 1, intercept = 0, lty=2) +
-  ggtitle("Model performance for recursive depth 0-5 with fitted alphas")
+  ggtitle("Model performance for recursive depth 0-2 with fitted alphas")
 
 sims_prior_temp %>%
   group_by(expt, depth) %>%
