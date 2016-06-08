@@ -297,13 +297,19 @@ maxCors <- aggregateTuneData %>%
 
 ### Plot performance tuning
 ```{r sims_priors_tuning_plot}
-## Plot tuning
-ggplot(aggregateTuneData, aes(x = alpha, y = cor, col = as.factor(depth))) +
-  geom_point() +
-  ylim(0.75, 1) +
-  geom_vline(xintercept = maxCors$alpha, lty = 4, col = "grey50") +
-  scale_x_continuous(breaks = round(seq(0, 6, by = 0.1)), "alpha") +
-  ggtitle("Model performance - priors incorporated")
+
+aggregateTuneData_plot <- aggregateTuneData %>%
+  mutate(Recursive_depth = as.factor(depth))
+
+## Plot tuning (Plot adapted for personal_site)
+ggplot(aggregateTuneData_plot, aes(x = alpha, y = cor, col=Recursive_depth)) +
+  geom_point(alpha=0.6, size=4) +
+  geom_vline(xintercept=maxCors$alpha, col="grey", lty="dotdash")+
+  ylab("Correlation") +
+  scale_x_continuous(breaks = round(seq(0, 6, by = 0.1)), "Rationality (alpha level)") +
+  theme_solarized() +
+  theme(legend.position="bottom", legend.box="horizontal",
+        legend.text=element_text(size=8), legend.direction="horizontal")
 ```
 
 ## Best priors model performance with fitted alphas
@@ -494,7 +500,10 @@ mfD <- read.csv("data/modelRuns.csv") %>%
 allData$mdPreds <- mfD$prediction
 allData %>%
   ggplot(aes(x = preds, y = mdPreds, fill = matrix, size = depth)) +
-  geom_point(shape = 21, alpha = 0.30)
+    xlab("rrrsa predictions") +
+    ylab("MF predictions") +
+    geom_point(shape = 21, alpha = 0.30)
+ggsave("pragmods.png", path = "~/Desktop/", width=7, height=3)
 ```
 
 # Propagating errors into model
