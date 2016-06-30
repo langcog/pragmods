@@ -23,8 +23,8 @@
 \title{Rational speech act models of pragmatic reasoning in reference games}
 
 
-\fourauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Noah D. Goodman}{Christopher G. Potts}
-\fouraffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, Stanford University}
+\fiveauthors{Michael C. Frank}{Andr\'es G\'omez Emilsson}{Benjamin Peloquin}{Noah D. Goodman}{Christopher G. Potts}
+\fiveaffiliations{Department of Psychology, Stanford University}{Department of Psychology, Stanford University}{Psychology, Stanford University}{Department of Psychology, Stanford University}{Department of Linguistics, Stanford University}
 
 \shorttitle{Rational speech act models}
 \rightheader{Rational speech act models}
@@ -46,7 +46,7 @@
 % \newcommand{\secref}[1]{section\,\ref{#1}}
 % \newcommand{\dashsecref}[2]{sections\,\ref{#1}--\ref{#2}}
 
-% Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \exptrefrange{exp:seqs-1}{exp:prod-2seq}. 
+% Thanks to Avery Katko and Paul Mains for assistance in data collection and design for \exptrefrange{exp:seqs-1}{exp:prod-2seq}.
 \acknowledgements{\singlespace Thanks to Alex Stiller for valuable work on a previous version of the ``base rate'' sequence of experiments. Thanks to Roger Levy for much valuable discussion and the design of the ``odd man out'' stimulus. Thanks to Allison Kraus for designing the stimuli used here.  Some of these ideas and experimental designs were presented in substantially different form in \citeA{stiller2011}; data from \exptref{exp:levels-level} were presented in \citeA{vogel2014}. We gratefully acknowledge funding from ONR and the Merck Family Foundation. Please address correspondence to Michael C. Frank, Department of Psychology, Stanford University, 450 Serra Mall (Jordan Hall), Stanford, CA, 94305, tel: (650) 724-4003, email:{\texttt mcfrank@stanford.edu}.
 
 ~\\
@@ -56,13 +56,51 @@
 \abstract{Human communication is almost always underspecified, but it typically takes place in a context where otherwise ambiguous messages can be decoded. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Following previous work, we describe this process of recursive reasoning---in which listeners reason about speakers and vice versa---using a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of experiments using simple one-shot reference-resolution games. Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described by the RSA framework.}
 
 \begin{document}
-\maketitle                            
+\maketitle
 
-\input{section-intro}
+\section{Introduction}
 
-\input{section-models}
+Human communication is astonishingly flexible and efficient. Between two people who know each other well, a single word, look, or gesture can convey volumes \cite{sperber1986,clark1996}. Even two people who barely know one another can rapidly leverage their shared vocabulary to create new, economical ways of communicating about novel situations \cite{brennan1996,clark1991}. These successes are all the more impressive considering the systematic issues of vagueness and ambiguity in natural language \cite{keefe1997,wasow2005}. How do we use such slippery means to produce such concrete results?
 
-\input{section-general-methods}
+\citeA{grice1975} provided a critical insight into this problem: listeners could reason about speakers' goals in choosing a particular form for their communication. By assuming that speakers were attempting to be cooperative in their communicative, listeners could then infer the most likely intended goal that would have given rise to that form, given the current circumstances. This proposal allowed the separation of semantic content---those aspects of meaning that are invariant across contexts---from pragmatic content---those aspects of meaning that rely on contextual inferences about speaker intentions.
+
+Although many subsequent analysts have attempted to refine Grice's original proposal or even to reject substantial elements, the semantics/pragmatics distinction has been critical for progress in understanding language comprehension. Nevertheless, because of the difficulties of formalizing notions like context and social goal inference, pragmatics has often remained a ``wastebasket'' for phenomena that are difficult to explain under formal theories of syntax or semantics \cite{bar-hillel1971}. This dismissal of pragmatics is regrettable because of the importance and richness of pragmatic phenomena. In some substantial sense, what linguists call ``pragmatics'' is what language users experience as the use of language in their everyday interpersonal communication---the reality of how context alters interpretation. Thus, an important goal for research in linguistics and the psychology of language is the development of formal tools for understanding pragmatic inferences and bringing them under experimental control.
+
+In this article, we report on a formal framework for understanding pragmatics, known as the ``rational speech act'' (RSA) framework \cite<originally introduced in>{frank2012,goodman2013}. This framework builds on Grice's initial insight and combines it with tools from Bayesian cognitive modeling \cite{tenenbaum2011}. The result is a set of tools for a quantitative understanding of the kind of social goal inference that Grice initially described. In the remainder of this introduction, we provide a relatively brief survey of qualitative frameworks for pragmatic reasoning, and then discuss quantitative progress in quantitative models of pragmatics. We then summarize the plan for the rest of the article.
+
+\subsection{Qualitative models of pragmatic reasoning}
+
+Grice
+
+Horn
+
+Levinson
+
+Sperber and Wilson
+
+Chierchia et al.
+
+\subsection{Quantitative models of pragmatic reasoning}
+
+Early work, hobbes, etc.
+
+referring expression generation
+
+percy liang
+
+Game-theoretic approaches - parikh, van rooj, Franke, Jaeger
+
+RSA models - antecedents in social reasoning models \cite{baker2009}
+
+\subsection{The current work}
+
+The current work has two interlocking goals. The first goal is empirical: via a sequence of large-scale, web-based experiments, we provide strong evidence that one-shot reference games provide a flexible and precise tool for studying quantitative patterns of human behavior. The second goal is formal: we provide a more comprehensive presentation of ``rational speech act'' (RSA) models of pragmatic reasoning and show that this framework captures many of the patterns of performance we observed in our experiments. Taken together, this body of work suggests that the RSA model provides a powerful set of tools for studying human pragmatic reasoning in quantitative detail.
+
+Our experiments are listed in Table \ref{tab:expts}; they are broken into three sequences. The first of these (``Preliminaries,'' Section \ref{sec:prelims}) explores our primary experimental paradigm, one-shot reference games, providing experimental evidence that minor design choices do not account for the pattern of data we observe. The second section (``Priors,'' Section \ref{sec:prior}) tests the role of prior expectations in reference game behavior. The third (``Levels,'' Section \ref{sec:levels}) tests the level of recursion that speakers reason to and provides further data on the relationship between prior and posterior measurements.
+% The fourth (``Sequences,'' Section \ref{sec:seqs}) takes a first step towards exploring sequential effects in pragmatic reasoning and whether these can scaffold more deeply referential expressions. The fifth and final section (``Production,'' Section \ref{sec:prod}) discusses speaker behavior in reference games and shows that it is sensitive to the costs of language production.
+
+Our plan is as follows. We first present formal details of the RSA model. We next move to our experimental presentation. We then examine the fit of RSA models to our data. To conclude, we discuss limitations and future directions for RSA modeling, as well implications of this work for the study of pragmatics more broadly.
+
 
 \begin{table}
 \caption{\label{tab:expts} Outline of the experiments reported here.}
@@ -95,12 +133,346 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 \end{tabular}
 \end{table}
 
-\input{section-prelims}
+
+\section{Formal Framework}
+\label{sec:models}
+
+In this section, we describe formal details of the ``rational speech act'' model. As described above, this model has been presented previously \cite{frank2012,goodman2013}. Our goal here is to provide a more comprehensive formal presentation. This presentation allows us to highlight choice-points in the model that we test below; in addition, it illuminates parallels and differences with other formal models in this space.
+% . (specific comparisons are given in Appendix \ref{app:equivalences}).
+
+% We introduce a notation for signaling games and other recursive reasoning problems \cite{golland2010,franke2012,frank2012,goodman2013}. This notation system allows us to define a set of recursive models; we show that a set of recent systems for pragmatic reasoning can be written within this system. As a consequence, they are equivalent to one another modulo three design decisions:
 
 
-\input{section-prior}
+\subsection{Preliminaries}
 
-\input{section-levels}
+A reference game under our definition is a game in which a speaker $S$ and listener $L$ collaborate in a context $C$ to identify a particular object in the context, known as the speaker's intended referent $r_S \in C$. The game has two parts. First the speaker chooses an utterance $w$ based on vocabulary $V$; this process can be as simple as selection from a list or as complex as generation from a grammar. Next the listener guesses a referent $r_L \in C$ after hearing $w$. The game is won if $r_S=r_L$. Although these game-theoretic foundations of RSA allow for definition of more complex payoff schemes (as in e.g., \citeNP{franke2009}), here we assume the simplest possible payoff, which is positive if the game is won and zero otherwise.
+
+We assume that the world consists of a set of objects, some subset of which are present in $C$. There is a distribution $\sigma$ over the objects ${o_1 ... o_n} \in C$, which is mutually known to both speaker and hearer. This distribution picks out those objects in the context which are more or less likely to be talked about, either because of their intrinsic perceptual or conceptual noteworthiness, or because of some prior history between speaker and listener (e.g. one object having been talked about previously). Although in previous work we described it as a ``contextual salience'' distribution, we now refer to this distribution as the ``prior'' to avoid bias in our interpretation.
+
+There is also a mutually-known semantics for the vocabulary of possible words $w$ that a speaker can send. Although in principle these words could be composed (see \citeNP{potts2015} for an example of this approach), here we examine only single words. Each word can be described as a Kronecker $\delta$ function that applies to objects and returns 1 if the message is true of that object, 0 otherwise. When applied to a context, a word specifies a uniform distribution over those objects of which it is true.
+
+\subsection{The model}
+
+We define the RSA model in terms of sub-agents, listeners $L$ and speakers $S$. Their goals are to reason about one another so that they are able to transmit information efficiently. $L$s reason abut what word $S$s would have said to describe a particular referent; $S$s reason about what interpretation $L$s would give to a particular message. Each agent uses Bayesian inference to reason about the other's likely actions.
+
+So, beginning our recursion, we can define:
+
+\begin{equation}
+  \begin{array}{r@{}l}
+    \label{eq:agents}
+    P_{L_0}(r_S \mid w, C) & \propto \begin{cases} 1 &\mbox{if } \delta_w(r_s) = 1 \\
+0 & \mbox{otherwise.} \end{cases} \\
+    P_{S_n}(w \mid r, C) & \propto P_{L_n-1} (r_S \mid w, C)  \\
+    P_{L_n}(r_S \mid w, C) & \propto P_{S_n} (w \mid r_S, C)\\
+  \end{array}
+\end{equation}
+
+The two agents are defined recursively and so individual probabilities are undefined unless the recursion ends.  Agent $L_0$, the ``literal listener,'' grounds the recursion by choosing an interpretation uniformly between available referents that are consistent with $w$. So then $L_1$ reasons about $S_1$, who in turn reasons about $L_0$. But $L_1$ and $S_1$ are not special. By analogy we can define $L_n$, a listener whose inferences reflect $n$ full cycles of listener-speaker recursion. Clearly the level of recursion $n$ is an important parameter, and it is one we discuss below in considerable depth.
+
+We then define a top-level agent for the purposes of decision-making, $L$:
+
+\begin{equation}
+P_L (r_s \mid w, C) \propto P_{L_n} (r_s \mid w, C) P(r_s)
+\end{equation}
+
+\noindent where $P(r_S)$ is the prior distribution over referents $\sigma$, which we discuss extensively below. In principle, we could also add a prior on words, $P(w)$, but for simplicity here we assume that $P(w) \propto 1$ and do not discuss it further.
+
+\subsection{Utility-theoretic definition}
+
+An alternative definition of our model can be posed in terms of rational action based on speakers' utilities, following the game-theoretic definition above. Consider a speaker who weighs a message $w$ in terms of its informational benefit $I(w)$ and cost $D(w)$:
+
+\begin{equation}
+U(w; r_S; D) = I(w; C) - D(w)
+\end{equation}
+
+\noindent The speaker should then choose rationally between messages as a function of a choice rule, e.g.:
+
+\begin{equation}
+P_S(w \mid r_S, C) \propto e^{-\alpha U(w;r_S; C)}
+\end{equation}
+
+\noindent where $\alpha$ is a ``greed'' parameter; if $\alpha=0$, choices are random, as $\alpha \rightarrow \infty$, she always chooses the option with greater utility.
+
+We define informational benefit with respect to the recursively lower listener's surprisal, such that the speaker's utility decreases as the listener (at the level they are assuming, namely $n-1$) has more uncertainty: $I(w; C) = -(-log(L_{n-1}))$. If we assume that cost is constant, that $\alpha=1$, and $n=1$, then the log in surprisal and the exponent in the choice rule cancel, as in the the derivation in \citeA{frank2012}.
+% We follow that derivation and do not consider cost or greed parameters, though we briefly return to them in the discussion of our modeling results.
+
+\subsection{Matrix definition}
+
+This probabilistic notation emphasizes individual interpretation probabilities; here we briefly describe how these models can be applied to entire signaling game matrices. This way of writing the models also highlights some of the similarities to iterated best response models \cite{jager2010}. Write a signaling game is as a binary context matrix $M$ with indices $w$ and $o$ corresponding to words and objects. If $M_{w,o} = 1$, then that word can be named with that object ($w(o) = 1$).
+
+Now define our listener and speaker agents as two functions over signaling game matrices. (As above, for simplicity we consider the case where there are no costs and $\alpha=1$). The first function, $L(x)$, is the listener function; for a particular object word pair, it returns the probability of that object, given the word.
+
+\begin{equation}
+L(x_{w,o}) = \frac{x_{w,o}}{\displaystyle\sum_{o' \in C} x_{w,o'} }
+\end{equation}
+
+\noindent Applying $L$ to each element of matrix $M$ results in the literal listener $L_0$.
+
+$S(x)$ is then the speaker function, which captures the intuition that the speaker chooses the best word to describe a particular object (from those that are available in the vocabulary). $S(x)$ takes an object-word pair from the matrix and returns the probability of speaking this word, normalized over the other possible words:
+
+\begin{equation}
+S(x_{w,o}) = \frac{x_{w,o}}{\displaystyle \sum_{w' \in V(C)} x_{w',o}}
+\end{equation}
+
+So now, if we successively apply these functions to matrix $M$, we can define agents with the same recursive depth as in the description above. For example, $L(S(L(M)))$ is equivalent to the $L_1$ agent above. In essence, repeated applications of the $L$ and $S$ functions is equivalent to iterated renormalization, first by columns and then by rows.
+
+\subsection{Worked example}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{figures/hatglasses.pdf}
+  \caption{\label{fig:ex} An example stimulus item showing our canonical inferential context. The prompt in this case would be ``glasses,'' and the pragmatic target item would be the face with glasses but not a hat (the logical target item would be the face with a hat and glasses). In all experiments reported here, position and identity of all features is randomized across displays; the target was not always the face with glasses nor was it always positioned in the middle.}
+\end{figure}
+
+We work through an example computation on the stimulus shown in Figure \ref{fig:ex}. The object by feature matrix $M$ is
+
+\begin{equation}
+M = \left[
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 1\\
+    \end{array}
+  \right]
+\end{equation}
+
+\noindent where the two rows are the messages ``hat'' and ``glasses'' respectively, and the columns correspond to the three faces. So then
+
+
+\begin{equation}
+L(M) = \left[
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & .5 & .5\\
+    \end{array}
+  \right]
+\end{equation}
+
+and
+
+\begin{equation}
+S(L(M)) = \left[
+    \begin{array}{ccc}
+      0 & 0 & .66 \\
+      0 & 1 & .33\\
+    \end{array}
+  \right]
+\end{equation}
+
+and then,
+
+
+\begin{equation}
+L(S(L(M))) = \left[
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & .75 & .25\\
+    \end{array}
+  \right]
+\end{equation}
+
+\noindent Thus, at $L_1$, the message ``glasses'' refers to the face with only glasses.
+
+\subsection{Relationship to other models}
+
+As reviewed above, a wide range of models in many different traditions have explored similar ideas to those in RSA. Here we highlight a few formal connections that are more apparent after having worked through the formal definition of RSA.
+
+In a seminal early paper, \citeA{rosenberg1964} studied simple communication games much like the ones we study here. They model speakers and listeners as non-recursive agents who nevertheless make symmetric choices using a \citeA{luce1963} choice rule.
+
+In a study of referring-expression production, \citeA{golland2010} describe a speaker-centric model in which an agent like $S(M)$ is the ``reflex speaker'' (producing true messages with equal probability) and $S(L(M))$ is called the ``reasoned speaker.''
+
+\citeA{jager2010} describes an iterated best response (IBR) model in which each agent takes the highest probability alternative, e.g.
+
+\begin{equation}
+L(x_{w,o}) = \begin{cases}
+1 &\mbox{if } x_{w,o} = \max_{o' \in C}{x_{w,o'}}  \\
+0 &\mbox{otherwise}
+\end{cases}
+\end{equation}
+
+\noindent This max operation can lead to a number of undesirable results such as ties or rows/columns with no non-zero elements; the model thus includes some ad-hoc procedures for dealing with these cases. Otherwise, RSA and the IBR model are quite similar in spirit, although RSA does not produce discrete results.
+
+\section{General Experimental Methods}
+
+This section describes the methods used in the experiments reported below. Our goal was to create a general method for measuring pragmatic inferences in simple reference games. Our taking-off point is two previous studies in which simple feature-based displays allowed measurement of pragmatic reasoning in grounded contexts \cite{frank2012,stiller2014}. In what follows we describe some of the general features of these displays and the experiments that use them.
+% In the experiments that follow we attempt to demonstrate that these signaling games provide a useful tool for measuring pragmatic reasoning.
+
+\subsection{Participants}
+
+One challenge of pragmatic communication experiments is that repeated communication within a signaling game is very likely to influence responding \cite<e.g.,>{brennan1996}. For this reason, we adopted a massively between-subjects approach, where each participant answered exactly one relevant question.
+
+We adopted a general standard of 50 independent participants per cell, based on the tradeoff between cost and the desired precision of measurements. With samples of N=50 participants making binary decisions, we could assume 95\% confidence intervals with width .24 at their widest; doubling the sample size to N=100 per cell would only reduce width to .18. While not every experiment reflects this precise standard due to idiosyncrasies of recruitment exclusion, we have tried to maintain approximately this standard throughout.
+
+All of the experiments described here were run on Amazon's Mechanical Turk crowdsourcing service, between Fall 2013 and Spring of 2015. In general, each experiment was run as an independent human intelligence task (HIT); a few were posted as multiple hits for convenience or due to experimenter error. In all cases, we remove duplicated workers from the samples, so that data in each experiment represent a set of unique judgments by distinct participants.
+
+In addition to excluding duplicated participants, we also excluded participants who failed manipulation checks (see below). Table \ref{tab:expts} gives details of participants for each experiment.
+
+\subsection{Stimuli}
+
+We created a set of six base domains that had features that could easily be added independently: faces (pictured in Figure \ref{fig:ex}), boats, pizzas, sundaes, snowmen, and christmas trees. We created slightly different versions of each base so that they would appear to be unique (e.g., by varying the proportions or color tone of the face). We then were able to add features to each of these programmatically (with most experiments using two features but some using three). Faces were supplemented with hats, glasses, and mustaches; boats had motors, sails, and cabins; pizzas had olives, peppers, and mushrooms; sundaes had whipped cream, chocolate, and cherries on top; snowmen had mittens, hats, and scarves; and christmas trees had lights, ornaments, and stars on top.
+
+\subsection{Procedure}
+
+Participants viewed the experiment within a browser window. The first screen of the experiment presented a basic description of the paradigm and asked for informed consent. The second screen of the experiment presented the interlocutor, Bob (a cartoon picture of a man), and noted that he liked to do activities with the base item (e.g., visit friends or sail boats). In experiments with familiarization stimuli (e.g., \exptref{exp:prior-baserate}), nine familiarization images were presented on this screen.
+
+The third screen was the key screen: it presented the experimental stimulus (a set of base items augmented with features, representing the signaling game of interest) at the top of the screen. Below each stimulus a letter was displayed. From left to right: A, B and C. In all experiments except for \exptref{exp:prelims-mc}, two manipulation check questions were asked directly below the display using text entry boxes (e.g. ``how many boats have cabins?''). Below this was the prompt, e.g. ``Bob can only say one word to communicate with you and he says: {\it glasses}. Click below on the option that represents the friend that you think Bob is talking about.'' Below this was a set of buttons labeled A, B and C for the participant to indicate which of the three options they thought the speaker was referring to. A final screen asked participants the following: ``Who did you meet in this survey?'',  ``What was this survey about?'' and ``Any other comments for us?'' Optionally, participants could also provide their age and gender, but finishing the experiment was not contingent on doing this.
+
+Note that in the first set of experiments, we manipulate a number of these experimental choices, including the dependent variable, the use of the manipulation check, and the linguistic framing of Bob's utterance. Our description here reflects the defaults used in the majority of the experiments we report.
+
+
+
+% Minor stuff:
+
+% Prelims measures has four items
+
+% Size and sequence have no manipulation check
+
+\section{Methodological preliminaries}
+\label{sec:prelims}
+
+Our first set of experiments, \exptrefrange{exp:prelims-dv}{exp:prelims-frame}, establish the simple reference games in Figure \ref{fig:ex} as a viable method, testing the replicability of judgments in this paradigm and examining particular experimental decisions.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=6in]{../plots/1-prelims-dv.pdf}
+  \caption{\label{fig:prelims-dv} Data from \exptref{exp:prelims-dv}. Each panel shows results from a different dependent variable (normalized for simplicity into the interval [0,1]. The three columns show results for the foil (e.g., face with nothing), logical (e.g., face with hat and glasses), and pragmatic (face with only glasses) targets. Error bars show 95\% confidence intervals, computed by non-parametric bootstrap.}
+\end{figure}
+
+\exptref{exp:prelims-dv} explored the use of different dependent variables. We considered a betting measure, in which participants were instructed to allocate \$100 across the three targets, as in \citeA{frank2012}; a 7-point Likert scale, as in \citeA{goodman2013}; and a simple three-alternative forced choice measure.\footnote{As this experiment was one of our first, we used only four of our six stimulus items: faces, boats, snowmen, and sundaes.} Figure \ref{fig:prelims-dv} shows results from each. With all three dependent variables, the pragmatic target was chosen more than the logical target, but this result was strongest for the forced choice, with 79\% of participants choosing the pragmatic target. Both the Likert and betting measures afforded the possibility of ``hedging'' by allocating equal bets or ratings to the pragmatic and logical targets. Conservative participants took advantage of this possibility very frequently, betting equal amounts on the logical and pragmatic targets 43\% of the time and using equal Likert ratings 46\% of the time. In contrast, the forced-choice dependent variable did not allow this kind of hedging; thus, we adopted it in our further experiments.
+
+\exptref{exp:prelims-mc} was designed to ensure that the presence of the manipulation check---asking participants to count how many of each feature was present---did not induce a task demand that changed the magnitude of pragmatic responding. We saw 83\% pragmatic responding in the manipulation check condition and 77\% pragmatic responding in a matched condition with no manipulation check. Because of the high power of this experiment ($N_{include}$ = 513), the difference between conditions was statistically significant ($\chi^2(2) = 6.97,~p = .03$). Nevertheless, the modest (6\%) difference between conditions suggests that the manipulation check does not \emph{create} the pragmatic effect, though it may heighten participants' attentions to the different distributions of the two features, leading to slightly more pragmatic responding. We continue to use the manipulation check as an exclusion criterion in further experiments.
+
+\exptref{exp:prelims-frame} was designed to test the particular linguistic framing we used. In particular, we contrasted the presentation of the target word (e.g. ``glasses'') as part of a phrase, ``Bob says: 'My friend has glasses.' '' and a presentation of the target word with the framing that the speaker can only say a single word (described above in the General Methods). The ``one word'' framing produced 80\% pragmatic responses, while the ``My friend has glasses'' framing produced 82\% pragmatic responses. These frames did not differ significantly from one another in the distribution of responses they produced ($\chi^2(2) = 2.54,~p = .28$). Except where noted below, we adopt the one-word framing.
+
+In sum, these findings suggest that aspects of the experimental presentation and dependent variable have some effects on the magnitude of the pragmatic effect we observed. Nevertheless, the existence of the effect and its magnitude were quite robust to these variations.
+
+\section{Measuring and manipulating prior expectations}
+\label{sec:prior}
+
+Our second set of experiments, \exptrefrange{exp:prior-frame}{exp:prior-color}, examine the role of prior expectations---broadly construed---in reference resolution through the kinds of reference games introduced above. These experiments serve two goals. First, they create a set of quantitative measurements of prior expectations combined with listener inferences; these measurements can be used for model comparison and assessment, a topic that we return to in \secref{sec:modelcomp}. Second, they allow causal inferences about the role of the prior in participants' pragmatic inferences. While \citeA{frank2012} \emph{measured} prior expectations and showed that they improved model fit, that work did not \emph{manipulate} prior expectations, so it was in principle possible that improvements in model fit did not result from a causal role played by prior expectations. We address this issue in the studies below. We begin by comparing methods for eliciting prior expectations (\exptref{exp:prior-frame}). We then investigate three ways of manipulating prior expectations: via base-rates (\exptref{exp:prior-baserate}), via linguistic valence (\exptref{exp:prior-valence}), and via perceptual salience (\exptref{exp:prior-color}).
+
+It is not immediately clear what the best way is to measure prior expectations for purposes of communication. One particular conceptual issue seems important, though: does the term $p(r_s)$ refer to a prior over \emph{reference}, that is, over things that a speaker would talk about? Or does it instead represent a prior over \emph{actions}, that is, over the things that a speaker would do? This is a fairly deep philosophical issue; but it also has important empirical consequences for our current project. If these two kinds of priors differ substantially, then our estimates of $p(r_S)$ might lead to incorrect conclusions. In particular, \citeA{frank2012} introduced a method in which priors were measured identically to listener judgements, with the exception that participants in the prior measurement condition were not given any linguistic information. They were told that the speaker could utter one word to signal their target referent, but that they (the listener) hadn't heard it. This method yielded reliable measurements, but presupposed that the prior was over reference, rather than action.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=5in]{../plots/2-prior-frame.pdf}
+  \caption{\label{fig:prior-frame} Data from \exptref{exp:prior-frame}. Colors indicate different methods for eliciting prior expectations.}
+\end{figure}
+
+In \exptref{exp:prior-frame}, we compared prior elicitation methods. We presented participants with the same canonical display we had used in the prior experiments, but asked them one of two prior questions. The reference prior method was based on \citeA{frank2012}, where the participant was told that ``Bob can say one word'' but the word was presented as ``mumblemumble (you didn't hear what he said).'' The action prior method consisted of simply asking, e.g. ``Which friend do you think Bob will visit next?'' The distribution of responses did not differ between the two questions ($\chi^2(2) = 3.45,~p = .18$, Figure \ref{fig:prior-frame}). Overall, participants showed a tendency to choose the logical target (e.g., face with both hat and glasses) most, the foil at intermediate rates, and the pragmatic target relatively less. While this experiment is not decisive regarding the underlying philosophical issue of what kinds of expectations the prior actually tracks, we put aside this issue for the time being and adopt the mumble prior elicitation method for subsequent experiments (as the choice does not appear critical for our purposes).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=5in]{../plots/2-prior-baserates.pdf}
+  \caption{\label{fig:prior-baserate} Data from \exptref{exp:prior-baserates} from prior elicitation and inference conditions. Horizontal axis shows the proportion of familiarization trials that showed the target.}
+\end{figure}
+
+In \exptref{expt:prior-baserate}, we attempted to manipulate participants' prior expectations about reference via a manipulation of the base rate of the interlocutor's actions.\footnote{This experiment is conceptually similar to a base-rate manipulation reported in \citeA{stiller2011}. Note however that the manipulation in that experiment uses a different display, one more similar to those used in \exptref{exp:levels-level}.} Prior to showing the target inference, we exposed participants to evidence about the habits of the interlocutor (Bob). The familiarization screen in this experiment stated (for example, in the case of the face stimulus) that Bob visited a friend every week; it then invited the participant to click on nine boxes to uncover the nine friends that Bob had visited most recently. Across four between-subjects base rate conditions, we manipulated how many of these boxes contained the pragmatic target (e.g., the face with glasses and no hat). One of the boxes always contained the foil (no glasses or hat) and another contained the logical target (hat and glasses). Then the other boxes contained either the pragmatic or the logical target. The four conditions were created such that 1/9, 3/9, 5/9, and 7/9 boxes showed the pragmatic target.
+
+Figure \ref{fig:prior-baserate} shows the results of this manipulation.\footnote{This experiment had unusually high rates of exclusion due to participants' confusion about whether they should report  familiarization frequencies for the manipulation check. We maintain our strict inclusion criterion here but note that the results are largely unchanged if we include these participants.}  The base rate had a strong effect on the prior elicitation, but it also boosted levels of pragmatic inferences. To quantify these effects, we used a logistic regression model (no hierarchical model was warranted because judgments were from independent participants). This model showed highly significant effects of base rate ($\beta = .27,~p = .004$) and condition  (with prior as the dummy-coded predictor, $\beta = -.57,~p < .0001$), as well as a marginal interaction of the two  ($\beta = .29,~p = .06$). Critically, the main effect of base rate remained reliable in a similar logistic regression for just the inference trials ($\beta = .28,~p = .0001$), indicating a highly reliable (and graded) effect of the base-rate manipulation on the strength of the pragmatic inference.
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{../plots/2-prior-valence.pdf}
+  \caption{\label{fig:prior-valence} Data from \exptref{exp:prior-valence} in the inference conditions.}
+\end{figure}
+
+Our next experiment, \exptref{exp:prior-valence}, investigated the effects of linguistic manipulations on participants' priors and their resulting inferences. In this experiment, we framed judgments as being about determining Bob's \emph{favorite} or \emph{least favorite} item.\footnote{This experiment was conducted chronologically earlier in the sequence and had four rather than six experimental items: faces, boats, pizzas, and snowmen.} While the manipulation was crude, we reasoned that, all else being equal, Bob's favorite item would likely have more features, while his least favorite would likely have fewer. Prior measurements supported this conclusion: The logical option, which had the most features, was chosen as ``favorite'' 70\% of the time, while the distractor option, which had zero features, was chosen as ``least favorite'' 77\% of the time. Pragmatic inferences reflected these changing expectations, with participants far less likely to choose the pragmatic target in the inference condition with a ``favorite'' frame than with a ``least favorite'' frame (Figure \ref{fig:prior-valence}).
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{../plots/2-prior-color.pdf}
+  \caption{\label{fig:prior-color} Data from \exptref{exp:prior-color} in the inference conditions.}
+\end{figure}
+
+Our final experiment in this sequence, \exptref{exp:prior-color}, attempted to manipulate prior expectations about reference by changing the salience of the different referents. In particular, we presented all but one of the images in grayscale, varying which of the images (pragmatic target, logical target, or foil) was shown in color.\footnote{To ensure that participants still made the inference more generally, we included a condition where none of the referents was shown in color, notated by ``none.''} This manipulation had a strong effect on both prior expectations and pragmatic inferences. In particular, when the logical target was shown in color, inferences to the pragmatic target dropped substantially (Figure \ref{fig:prior-color}), presumably because the color either drew attention to the logical target or signaled to participants that their attention \emph{should be} drawn to the logical target. \red{TODO: stats}
+
+In sum, though the type of manipulation varies widely across them, Experiments \exptrefrange{exp:prior-baserate}{exp:prior-color} together show strong evidence that many information sources can affect prior expectations about reference. In \secref{sec:models}, we return to these data and test the stronger hypothesis that variation in inference levels in these three experiments can be accounted for by variation in prior expectations.
+
+
+\section{Levels of recursion and limits on human reasoning}
+\label{sec:levels}
+
+In our next set of experiments, \exptrefrange{exp:levels-level}{exp:levels-oddman}, we probed limits on the kind of inferences we could measure in our reference game paradigm. In all of these experiments, we also conducted parallel experiments measuring prior expectations using the methods described in \secref{sec:priors}, but we largely omit discussion of these data until \secref{sec:models}.
+
+
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{../plots/3-levels-levels.pdf}\\
+  A) \includegraphics[width=3in]{figures/hatglasses.pdf}\\
+  B) \includegraphics[width=3in]{figures/levels-levels-stim.pdf}
+  \caption{\label{fig:levels-level} Data from \exptref{exp:levels-level}, plotted by display (A being simple, B being complex) and inference level (see text).}
+\end{figure}
+
+
+In our first experiment, \exptref{exp:levels-level}, we attempted to measure patterns of inference in more complex reference games. Following \citeA{stiller2011} and \citeA{degen2012}, we created a matrix that required a deeper level of reasoning than our previous experiments. In particular, we compared our standard reference game (shown again for reference in Figure \ref{fig:levels-level}A) with a more complex game (Figure \ref{fig:levels-level}B):
+
+
+\begin{equation}
+\left[
+    \begin{array}{ccc}
+      0 & 0 & 1 \\
+      0 & 1 & 1\\
+      1 & 1 & 0
+    \end{array}
+  \right]
+\end{equation}
+
+\noindent In RSA-style models, the level of recursion $n$ describes the number of iterations of speaker-listener computation that are performed. Here we impose this notation on individual inferences and whole matrices. We refer to a ``level 1'' inference as one that an RSA agent with $n=1$ can solve (e.g., the designated target has the highest probability of the possible choices). By analogy, then, a ``level 1'' matrix stimulus is one for which all possible inferences can be answered correctly at greater than chance levels by an RSA agent with $n=1$.
+
+In \exptref{exp:levels-level}, we used the stimulus in Figure \ref{fig:levels-level}A to measure inferences about the pragmatic target (as above, a level 1 inference) and the target with the unique feature (e.g. choosing the hat with the word ``hat''; a level 0 inference). We also used the stimuluis in Figure \ref{fig:levels-level}B to measure a level 1 pragmatic inference (the target for this inference was the face with a mustache but no glasses, for the utterance ``mustache''). The main contribution of this experiment, however, was our test of a level 2 inference (``glasses,'' with the presumptive target the face with glasses and mustache, not glasses and hat). This inference depends on having reasoned that while both of the targets have another possible descriptor, for one of those targets, the second descriptor is unique, whereas for the other the second descriptor is also non-unique.
+
+As shown in Figure \ref{fig:levels-level}, judgments in the Level 1 inference remained very close to 75\%, regardless of display (the level observed across many of our other experiments). Level 0 inferences were of course at ceiling. In contrast, Level 2 inferences were at chance (53\%). The prior for this target was lower than the prior for the logical distractor image, however (23\% vs 39\%). Thus, it may be the case that participants make this inference but it is partially or fully cancelled out by an expectation against it (see Figure 1 of Frank \& Goodman, 2012, for a potential example of this kind of cancelation).
+
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{figures/levels-twins-stim.pdf}
+  \includegraphics[width=4in]{../plots/3-levels-twins.pdf}
+  \caption{\label{fig:levels-twins} Data from \exptref{exp:levels-twins}, along with the display used for this experiment.}
+\end{figure}
+
+\exptref{expt:levels-twins} further considered the scope of the inferences that participants would make by examining displays like the one shown in Figure \ref{fig:levels-twins}, top:
+
+\begin{equation}
+\left[
+    \begin{array}{ccc}
+      0 & 1 & 1 \\
+      1 & 0 & 0\\
+      1 & 1 & 1
+    \end{array}
+  \right]
+\end{equation}
+
+\noindent These displays had a uniform feature and another feature that was shared by two of the three objects. Intuitively, naming the unique feature (``glasses'') should reference the object with it. But the predictions for the other features are perhaps less clear. Should the uniform feature also resolve to the unique object (e.g. ``mustache'' means {\sc mustache+glasses})? And should the duplicated feature resolve to the duplicated objects, or to the non-duplicated object, violating the literal semantics?
+
+Findings, shown in Figure \ref{fig:levels-oddman}, suggest that referencing the twin feature ({\sc hat}) led to a high degree of choice of one of the duplicated referents; choice of the uniform feature ({\sc mustache}) led to more choices of the unique object. Inferences about ``mustache,'' the uniform feature'' led to a standard level 1 implicature; inferences about the ``twin'' feature provided little evidence that participants violated the literal semantics of the ambiguous predicate.
+
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=4in]{figures/levels-oddman-stim.pdf}
+  \includegraphics[width=4in]{../plots/3-levels-oddman.pdf}
+
+  \caption{\label{fig:levels-oddman} Data from \exptref{exp:levels-oddman}, along with the display used for this experiment.}
+\end{figure}
+
+\exptref{exp:levels-oddman} further considered whether participants would reach communicative equilibria that were at odds with those implied by the literal semantics of the words the speaker used, in cases where the matrix was systematically and frustratingly ambiguous. To address this question, we used a display like the one in Figure \ref{fig:levels-oddman}, top:
+
+\begin{equation}
+\left[
+    \begin{array}{ccc}
+      1 & 1 & 0 \\
+      1 & 0 & 1\\
+      0 & 1 & 1
+    \end{array}
+  \right]
+\end{equation}
+
+\noindent Although every feature was ambiguous, a potential equilibrium would be the use of a particular feature to describe the target \emph{without} that feature. For example, here ``hat'' could refer to the face without a hat; ``glasses'' to the face without glasses; etc. But by and large, participants did not converge on this equilibrium and instead were content to choose between the two ambiguous referents.
+
+A second condition examined whether participants would be more or less likely to abandon the signal if it were an unconventional signal rather than a word with conventional semantics. In this condition, we recolored the features of each object (e.g., the hat and glasses) so that each had its own unique color. Bob then communicated by showing a color patch corresponding to the matching feature. Contra our initial prediction, participants stuck \emph{more} closely to the match between color patches and particular features, choosing the ``odd man out'' at very low rates. This condition suggests that it may be a feature of reasoning in these signaling games (rather than of words per se) that keeps participants from abandoning the literal semantics of the particular signals the communicator uses.
+
+In sum, these experiments suggest that evidence for level 1 inferences was robust across a variety of displays, for example in the new matrix types show in \exptrefrange{exp:levels-level}{exp:levels-twins}). But we saw very little evidence that, in a one-shot game of the sort studied here, we would see participants abandoning the literal semantics of the words that were used.
+
 
 % \input{section-size}
 
@@ -108,9 +480,50 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 
 % \input{section-production}
 
-\input{section-model-fits}
+\section{Model fits and model comparison}
+\label{sec:models}
 
-\input{section-discussion}
+In the experiments reported above, we see strong evidence that participants are engaging in reasoning that goes beyond the simple semantic interpretation of messages. Instead, they appear to be making inferences about reference in context that have the character of pragmatic reasoning---considering inferential alternatives that a speaker could have said. In this section, we test the ability of the RSA model to describe human behavior in these experiments.
+
+We are well aware of the difficulties surrounding reasoning from a good fit alone \cite{roberts2000}. In a nutshell, any model must both show that it \emph{can} predict the data that actually occurred and \emph{cannot} predict the data that did not occur. The flexibility of the theory is thus of critical importance in understanding its performance. The RSA model as stated here and earlier contains a relatively small number of parameters, however: primarily $n$ (the depth of recursion) and $\alpha$, the greed parameter in the choice rule.
+
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=6in]{../plots/models-2.pdf}
+  \caption{\label{fig:models-2} Model identifiability simulation results. Each plot on the lower triangle shows model predictions for one model plotted by predictions for another. Each dot is an experimental condition, with trend lines showing simple linear regression with 95\% confidence intervals. Each plot on the upper triangle shows the pearson correlation value between those two models. Models with higher levels of recursion are very difficult to distinguish from one another.}
+\end{figure}
+
+
+ \begin{figure}[t]
+  \centering
+  \includegraphics[width=6in]{../plots/models-1.pdf}
+  \caption{\label{fig:models-2} Full model fit to data for $L_0$, $L_1$, and $L_2$. Each point represents proportions choosing a particular target object in an experimental condition. The diagonal dashed line shows perfect fit, and the blue solid line shows a line of best fit with 95\% confidence intervals.}
+\end{figure}
+
+In our first analysis, we
+
+
+\subsection{Identifiability}
+
+\section{General Discussion}
+\label{sec:discussion}
+
+
+\subsection{Other work using RSA and variants}
+
+Epistemic inferences \cite{goodman2013}
+
+Affective \cite{kao2014}
+
+
+Quantifiers \cite{franke2013}
+
+
+Embedded implicature \cite{pottsunderreview}
+
+\subsection{Limitations}
+
+
 
 \newpage
 
@@ -119,11 +532,12 @@ Expt. \# & Sequence & Experiment & $N_{total}$ & $N_{include}$ & Summary \\
 
 \newpage
 
+
+\end{document}
+
+
 % \theappendix
 
 % \input{section-equivalences}
 
 % \input{section-matrix}
-
-\end{document}
-
