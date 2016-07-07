@@ -1,0 +1,365 @@
+---
+title: "Model Simulations (Trimmed for Paper)"
+author: "Ben Peloquin & Mike Frank"
+date: "July 6, 2016"
+output:
+html_document:
+toc: true
+---
+
+# Helpers and Setup
+
+Load helper functions of data pre-processing and combining. (Also bootstrapping). 
+
+```{r setup2, warning = FALSE, message = FALSE, echo = FALSE}
+source("matrices.R")
+source("agents.R")
+library(rrrsa)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(parallel)
+library(stats)
+library(langcog)
+library(xtable)
+library(purrr)
+knitr::opts_chunk$set(cache=TRUE,
+                      warning=FALSE, message=FALSE)
+
+source("helper.R")
+```
+
+Global data / settings
+
+```{r globals}
+set.seed(1)
+ALPHAS <- seq(0, 5, by = 0.1)
+DEPTHS <- seq(0, 5)
+```
+
+Read in data
+
+```{r main_df}
+## This is `d` df from line 128 in sims.Rmd
+d <- read.csv("data/models.csv")
+```
+
+Get prior counts. 
+
+```{r}
+priorCounts <- read.csv("data/prior_counts.csv")
+names(priorCounts)[1:3] <- c("foil_cnts", "logical_cnts", "target_cnts")
+## Merge with our original data set
+d_prior_counts <- merge(d, priorCounts, by = "prior", all = TRUE)
+```
+
+Matrices from `matrices.R`
+
+```{r matrix_data}
+## Renamed, normalized matrices from matrices.R
+simpleM <- normalizeBy(simple, rows = FALSE)
+complexM <- normalizeBy(complex, rows = FALSE)
+twinsM <- normalizeBy(twins, rows = FALSE)
+oddmanM <- normalizeBy(oddman, rows = FALSE)
+```
+
+Data pre-processing
+
+NOTE:: To work with rrrsa::runDf we need each matrix to include the literal semantics of all the queries (even if they weren't actually queried)
+Look at group 'baserate-63': only 'glasses' is queried, but we need to add the literal semantics for 'hat' and 'mustache' as well.
+
+```{r data_processing}
+fullData <- rrrsa_ready_df(d)
+```
+
+# Analysis 1: Basic RSA (a la FG2012)
+
+## With no comparison, alpha = 1
+
+Load sims (N=500) and relevel. 
+
+```{r bstrap_data_all_depths}
+sims_prior_bstrap_errs <- read.csv("data/sims_prior_bstrap_errs.csv") ## From previous run with 
+
+sims_prior_bstrap_errs$expt[sims_prior_bstrap_errs$expt=="complex"] <- "simple"
+sims_prior_bstrap_errs$expt <- factor(sims_prior_bstrap_errs$expt, 
+                                      levels = c("baserate","lang","color","simple",
+                                                 "twins","oddman"),
+                                      labels = c("E5: Base rate","E6: Ling. Frame","E7: Salience",
+                                                 "E8: Levels","E9: Twins","E10: Oddman"))
+```
+
+Plot bootstrap CIs
+
+```{r plot_bstrap_cis_single_depth}
+pdf("../plots/model_basic.pdf", width = 8, height = 6)
+ggplot(filter(sims_prior_bstrap_errs,
+              depth == 1), 
+              aes(x = preds, y = p, col = object)) +
+  geom_point() + 
+  geom_errorbarh(aes(xmin = ci_hi, xmax = ci_low, height = 0)) +
+  geom_errorbar(aes(ymin = cil, ymax = cih, width = 0)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1), se=FALSE, col = "black") + 
+  geom_abline(slope = 1, intercept = 0, lty=2, "gray") + 
+  facet_wrap(~expt) + 
+  theme_bw() + 
+  scale_color_solarized() + 
+  theme(legend.position="bottom")
+dev.off()
+```
+
+# Analysis 2: Effects of depth
+
+```{r plot_bstrap_cis_all_depths}
+pdf("../plots/model_depth.pdf", width = 8, height = 6)
+ggplot(filter(sims_prior_bstrap_errs, depth < 3),
+       aes(x = preds, y = p, col = object)) +
+  geom_point() + 
+  geom_errorbarh(aes(xmin = ci_hi, xmax = ci_low, height = 0)) +
+  geom_errorbar(aes(ymin = cil, ymax = cih, width = 0)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1), se=FALSE, col = "black") + 
+  geom_abline(slope = 1, intercept = 0, lty=2, "gray") + 
+  facet_grid(depth~expt) + 
+  theme_bw() + 
+  scale_color_solarized() + 
+  theme(legend.position="bottom")
+dev.off()
+```
+
+## Table of correlations
+
+```{r}
+corrs <- sims_prior_bstrap_errs %>%
+  group_by(depth) %>%
+  do(data.frame(full_corr = cor(.$p,.$preds), 
+                no_zero_corr = cor(.$p[.$preds != 0 & .$preds != 1], 
+                                   .$preds[.$preds != 0 & .$preds != 1])))
+
+print(xtable(corrs, digits = 2), 
+      include.rownames=FALSE)
+```
+
+# Analysis 3: Fitting alpha
+
+Load alpha tuning. 
+
+```{r}
+tune_data <- read.csv("data/alpha_tuning_with_prior.csv")
+```
+
+Extract best correlations. 
+
+```{r sims_priors_fitted_cors}
+maxCors <- tune_data %>%
+  group_by(depth) %>%
+  summarize(maxCor = max(cor),
+            alpha = alpha[which.max(cor)])
+```
+
+Get non-0/1 correlations for this batch. 
+
+```{r}
+fullData <- fullData %>% arrange(grouper)
+
+dosim <- function(df) {
+  data.frame(fullData) %>% 
+    group_by(grouper) %>%
+    do(rsa.runDf(data = ., quantityVarName = "object", semanticsVarName = "speaker.p",
+                 itemVarName = "query", priorsVarName = "priorValue", 
+                 depth = df$depth, alpha = df$alpha,
+                 usePriorEveryRecurse = FALSE))
+}
+
+sims_alpha <- data.frame(maxCors) %>%
+  group_by(depth) %>%
+  do(dosim(.)) 
+
+alpha_corrs <- sims_alpha %>%
+  filter(!is.na(p)) %>%
+  group_by(depth) %>%
+  do(data.frame(full_corr = cor(.$p,.$preds), 
+                no_zero_corr = cor(.$p[.$preds != 0 & .$preds != 1], 
+                                   .$preds[.$preds != 0 & .$preds != 1])))
+```
+
+Table.
+
+```{r}
+alpha_corrs <- alpha_corrs %>% 
+  left_join(maxCors) %>% 
+  select(depth, alpha, full_corr, no_zero_corr)
+
+print(xtable(alpha_corrs, digits = 2), 
+      include.rownames=FALSE)
+```
+
+
+Figure.
+
+```{r}
+tune_data <- tune_data %>%
+  mutate(Recursive_depth = as.factor(depth))
+
+pdf("../plots/alpha-fit.pdf", width = 6, height = 4.5)
+## Plot tuning (Plot adapted for personal_site)
+ggplot(tune_data, aes(x = alpha, y = cor, col=Recursive_depth)) +
+  # geom_point(alpha=0.6, size=4) +
+  geom_line() + 
+  geom_vline(data = maxCors, aes(xintercept=alpha, col = factor(depth)), lty=2)+
+  ylab("Correlation") +
+  scale_x_continuous(breaks = round(seq(0, 6, by = 0.1)), "alpha (\"greed\") value") +
+  scale_color_solarized(name = "Recursive Depth") +
+  theme_bw() +
+  theme(legend.position="bottom", legend.box="horizontal",
+        legend.text=element_text(size=8), legend.direction="horizontal")+ 
+  ylim(c(0,1))
+dev.off()
+```
+
+# Analysis 4: Simulations WITHOUT priors (recursive depth 0-5)
+
+## Recursive depth sims
+
+```{r sims_no_priors}
+sims_NoPrior_temp <- lapply(DEPTHS, function(depth) {
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+              quantityVarName = "object", semanticsVarName = "speaker.p",
+              itemVarName = "query", depth = depth) %>%
+    rowwise %>%
+    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+           depth = depth) %>%
+    filter(tuningData == "keep")
+})
+sims_NoPrior <- convertListToDF(sims_NoPrior_temp)
+```
+
+## Simulation plots
+
+### Recursive depth 0-2
+```{r sims_no_priors_plot1, eval = FALSE}
+sims_NoPrior %>%
+  filter(depth < 3) %>%
+  ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) + theme_bw()
+```
+
+### Recursive depth 0-5
+```{r sims_no_priors_plot2, eval = FALSE}
+ggplot(sims_NoPrior, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2)+ theme_bw()
+```
+
+## Correlations
+```{r sims_no_priors_cors, eval=FALSE}
+sims_NoPrior %>%
+  group_by(depth) %>%
+  summarise("cor" = cor(p, preds)) %>%
+  mutate("alpha" = 1)
+```
+
+## Fitting alpha
+
+```{r}
+tune_noprior_data <- read.csv("data/alpha_tuning_no_prior.csv")
+```
+
+Get best model performance by alpha, depth.
+
+```{r sims_no_priors_fitted_cors}
+maxCors_noPriors <- tune_noprior_data %>%
+  group_by(depth) %>%
+  summarize(maxCor = max(cor),
+            alpha = alpha[which.max(cor)])
+```
+
+Get non-0/1 correlations for this batch. 
+
+```{r}
+fullData <- fullData %>% arrange(grouper)
+
+dosim_noprior <- function(df) {
+  data.frame(fullData) %>% 
+    group_by(grouper) %>%
+    do(rsa.runDf(data = ., quantityVarName = "object", semanticsVarName = "speaker.p",
+                 itemVarName = "query", 
+                 depth = df$depth, alpha = df$alpha,
+                 usePriorEveryRecurse = FALSE))
+}
+
+sims_alpha <- data.frame(maxCors_noPriors) %>%
+  group_by(depth) %>%
+  do(dosim(.)) 
+
+alpha_corrs <- sims_alpha %>%
+  filter(!is.na(p)) %>%
+  group_by(depth) %>%
+  do(data.frame(full_corr = cor(.$p,.$preds), 
+                no_zero_corr = cor(.$p[.$preds != 0 & .$preds != 1], 
+                                   .$preds[.$preds != 0 & .$preds != 1])))
+```
+
+Table.
+
+```{r}
+alpha_corrs <- alpha_corrs %>% 
+  left_join(maxCors_noPriors) %>% 
+  select(depth, alpha, full_corr, no_zero-corr)
+
+print(xtable(alpha_corrs, digits = 2), 
+      include.rownames=FALSE)
+```
+
+
+
+## Best NO-priors model performance with fitted alphas
+```{r}
+depths_param_data <- maxCors_noPriors %>%
+  arrange(depth)
+best_noPrior_models_fitted_alpha <- convertListToDF(lapply(DEPTHS, function(depth) { ## parallelize over depths
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+              quantityVarName = "object", semanticsVarName = "speaker.p",
+              usePriorEveryRecurse = FALSE, itemVarName = "query",
+              depth = depths_param_data$depth[depth + 1], alpha = depths_param_data$alpha[depth + 1]) %>%
+    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+           depth = depth) %>%
+    filter(tuningData == "keep")
+}))
+## Quick check
+## cor(best_noPrior_models_fitted_alpha[best_noPrior_models_fitted_alpha$depth == 1, ]$p, best_noPrior_models_fitted_alpha[best_noPrior_models_fitted_alpha$depth == 1, ]$preds)
+```
+
+### Plot best No priors model performance with fitted alphas
+```{r}
+print("Model performance for recursive depth 0-5 with fitted alphas no priors")
+maxCors_noPriors ## performance data
+
+## plots
+ggplot(best_noPrior_models_fitted_alpha, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth, labeller = label_both) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle("No-prior model performance for recursive depth 0-5 with fitted alphas") + theme_bw()
+```
+
