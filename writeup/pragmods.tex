@@ -39,7 +39,7 @@
 ~\\}
 
 
-\abstract{Human communication is almost always ambiguous, but it typically takes place in a context where this ambiguity can be resolved. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Following previous work, we describe pragmatic inference as a process of recursive reasoning---in which listeners reason about speakers and vice versa---using a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of ten experiments using simple one-shot reference-resolution games (N = 7569). Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described by the RSA framework.}
+\abstract{Human communication is almost always ambiguous, but it typically takes place in a context where this ambiguity can be resolved. A key part of this process of pragmatic disambiguation comes from reasoning about the possible alternative messages that could have been said in that context. Following previous work, we describe pragmatic inference as a process of recursive reasoning -- in which listeners reason about speakers and vice versa -- using a ``rational speech act'' (RSA) model. We then systematically test the parameters and design decisions of this model through a series of ten experiments using simple one-shot reference-resolution games (N = 7,569). Such games present a valuable and tractable microcosm for studying broader questions about communication in context, and human behavior within them is well-described by the RSA framework.}
 
 \begin{document}
 
@@ -49,15 +49,15 @@
 
 Human communication is astonishingly flexible and efficient. Between two people who know each other well, a single word, look, or gesture can convey volumes \cite{sperber1986,clark1996}. Even two people who barely know one another can rapidly leverage their shared vocabulary to create new, economical ways of communicating about novel situations \cite{brennan1996,clark1991}. These successes are all the more impressive considering the systematic issues of vagueness and ambiguity in natural language \cite{keefe1997,wasow2005}. How do we use such slippery means to produce such concrete results?
 
-\citeA{grice1975} provided critical insight into this problem, describing how listeners reason about speakers' language production goals. By assuming that speakers were attempting to be cooperative in their communicative, listeners could then infer the most likely intended goal that would have given rise to that form, given the current circumstances. This proposal allowed the separation of semantic content---those aspects of meaning that are invariant across contexts---from pragmatic content---those aspects of meaning that rely on contextual inferences about speaker intentions.
+\citeA{grice1975} provided critical insight into this problem, describing how listeners reason about speakers' language production goals. By assuming that speakers were attempting to be cooperative in their communicative, listeners could then infer the most likely intended goal that would have given rise to that form, given the current circumstances. This proposal allowed the separation of semantic content -- those aspects of meaning that are invariant across contexts -- from pragmatic content -- those aspects of meaning that rely on contextual inferences about speaker intentions.
 
-Although many subsequent analysts have attempted to refine Grice's original proposal or even to reject substantial elements, the semantics/pragmatics distinction has been critical for progress in understanding language comprehension. Nevertheless, because of the difficulties of formalizing notions like context and social goal inference, pragmatics has often remained a ``wastebasket'' for phenomena that are difficult to explain under formal theories of syntax or semantics \cite{bar-hillel1971}. This dismissal of pragmatics is regrettable because of the importance and richness of pragmatic phenomena. In some substantial sense, what linguists call ``pragmatics'' is what language users experience as the use of language in their everyday interpersonal communication---the reality of how context alters interpretation. Thus, an important goal for research in linguistics and the psychology of language is the development of formal tools for understanding pragmatic inferences and bringing them under experimental control.
+Although many subsequent analysts have attempted to refine Grice's original proposal or even to reject substantial elements, the semantics/pragmatics distinction has been critical for progress in understanding language comprehension. Nevertheless, because of the difficulties of formalizing notions like context and social goal inference, pragmatics has often remained a ``wastebasket'' for phenomena that are difficult to explain under formal theories of syntax or semantics \cite{bar-hillel1971}. This dismissal of pragmatics is regrettable because of the importance and richness of pragmatic phenomena. In some substantial sense, what linguists call ``pragmatics'' is what language users experience as the use of language in their everyday interpersonal communication -- the reality of how context alters interpretation. Thus, an important goal for research in linguistics and the psychology of language is the development of formal tools for understanding pragmatic inferences and bringing them under experimental control.
 
 In this article, we provide an extended presentation and evaluation of a formal framework for understanding pragmatics, known as the ``rational speech act'' (RSA) framework \cite<originally introduced in>{frank2012,goodman2013}. This framework builds on Grice's initial insight and combines it with tools from Bayesian cognitive modeling \cite{tenenbaum2011}. The result is a set of tools for a quantitative understanding of the kind of social goal inference that Grice initially described. In the remainder of this introduction, we provide a brief survey of previous frameworks for pragmatic reasoning \cite<for further review and discussion, see>{goodman2016}, give an informal introduction to RSA models,  and then summarize the plan for the rest of the article.
 
 \subsection{Modeling pragmatic reasoning as rational action}
 
-Our conception of pragmatic enrichment---how the literal semantics of an utterance becomes strengthened in context by a consideration of the speaker's communicative goals---was initially established by \citeA{grice1975}. But Grice's original formulation of pragmatic inference is typically summarized with reference to the \emph{maxims} he proposed. These maxims, a set of normative guidelines that speakers are assumed to follow (be truthful, informative, perspicuous, and relevant), have been immensely influential. Despite this popularity, the maxims themselves do not figure heavily in most contemporary empirical or theoretical work in linguistics and psycholinguistics \cite<e.g.>{chemla2011,breheny2013}. In fact, they are considered by many theorists to be a dead end as a method for deriving pragmatic phenomena \cite<e.g.>{hirschberg1985,frederking1996}. Indeed, though the general Gricean program has been advanced by a number of influential and important theories, none of these have incorporated the initial set of maxims as central part \cite{levinson2000,sperber1986,clark1996}. For example, \citeA{clark1996} extends pragmatic theorizing into the context of conversations, starting with the general Gricean backdrop of the cooperative principle. And \citeA{sperber1986} construct their theory around a single maxim, that of relevance.
+Our conception of pragmatic enrichment -- how the literal semantics of an utterance becomes strengthened in context by a consideration of the speaker's communicative goals -- was initially established by \citeA{grice1975}. But Grice's original formulation of pragmatic inference is typically summarized with reference to the \emph{maxims} he proposed. These maxims, a set of normative guidelines that speakers are assumed to follow (be truthful, informative, perspicuous, and relevant), have been immensely influential. Despite this popularity, the maxims themselves do not figure heavily in most contemporary empirical or theoretical work in linguistics and psycholinguistics \cite<e.g.>{chemla2011,breheny2013}. In fact, they are considered by many theorists to be a dead end as a method for deriving pragmatic phenomena \cite<e.g.>{hirschberg1985,frederking1996}. Indeed, though the general Gricean program has been advanced by a number of influential and important theories, none of these have incorporated the initial set of maxims as a central part \cite{levinson2000,sperber1986,clark1996}. For example, \citeA{clark1996} extends pragmatic theorizing into the context of conversations, starting with the general Gricean backdrop of the cooperative principle. Similarly, \citeA{sperber1986} construct their theory around a single maxim, that of relevance.
 
 Instead, one lasting contribution of Grice's work has been his construal of language use as a subclass of rational action. Grouping language together with other actions has allowed a set of more general tools to be applied. These tools stem from the theory of rational economic action \cite{von-neumann2007}, and allow an analysis of the costs and benefits of individual linguistic actions relative to one another. \citeA{horn1984} proposed an early version of this kind of analysis (elaborating ideas from \citeNP{zipf1949}) in describing pragmatic phenomena as arising from a conflict between listeners, who want sufficient information from an utterance to be able to grasp its meaning, and speakers, who want to expend the minimal effort in talking. Since this initial work, the rational action perspective has been explored more extensively in several different, and largely non-intersecting literatures.
 
@@ -89,7 +89,7 @@ The current work has two interlocking goals. The first goal is empirical. Via a 
 Our experiments are listed in Table \ref{tab:expts}; they are broken into three sequences. The first of these (``Preliminaries,'' Section \ref{sec:prelims}) explores our experimental paradigm, one-shot reference games, providing experimental evidence that minor design choices do not account for the pattern of data we observe. The second section (``Priors,'' Section \ref{sec:prior}) tests the role of prior expectations in reference game behavior. The third (``Levels,'' Section \ref{sec:levels}) tests the level of recursion that speakers reason to and provides further data on the relationship between prior and posterior measurements.
 % The fourth (``Sequences,'' Section \ref{sec:seqs}) takes a first step towards exploring sequential effects in pragmatic reasoning and whether these can scaffold more deeply referential expressions. The fifth and final section (``Production,'' Section \ref{sec:prod}) discusses speaker behavior in reference games and shows that it is sensitive to the costs of language production.
 
-Our plan is as follows. We first present formal details of the RSA model. We next move to our experimental presentation. We then examine the fit of RSA models to our data. To conclude, we discuss limitations and future directions for RSA modeling, as well implications of this work for the study of pragmatics more broadly.
+Our plan is as follows. We first present formal details of the RSA model. We next move to our experimental presentation. We then examine the fit of RSA models to our data. To conclude, we discuss limitations and future directions for RSA modeling.
 
 \begin{table}
 \caption{\label{tab:expts} Outline of the experiments reported here.}
@@ -288,33 +288,30 @@ This section describes the methods used in the experiments reported below. Our g
 
 One challenge of pragmatic communication experiments is that repeated communication within a signaling game is very likely to influence responding \cite<e.g.,>{brennan1996}. For this reason, we adopted a massively between-subjects approach, where each participant answered exactly one relevant question.
 
-We adopted a general standard of 50 independent participants per cell, based on the tradeoff between cost and the desired precision of measurements. With samples of N=50 participants making binary decisions, we could assume 95\% confidence intervals with width .24 at their widest; doubling the sample size to N=100 per cell would only reduce width to .18. While not every experiment reflects this precise standard due to idiosyncrasies of recruitment exclusion, we have tried to maintain approximately this standard throughout.
+We adopted a general standard of 50 independent participants per cell, based on the tradeoff between cost and the desired precision of measurements. With samples of N=50 participants making binary decisions, we could assume 95\% confidence intervals (CIs) with width .24 at their widest; doubling the sample size to N=100 per cell would only reduce CI width to .18. While not every experiment reflects this precise standard due to idiosyncrasies of recruitment and exclusion, we have tried to maintain approximately this standard throughout.
 
-All of the experiments described here were run on Amazon's Mechanical Turk crowdsourcing service, between Fall 2013 and Spring of 2015. In general, each experiment was run as an independent human intelligence task (HIT); a few were posted as multiple hits for convenience or due to experimenter error. In all cases, we remove duplicated workers from the samples, so that data in each experiment represent a set of unique judgments by distinct participants.
+All of the experiments described here were run on Amazon's Mechanical Turk crowdsourcing service, between Fall 2013 and Spring of 2015. In general, each experiment was run as an independent human intelligence task (HIT); a few were posted as multiple hits for convenience or due to experimenter error. In all cases, we remove duplicated workers from the samples, so that data in each experiment represent a set of unique judgments by distinct participants.\footnote{We have not excluded workers who participated in multiple experiments. Because of the wide temporal intervals between experiments and the randomization of experimental items, it is unlikely that participants would have seen similar items. In addition, our pilot data suggest that repeating even exactly the same judgment multiple times within an experiment does not lead to major changes in responding.}
 
 In addition to excluding duplicated participants, we also excluded participants who failed manipulation checks (see below). Table \ref{tab:expts} gives details of participants for each experiment.
 
 \subsection{Stimuli}
 
-We created a set of six base domains that had features that could easily be added independently: faces (pictured in Figure \ref{fig:ex}), boats, pizzas, sundaes, snowmen, and christmas trees. We created slightly different versions of each base so that they would appear to be unique (e.g., by varying the proportions or color tone of the face). We then were able to add features to each of these programmatically (with most experiments using two features but some using three). Faces were supplemented with hats, glasses, and mustaches; boats had motors, sails, and cabins; pizzas had olives, peppers, and mushrooms; sundaes had whipped cream, chocolate, and cherries on top; snowmen had mittens, hats, and scarves; and christmas trees had lights, ornaments, and stars on top.
+We created a set of six base ``domains" that had features that could easily be added and subtracted independently: faces (pictured in Figure \ref{fig:ex}), boats, pizzas, sundaes, snowmen, and christmas trees. We created slightly different versions of each base so that they would appear to be unique (e.g., by varying the proportions or color tone of the face). We then were able to add features to each of these programmatically (with most experiments using two features, but some using three). Faces were supplemented with hats, glasses, and mustaches; boats had motors, sails, and cabins; pizzas had olives, peppers, and mushrooms; sundaes had whipped cream, chocolate, and cherries on top; snowmen had mittens, hats, and scarves; and christmas trees had lights, ornaments, and stars on top.
 
 \subsection{Procedure}
 
-Participants viewed the experiment within a browser window. The first screen of the experiment presented a basic description of the paradigm and asked for informed consent. The second screen of the experiment presented the interlocutor, Bob (a cartoon picture of a man), and noted that he liked to do activities with the base item (e.g., visit friends or sail boats). In experiments with familiarization stimuli (e.g., \exptref{exp:prior-baserate}), nine familiarization images were presented on this screen.
+Participants viewed the experiment within a browser window. The first screen of the experiment presented a basic description of the paradigm and asked for informed consent. The second screen of the experiment presented the interlocutor, Bob (a cartoon picture of a man), and noted that he liked to do activities with the base item (e.g., visit friends or sail boats). In experiments with familiarization stimuli (e.g., \exptref{exp:prior-baserate}),  familiarization images were presented on this screen.
 
 The third screen was the key screen: it presented the experimental stimulus (a set of base items augmented with features, representing the signaling game of interest) at the top of the screen. Below each stimulus a letter was displayed. From left to right: A, B and C. In all experiments except for \exptref{exp:prelims-mc}, two manipulation check questions were asked directly below the display using text entry boxes (e.g. ``how many boats have cabins?''). Below this was the prompt, e.g. ``Bob can only say one word to communicate with you and he says: {\it glasses}. Click below on the option that represents the friend that you think Bob is talking about.'' Below this was a set of buttons labeled A, B and C for the participant to indicate which of the three options they thought the speaker was referring to. A final screen asked participants the following: ``Who did you meet in this survey?'',  ``What was this survey about?'' and ``Any other comments for us?'' Optionally, participants could also provide their age and gender, but finishing the experiment was not contingent on doing this.
 
 Note that in the first set of experiments, we manipulate a number of these experimental choices, including the dependent variable, the use of the manipulation check, and the linguistic framing of Bob's utterance. Our description here reflects the defaults used in the majority of the experiments we report.
-
-
-
 % Minor stuff:
 
 % Prelims measures has four items
 
 % Size and sequence have no manipulation check
 
-\section{Methodological preliminaries}
+\section{Methodological Preliminaries}
 \label{sec:prelims}
 
 Our first set of experiments, \exptrefrange{exp:prelims-dv}{exp:prelims-frame}, establish the simple reference games in Figure \ref{fig:ex} as a viable method, testing the replicability of judgments in this paradigm and examining particular experimental decisions.
@@ -327,16 +324,16 @@ Our first set of experiments, \exptrefrange{exp:prelims-dv}{exp:prelims-frame}, 
 
 \exptref{exp:prelims-dv} explored the use of different dependent variables. We considered a betting measure, in which participants were instructed to allocate \$100 across the three targets, as in \citeA{frank2012}; a 7-point Likert scale, as in \citeA{goodman2013}; and a simple three-alternative forced choice measure.\footnote{As this experiment was one of our first, we used only four of our six stimulus items: faces, boats, snowmen, and sundaes.} Figure \ref{fig:prelims-dv} shows results from each. With all three dependent variables, the pragmatic target was chosen more than the logical target, but this result was strongest for the forced choice, with 79\% of participants choosing the pragmatic target. Both the Likert and betting measures afforded the possibility of ``hedging'' by allocating equal bets or ratings to the pragmatic and logical targets. Conservative participants took advantage of this possibility very frequently, betting equal amounts on the logical and pragmatic targets 43\% of the time and using equal Likert ratings 46\% of the time. In contrast, the forced-choice dependent variable did not allow this kind of hedging; thus, we adopted it in our further experiments.
 
-\exptref{exp:prelims-mc} was designed to ensure that the presence of the manipulation check---asking participants to count how many of each feature was present---did not induce a task demand that changed the magnitude of pragmatic responding. We saw 83\% pragmatic responding in the manipulation check condition and 77\% pragmatic responding in a matched condition with no manipulation check. Because of the high power of this experiment ($N_{include}$ = 513), the difference between conditions was statistically significant ($\chi^2(2) = 6.97,~p = .03$). Nevertheless, the modest (6\%) difference between conditions suggests that the manipulation check does not \emph{create} the pragmatic effect, though it may heighten participants' attentions to the different distributions of the two features, leading to slightly more pragmatic responding. We continue to use the manipulation check as an exclusion criterion in further experiments.
+\exptref{exp:prelims-mc} was designed to ensure that the presence of the manipulation check -- asking participants to count how many of each feature was present -- did not induce a task demand that changed the magnitude of pragmatic responding. We saw 83\% pragmatic responding in the manipulation check condition and 77\% pragmatic responding in a matched condition with no manipulation check. Because of the high power of this experiment ($N_{include}$ = 513), the difference between conditions was statistically significant ($\chi^2(2) = 6.97,~p = .03$). Nevertheless, the modest (6\%) difference between conditions suggests that the manipulation check does not \emph{create} the pragmatic effect, though it may heighten participants' attentions to the different distributions of the two features, leading to slightly more pragmatic responding. We continue to use the manipulation check as an exclusion criterion in further experiments.
 
 \exptref{exp:prelims-frame} was designed to test the particular linguistic framing we used. In particular, we contrasted the presentation of the target word (e.g. ``glasses'') as part of a phrase, ``Bob says: 'My friend has glasses.'~'' and a presentation of the target word with the framing that the speaker can only say a single word (described above in the General Methods). The ``one word'' framing produced 80\% pragmatic responses, while the ``My friend has glasses'' framing produced 82\% pragmatic responses. These frames did not differ significantly from one another in the distribution of responses they produced ($\chi^2(2) = 2.54,~p = .28$). Except where noted below, we adopt the one-word framing.
 
-In sum, these findings suggest that aspects of the experimental presentation and dependent variable have some effects on the magnitude of the pragmatic effect we observed. Nevertheless, the existence of the effect and its magnitude were quite robust to these variations.
+In sum, these findings suggest that aspects of the experimental presentation and dependent variable have some minor effects on the magnitude of the pragmatic effect we observed. Nevertheless, the existence of the effect and its magnitude were quite robust to these variations.
 
 \section{Measuring and manipulating prior expectations}
 \label{sec:prior}
 
-Our second set of experiments, \exptrefrange{exp:prior-frame}{exp:prior-color}, examine the role of prior expectations---broadly construed---in reference resolution through the kinds of reference games introduced above. These experiments serve two goals. First, they create a set of quantitative measurements of prior expectations combined with listener inferences; these measurements can be used for model comparison and assessment, a topic that we return to in Section \ref{sec:modelcomp}. Second, they allow causal inferences about the role of the prior in participants' pragmatic inferences. While \citeA{frank2012} \emph{measured} prior expectations and showed that they improved model fit, that work did not \emph{manipulate} prior expectations, so it was in principle possible that improvements in model fit did not result from a causal role played by prior expectations. We address this issue in the studies below. We begin by comparing methods for eliciting prior expectations (\exptref{exp:prior-frame}). We then investigate three ways of manipulating prior expectations: via base-rates (\exptref{exp:prior-baserate}), via linguistic valence (\exptref{exp:prior-valence}), and via perceptual salience (\exptref{exp:prior-color}).
+Our second set of experiments, \exptrefrange{exp:prior-frame}{exp:prior-color}, examine the role of prior expectations -- broadly construed -- in reference resolution through the kinds of reference games introduced above. These experiments serve two goals. First, they create a set of quantitative measurements of prior expectations combined with listener inferences; these measurements can be used for model comparison and assessment, a topic that we return to in Section \ref{sec:modelcomp}. Second, they allow causal inferences about the role of the prior in participants' pragmatic inferences. While \citeA{frank2012} \emph{measured} prior expectations and showed that they improved model fit, that work did not \emph{manipulate} prior expectations, so it was in principle possible that improvements in model fit did not result from a causal role played by prior expectations. We address this issue in the studies below. We begin by comparing methods for eliciting prior expectations (\exptref{exp:prior-frame}). We then investigate three ways of manipulating prior expectations: via base-rates (\exptref{exp:prior-baserate}), via linguistic valence (\exptref{exp:prior-valence}), and via perceptual salience (\exptref{exp:prior-color}).
 
 It is not immediately clear what the best way is to measure prior expectations for purposes of communication. One particular conceptual issue seems important, though: does the term $p(r_s)$ refer to a prior over \emph{reference}, that is, over things that a speaker would talk about? Or does it instead represent a prior over \emph{actions}, that is, over the things that a speaker would do? This is a fairly deep philosophical issue; but it also has important empirical consequences for our current project. If these two kinds of priors differ substantially, then our estimates of $p(r_S)$ might lead to incorrect conclusions. In particular, \citeA{frank2012} introduced a method in which priors were measured identically to listener judgements, with the exception that participants in the prior measurement condition were not given any linguistic information. They were told that the speaker could utter one word to signal their target referent, but that they (the listener) hadn't heard it. This method yielded reliable measurements, but presupposed that the prior was over reference, rather than action.
 
@@ -459,7 +456,7 @@ Findings, shown in Figure \ref{fig:levels-oddman}, suggest that referencing the 
 
 A second condition examined whether participants would be more or less likely to abandon the signal if it were an unconventional signal rather than a word with conventional semantics. In this condition, we recolored the features of each object (e.g., the hat and glasses) so that each had its own unique color. Bob then communicated by showing a color patch corresponding to the matching feature. Contra our initial prediction, participants stuck \emph{more} closely to the match between color patches and particular features, choosing the ``odd man out'' at very low rates. This condition suggests that it may be a feature of reasoning in these signaling games (rather than of words per se) that keeps participants from abandoning the literal semantics of the particular signals the communicator uses.
 
-In sum, these experiments suggest that evidence for level 1 inferences was robust across a variety of displays, for example in the new matrix types show in \exptrefrange{exp:levels-level}{exp:levels-twins}). But we saw very little evidence that, in a one-shot game of the sort studied here, we would see participants abandoning the literal semantics of the words that were used.
+In sum, these experiments suggest that evidence for level 1 inferences was robust across a variety of displays (for example in the new matrix types shown in \exptrefrange{exp:levels-level}{exp:levels-twins}). But we saw very little evidence that, in a one-shot game of the sort studied here, we would see participants abandoning the literal semantics of the words that were used.
 
 
 % \input{section-size}
@@ -471,18 +468,19 @@ In sum, these experiments suggest that evidence for level 1 inferences was robus
 \section{Model fits and model comparison}
 \label{sec:modelcomp}
 
-In the experiments reported above, we see strong evidence that participants are engaging in reasoning that goes beyond the simple semantic interpretation of messages. Instead, they appear to be making inferences about reference in context that have the character of pragmatic reasoning---considering inferential alternatives that a speaker could have said. In this section, we test the ability of the RSA model to describe human behavior in these experiments.
+In the experiments reported above, we see strong evidence that participants are engaging in reasoning that goes beyond the simple semantic interpretation of messages. Instead, they appear to be making inferences about reference in context that have the character of pragmatic reasoning -- considering inferential alternatives that a speaker could have said. In this section, we test the ability of the RSA model to describe human behavior in these experiments.
 
 
 \subsection{Model comparison methods}
 
 For each experiment in the second and third sequences (\exptrefrange{exp:prior-baserate}{exp:levels-oddman}), we compared predictions of the RSA model to participant data. As in \citeA{frank2012}, for each experiment and experimental condition, we compared the proportion of participants choosing each different target to the model's predictions about that target. This procedure yielded between 4 and 10 datapoints per experiment.
 
-We used an implementation of the RSA model provided by a new package for the R statistical computing platform: \texttt{rrrsa}. The package is available at \url{http://github.com/benpeloquin7/rrrsa} and installation instructions and comprehensive documentation are also available at that link.
+We used an implementation of the RSA model provided by a new package for the R statistical computing platform: \texttt{rrrsa}. The package is available at \url{http://github.com/benpeloquin7/rrrsa} and installation instructions and comprehensive documentation are also available at that link. The \texttt{rrrsa} package is optimized for analysis of experimental data like those presented here; other, more flexible variants of RSA models are available for exploration and extension at \url{http://forestdb.org/models/scalar-implicature.html}.
 
-\red{confidence intervals}.
+When we propagate empirical  prior information into the model, we compute confidence intervals by simulating model fit using a non-parametric bootstrap resampling procedure in which the prior data are resampled with replacement and then the model is rerun 500 times using these resampled priors. Error bars then reflect empirical confidence intervals computed from these simulations. \red{EPSILON: check details with ben}.
 
-\red{EPSILON: check details}.
+Throughout, we assess model fit to data using a simple Pearson correlation statistic. Although a good fit alone cannot be probative \cite{roberts2000}, the RSA model as stated here and earlier contains a  small number of parameters, however: only the depth of recursion and $\alpha$, the greed parameter in the choice rule. We believe the use of correlations is relatively unproblematic since (as we show) changes in these parameters do not result in any radically different patterns of model predictions. Nevertheless, we do caution that our comparions between models are informal and serve to
+
 
 \subsection{RSA models achieve globally good fit to experimental data}
 
@@ -492,7 +490,7 @@ We used an implementation of the RSA model provided by a new package for the R s
  \caption{\label{fig:basic} Human data plotted against RSA model predictions for a recursive depth of 1, and $\alpha=1$. Each point shows proportion of choices for a single target object. Colors denote the pragmatic target (e.g., glasses), logically true object (e.g., hat and glasses), foil (e.g., no hat, no glasses). Vertical error bars are binomial confidence intervals; horizontal error bars are computed by resampling prior data and recomputing model predictions (see text). Black lines show the line of best fit.}
 \end{figure}
 
-In our first simulation, we used the exact version of the RSA model given in \citeA{frank2012}, with a recursive depth of 1 and $\alpha=1$. Results of this simulation are given in Figure \ref{fig:basic}. The RSA model was correlated with human judgments ($r_{all} = .86$), and this correlation persisted even when removing those points predicted to be 0 or 1 ($r_{no 0/1} = .68$).\footnote{For \exptref{exp:prior-salience}---and to a lesser extent, for \exptref{exp:prior-lang}---we saw a number of conditions in which model predictions had very high variance. This variance arises from variability in the prior on particular objects (since they are chosen very infrequently in the prior condition, they show high numerical instability).}
+In our first simulation, we used the exact version of the RSA model given in \citeA{frank2012}, with a recursive depth of 1 and $\alpha=1$. Results of this simulation are given in Figure \ref{fig:basic}. The RSA model was correlated with human judgments ($r_{all} = .86$), and this correlation persisted even when removing those points predicted to be 0 or 1 ($r_{no 0/1} = .68$).\footnote{For \exptref{exp:prior-color} -- and to a lesser extent, for \exptref{exp:prior-valence} -- we saw a number of conditions in which model predictions had very high variance. This variance arises from variability in the prior on particular objects (since they are chosen very infrequently in the prior condition, they show high numerical instability).}
 
 Nevertheless, there were a number of experimental conditions for which this parameter setting did not yield good predictions. In \exptrefrange{exp:prior-baserate}{exp:levels-level}, there appears to be a trend in which the model overpredicts for options that are judged to be lower probability, and underpredicts for those options judged more likely by participants. (This trend manifests itself as a cluster of predictions that are too close to the vertical midline of $p=.5$). In order to explore this trend further, we next varied the recursive depth in the model. Intuitively, further recursion should strengthen pragmatic inferences.
 
@@ -504,7 +502,7 @@ Nevertheless, there were a number of experimental conditions for which this para
 \centering
 \begin{tabular}{rrr}
   \hline
-depth & $r_{all}$ & $r_{no~0/1}$ \\
+Depth & $r_{all}$ & $r_{no~0/1}$ \\
   \hline
   0 & 0.74 & 0.14 \\
     1 & 0.86 & 0.68 \\
@@ -543,7 +541,7 @@ Recall, however, that we set the $\alpha$ parameter to 1 in these simulations . 
 \centering
 \begin{tabular}{rrrr}
   \hline
-depth & $\alpha_{best}$ & $r_{all}$ & $r_{no~0/1}$ \\
+Depth & $\alpha_{best}$ & $r_{all}$ & $r_{no~0/1}$ \\
   \hline
   0 & 0.0 & 0.74 & 0.14 \\
     1 & 3.1 & 0.95 & 0.89 \\
@@ -558,9 +556,9 @@ depth & $\alpha_{best}$ & $r_{all}$ & $r_{no~0/1}$ \\
 
 Figure \ref{fig:alpha-fit} shows the range of correlations with human data achieved at different levels of $\alpha$, across recursive depths; Table \ref{tab:corrs-fita} gives the highest correlation and corresponding $\alpha$ level. Two findings become apparent. First, at the highest level, although numerical correlations do vary across $\alpha$ levels, with $\alpha > 1$ the range of correlations is quite restricted across all depths. Thus, the performance of the model is relatively insensitive to this parameter.
 
-Nevertheless, a close examination of Table \ref{tab:corrs-fita} shows that values at depth 2 and especially depth 1 are noticeably higher than in Table \ref{tab:corrs} where $\alpha=1$. In fact, by setting $\alpha=3.1$, a model with depth 1 still achieves just about the same level of fit to data as a model with depth 4 or 5. This finding suggests that $\alpha$ and depth trade off against one another in most of the experiments that we conducted.
+Nevertheless, a close examination of Table \ref{tab:corrs-fita} shows that values at depth 2 and especially depth 1 are noticeably higher than in Table \ref{tab:corr-a1} where $\alpha=1$. In fact, by setting $\alpha=3.1$, a model with depth 1 still achieves just about the same level of fit to data as a model with depth 4 or 5. This finding suggests that $\alpha$ and depth trade off against one another in most of the experiments that we conducted.
 
-To understand this finding, consider the worked example above (used in many of our experiments):
+To understand this result, consider the worked example above (used in many of our experiments):
 
 \begin{equation}
 \left[
@@ -595,29 +593,83 @@ To understand this finding, consider the worked example above (used in many of o
 
 \noindent which is identical to the same result at recursive depth 1 with \red{$\alpha = XYZ$}. But that is not always true. In principle, if a particular matrix is completely ambiguous at a particular recursive depth, then changing $\alpha$ will not affect performance. (A trivial example of this would be changing levels of $\alpha$ for a literal listener; clearly this manipulation would have no effect since by definition the literal listener assigns probability evenly to all alternatives).
 
+\subsection{Priors do not improve global fit and also trade off with $\alpha$ and recursive depth}
+
+\begin{figure}[t]
+ \centering
+ \includegraphics[width=6in]{../plots/model_noprior_depth.pdf}
+ \caption{\label{fig:noprior} Human data plotted against RSA model predictions for recursive depths 0 -- 2, and $\alpha=1$. RSA model does not include estimates of the prior, hence there are no error bars on the horizontal axis. Plotting conventions are as above.}
+\end{figure}
+
+% latex table generated in R 3.3.0 by xtable 1.8-2 package
+% Thu Jul  7 11:16:06 2016
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrr}
+  \hline
+  Depth & $r_{all}$ & $r_{no~0/1}$ \\
+  \hline
+  0 & 0.74 & 0.14 \\
+    1 & 0.94 & 0.90 \\
+    2 & 0.95 & 0.90 \\
+    3 & 0.95 & 0.90 \\
+    4 & 0.94 & 0.90 \\
+    5 & 0.94 & 0.90 \\
+   \hline
+\end{tabular}
+\caption{\label{tab:corrs-noprior} Correlations of no-prior model and data at varying recursive depths.}
+\end{table}
+
+The final issue we examine is the contribution of empirically-determined priors to overall model fit. Note that we began with a model that used empirical prior measurements because \citeA{frank2012} proposed that they were necessary. Despite this previous work, we found that global fit of a model with $\alpha=1$ and no prior was equivalent to the performance of the fitted-$\alpha$ model \emph{with} priors. Correlations are shown in Table \ref{tab:corrs-noprior}; numerically, results are almost identical with those shown in Table \ref{tab:corrs-fita}. Levels of recursion from 0--2 are shown visually in Figure \ref{fig:noprior}.
+
+It is surprising that the use of the empirical prior fails to improve model fit. Yet despite this lack of global improvement, we note that there is unambiguous evidence from \exptrefrange{exp:prior-baserate}{exp:prior-salience} that manipulations of participant expectations about the target object lead to altered pragmatic judgments. In \exptref{exp:prior-baserate} in particular, we saw that manipulations of the base rate of a target object led to quantitative changes in both prior measurements and rates of pragmatic inference.
+
+% latex table generated in R 3.3.0 by xtable 1.8-2 package
+% Thu Jul  7 11:39:37 2016
+\begin{table}[ht]
+\centering
+\begin{tabular}{clrrrrrr}
+  \hline
+Depth & Model & E5 & E6 & E7 & E8 & E9 & E10 \\
+  \hline
+  1 & No prior, $\alpha=1$ & 0.96 & 0.89 & {\bf 0.95} & 0.96 & 0.88 & 0.95 \\
+    1 & Prior, $\alpha$ fit & {\bf 0.99} & {\bf 0.93} & 0.89 & {\bf 0.97} & 0.75 & {\bf 0.98} \\
+    1 & Prior, $\alpha=1$ & 0.87 & 0.87 & 0.67 & 0.95 & {\bf 1.00} & {\bf 0.98} \\
+  \hline
+    2 & No prior, $\alpha=1$ & {\bf 0.99} & 0.87 & {\bf 0.95} & 0.97 & 0.80 & 0.95 \\
+    2 & Prior, $\alpha$ fit & {\bf 0.99} & 0.93 & 0.89 & {\bf 0.98} & 0.84 & {\bf 0.98} \\
+    2 & Prior, $\alpha=1$ & 0.95 & {\bf 0.96} & 0.81 & {\bf 0.98} & {\bf 0.99} & {\bf 0.98} \\
+  \hline
+    3 & No prior, $\alpha=1$ & {\bf 0.99} & 0.86 & {\bf 0.95} & 0.97 & 0.74 & 0.95 \\
+    3 & Prior, $\alpha$ fit & {\bf 0.99} & 0.93 & 0.89 & {\bf 0.98} & 0.89 & {\bf 0.98} \\
+    3 & Prior, $\alpha=1$ & 0.98 & {\bf 0.95} & 0.86 & {\bf 0.98} & {\bf 0.95} & {\bf 0.98} \\
+  \hline
+\end{tabular}
+\caption{\label{tab:expts-corrs} Correlations of model and data for three model variants and varying recursive depths, broken down by experiment. Results for depths 4 and 5 are similar to depth 3.}
+\end{table}
+
+We discuss two observations about this unexpected finding: that there are tradeoffs between the prior, $\alpha$, and depth of recursion and that there may be measurement issues that complicate model comparisons. These observations are based on an analysis of the individual correlations, separated by experiment (Table \ref{tab:expts-corrs}).
+
+First, intuitively and as illustrated above, both increases in $\alpha$ and increases in recursive depth function to ``pull apart'' different targets, increasing the highest probability option and decreasing the lowest probability option. A comparison of Figures \ref{fig:depths} and \ref{fig:noprior} suggests that including empirical prior measurements tends to exert the opposite pressure. In fact, this observation reveals an interesting generalization about our displays in general: our pragmatic targets tend to be \emph{less} salient than our logical targets. For example, in the canonical display we use, the face with a hat is less salient than the display with the hat and glasses. Including information of this sort about salience via the empirical prior then works \emph{against} the pragmatic inference, even as both increasing $\alpha$ and recursive depth strengthen the inference.
+
+Second, note that adding empirical priors to the model complicates quantitative comparison with no-prior models. Although technically, the prior does not add any free variables to the model, it does add substantial measurement-related noise (consider the error bars shown in Figure \ref{fig:depths} but not Figure \ref{fig:noprior}). Thus, a failure to see increases in overall fit to data may be the result of a tradeoff between better fit in some cases due to the prior better accounting for the structure of the data \emph{and} worse fit due to the prior measurements introducing random noise.
+
 \section{General Discussion}
 \label{sec:discussion}
 
-%
-% We are well aware of the difficulties surrounding reasoning from a good fit alone \cite{roberts2000}. In a nutshell, any model must both show that it \emph{can} predict the data that actually occurred and \emph{cannot} predict the data that did not occur. The flexibility of the theory is thus of critical importance in understanding its performance. The RSA model as stated here and earlier contains a relatively small number of parameters, however: primarily $n$ (the depth of recursion) and $\alpha$, the greed parameter in the choice rule.
+The flexibility of comprehension in context is one of the most important and striking features of human language. Yet in contrast to theories of syntax and semantics \cite<e.g.>{chomsky1965,jackendoff2002}, the most influential pragmatic theories have typically been quite informal in nature \cite{grice1975,sperber1986,clark1996,levinson2000}. This gap has been addressed by recent efforts to develop probabilistic models of pragmatic reasoning, inspired by developments in game theory \cite<e.g.>{benz2005} and social cognition \cite{baker2009}.
 
+In the current work, we gave an extended presentation of one particular class of probabilistic pragmatics model: the rational speech act, or RSA, model \cite{frank2012,goodman2013}. Although a variety of models in this family have been presented previously, we provided a more extended formal description and comparison to other related models (along with software for using basic RSA models for simulations). We then conducted a series of large-scale, single-judgment pragmatic inference experiments to validate and explore one-shot reference games as a method for studying pragmatic inference quantitatively.
 
-\subsection{Other work using RSA and variants}
+These experiments support three main conclusions. First, language games of the type we studied here are a flexible and robust tool for probing pragmatic judgments (despite their schematic nature). Second, judgments in these games were systematically affected by a variety of manipulations of the linguistic, perceptual, and statistical structure of the game; these variables appeared to influence participants' pragmatic inferences in a graded way. Third, we found that participants typically began their reasoning with the literal semantics of the message that they were interpreting and converged to an interpretation consistent with a low number (but definitely non-zero) number of recursive iterations.
 
-Epistemic inferences \cite{goodman2013}
+Our simulations using the RSA model largely confirmed these conclusions. We found that the basic RSA model provided relatively good fit to our corpus of experimental data. Increasing either the $\alpha$ (greed) parameter \emph{or} the level of recursive depth in the pragmatic computation each led to increases in fit, but these two parameters traded off against one another. For this reason, we were not able to make a conclusive statment about the level of recursion used by comprehenders in our study \cite<for more evidence on this question, see>{franke2016}. Surprisingly, we did not find evidence for a global boost in fit by including empirical prior information, although we did see that some experiments were fit better by models that included a prior.
 
-Affective \cite{kao2014}
+Despite our attempts to make a comprehensive study of the RSA model, our work here has many limitations that should form a basis for future investigations. First of all, our experiments were focused on the judgments of single Mechanical Turk participants in one-off games. This methodology limits interpretation in a number of important ways. Although preliminary evidence suggests that such judgments are similar for other convenience populations \cite<e.g., college undergraduates in the U.S.>{frank2009}, it is an open question how similar rates of pragmatic inference would be across cultures and contexts. In addition, because our design elicited exactly one judgment per participant, we have no information about how rates of pragmatic inference vary across individuals. Individual differences in inference and their connections with other aspects of language processing are a rich topic for future study, and reference games like ours may provide a possible tool for executing well-controlled studies in this area.
 
+More generally, however, our modeling framework and experiments probe only a small part of the immense space of contextual inferences in language comprehension. We restricted our scope to single interactions, puposefully blocking collaborative inferences about reference across a discourse \cite{clark1996}. Similarly, although details of the broader context, discourse history, and physical setting can deeply influence the details of the pragmatic inference \cite{sperber1986}, we focused on aspects of the situation that we could either manipulate systematically or hold constant. The strength of this empirical strategy is that it yields large amounts of quantitative data that can be compared with quantitative models. The weaknesses, however, are apparent as well. First and foremost among these is that our work eliminates much (but hopefully not all) of the contextual details that create pragmatic inferences in the first place.
 
-Quantifiers \cite{franke2013}
-
-
-Embedded implicature \cite{potts2015}
-
-\subsection{Limitations}
-
-Production
-
+Nevertheless, are hopeful that the restricted models we describe here can be extended to a broader range of phenomena. RSA-type models have been used to capture judgments across a wide range of stimuli \cite<e.g.>{franke2016,carstensen2014} and phenomena \cite<e.g.>{potts2015,kao2014,bergen2016}; for review, see \citeA{goodman2016}. By treating RSA as a base for the formal exploration of pragmatic phenomena, we hope to build towards a more comprehensive quantitative theory of language comprehension in context.
 
 \newpage
 
