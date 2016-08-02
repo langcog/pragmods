@@ -9,6 +9,7 @@ output: html_document
 rm(list=ls())
 source("../helper.R")
 source("../useful_dplyr.R")
+library(langcog)
 ```
 
 Preliminary CI analysis
@@ -149,10 +150,11 @@ ms <- rbind_list(d.fc, d.likert, d.bet) %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
-qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
-      ymin=mean - cil, ymax=mean + cih, fill=measure,
-      facets=response.cond~item, 
-  data=ms) 
+ggplot(ms, aes(x = measure, y = mean, fill = measure)) + 
+  geom_bar(stat = "identity") + 
+  geom_linerange(aes(ymin=mean - cil, ymax=mean + cih)) + 
+  facet_grid(response.cond~item) +
+  scale_fill_solarized()
 ```
 
 Exactly the same thing without the items.
@@ -198,7 +200,7 @@ d.bet <- dc %>% filter(response.cond == "betting") %>%
             n = length(workerid),
             response.cond = response.cond[1])
 
-ms <- rbind_list(d.fc, d.likert, d.bet) %>% 
+ms <- bind_rows(d.fc, d.likert, d.bet) %>% 
   gather(measure, value, pragmatic, logical, 
          foil, pragmatic.cil, logical.cil, 
          foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
@@ -208,10 +210,15 @@ ms <- rbind_list(d.fc, d.likert, d.bet) %>%
   spread(role, value)
 
 pdf("../../plots/1-prelims-dv.pdf", width=8, height=3.5)
-qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
-      ymin=mean - cil, ymax=mean + cih, fill=measure,
-      facets=.~response.cond, 
-  data=ms) + 
+ms$measure <- factor(ms$measure, 
+                     levels = c("foil","pragmatic","logical"), 
+                     labels = c("foil","target","logical"))
+
+ggplot(ms, aes(x = measure, y = mean, fill = measure)) + 
+  geom_bar(stat = "identity") + 
+  geom_linerange(aes(ymin=mean - cil, ymax=mean + cih)) + 
+  facet_grid(.~ response.cond) +
+  scale_fill_solarized(guide=FALSE) + 
   ylim(c(0,1)) + 
   ylab("Normalized measure mean") + 
   xlab("Target")
