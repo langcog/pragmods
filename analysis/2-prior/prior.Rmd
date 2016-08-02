@@ -7,6 +7,7 @@ output: pdf_document
   
 ```{r}
 rm(list=ls())
+library(langcog)
 source("../helper.R")
 source("../useful_dplyr.R")
 ```
@@ -52,13 +53,14 @@ ms <- dc %>%
          cih = binom.bayes(n, sum(n))$upper)  
 
 pdf("../../plots/2-prior-frame.pdf", width=6, height=3.5)
-qplot(choice, prop, geom=c("bar","linerange"), stat="identity",
-      ymin=cil, ymax=cih, position=position_dodge(width=.9), 
-      fill=factor(cond),
-      data=ms) + 
+ggplot(ms, aes(x = choice, y = prop,
+      ymin=cil, ymax=cih, fill = cond)) + 
+  geom_bar(position=position_dodge(width=.9), stat = "identity") + 
+  geom_linerange(position=position_dodge(width=.9)) + 
   ylim(c(0,1)) + 
+  scale_fill_solarized("Condition") + 
   ylab("Proportion correct") + 
-  xlab("Base rate of target")
+  xlab("Referent")
 dev.off()
 ```
 
@@ -109,7 +111,7 @@ d2$cond <- "inference"
 d3 <-  read.turk("../../data/2-prior/baserates/scale_6stimuli_yes_fam_mumblemumble_26_february_FMMM.tsv")
 d3$cond <- "prior"
 
-d <- rbind_list(d1,d2,d3) 
+d <- bind_rows(d1,d2,d3) 
 
 d <- d %>% mutate(baserate = c(1/9,3/9,5/9,7/9)[familiarization + 1])
 ```
@@ -157,7 +159,8 @@ qplot(baserate, correct, geom=c("line","linerange"), stat="identity",
   ylim(c(0,1)) + 
   xlim(c(0,1)) +
   ylab("Proportion correct") + 
-  xlab("Base rate of target")
+  xlab("Base rate of target") + 
+  scale_colour_solarized(name = "Condition")
 dev.off()
 ```
 
@@ -210,7 +213,7 @@ d1d <- read.turk("../../data/2-prior/language/forced_choice_no_fam_snowman_30_no
 d2 <- read.turk("../../data/2-prior/language/forced_choice_no_fam_4random_count_12_january_least_LEAS.tsv")
 d3 <- read.turk("../../data/2-prior/language/scale_6stimuli_no_fam_prior_5_april_PRIOLF.tsv")
 
-d <- rbind_list(d1a,d1b,d1c,d1d,d2,d3) 
+d <- bind_rows(d1a,d1b,d1c,d1d,d2,d3) 
 d$cond <- factor(d$ling.cond)
 levels(d$cond) <- c("favorite","least favorite","favorite prior","least favorite prior")
 ```
@@ -254,6 +257,49 @@ qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
 dev.off()
 ```
 
+And split by target. 
+
+```{r}
+ms <- dc %>% 
+  group_by(cond, item) %>%
+  filter(item %in% c("boat","friend","pizza","snowman")) %>%
+  summarise(correct = mean(choice == "target"),
+            foil = mean(choice == "logical"), 
+            dist = mean(choice == "foil"),
+            n = n(), 
+            cih = ci.high(choice == "target"),
+            cil = ci.low(choice == "target")) %>%
+  ungroup %>%
+  mutate(condition = ifelse(grepl(pattern = "least", cond), 
+                            "least favorite","favorite"),
+         measure = ifelse(grepl(pattern = "prior", cond), 
+                          "prior","inference")) %>%
+  mutate(cih = ifelse(correct == 0, .02, cih), 
+         correct = ifelse(correct == 0, .01, correct))
+
+pdf("../../plots/2-prior-valence-items.pdf", width=6, height=3.5)
+ggplot(filter(ms, measure == "inference"), 
+       aes(x = item, y = correct, fill = condition)) + 
+  geom_bar(stat="identity", position = "dodge") + 
+  geom_linerange(aes(ymin=correct - cil, ymax=correct + cih),
+                 position = position_dodge(width = .9)) + 
+  ylim(c(0,1)) + 
+  scale_fill_solarized(name = "Condition") +
+  ylab("Proportion correct") + 
+  xlab("Item") 
+dev.off()
+```
+
+Logistic regression.
+
+```{r}
+mod <- glm(choice == "target" ~ item * cond, 
+    family = "binomial",
+    data = filter(dc, !grepl("prior",cond)))
+
+summary(mod)
+```
+
 Output for models.
 
 ```{r}
@@ -262,6 +308,7 @@ m.lang <- dc %>%
   summarise(n = n()) %>%
   spread(choice, n) %>%
   mutate(expt = "lang") %>%
+  ungroup %>%
   mutate(question = c("inference","inference","prior","prior"), 
          cond = c("favorite","least favorite","favorite","least favorite"))
 ```
@@ -278,7 +325,7 @@ Files:
 d1 <- read.turk("../../data/2-prior/color/forced_choice_no_fam_6random_2count_oneword_4mar2015_COLORBASE.tsv")
 d2 <- read.turk("../../data/2-prior/color/forced_choice_no_fam_6random_2count_oneword_23feb2015_COLORSALIENCE.tsv")
 
-d <- rbind_list(d1,d2) 
+d <- bind_rows(d1,d2) 
 d$cond <- factor(d$ling.cond)
 levels(d$cond) <- c("inference","prior")
 ```
@@ -313,15 +360,26 @@ ms <- dc %>%
             cil = ci.low(choice == "target"))
 
 pdf("../../plots/2-prior-color.pdf", width=6, height=3.5)
-qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
-      ymin=correct - cil, ymax=correct + cih, 
-      position=position_dodge(width=.9),
-      fill=referent_with_color,
-      data=filter(ms, !grepl("prior",cond))) + 
+ggplot(filter(ms, cond!="prior"), 
+       aes(x = referent_with_color, y = correct, fill=cond)) + 
+  geom_bar(stat="identity", position = "dodge") + 
+  geom_linerange(aes(ymin=correct - cil, ymax=correct + cih),
+                 position = position_dodge(width = .9)) + 
   ylim(c(0,1)) + 
   ylab("Proportion correct") + 
-  xlab("Referent displayed in color")
+  xlab("Colored Referent") + 
+  scale_fill_solarized(guide=FALSE)
 dev.off()
+```
+
+Logistic regression.
+
+```{r}
+mod <- glm(choice == "target" ~ referent_with_color, 
+    family = "binomial",
+    data = filter(dc, !grepl("prior",cond)))
+
+summary(mod)
 ```
 
 Output for models.
