@@ -9,6 +9,7 @@ output: pdf_document
 rm(list=ls())
 source("../helper.R")
 source("../useful_dplyr.R")
+library(langcog)
 ```
 
 Level of recursion
@@ -31,7 +32,7 @@ d3$cond <- "complex prior"
 d3$level <- -1
 d1 <- d1 %>% rename(level = scale_and_levels_condition) %>% mutate(level = level -2)
 d2 <- d2 %>% rename(level = scale_and_levels_condition)
-d <- rbind_list(d1,d2, d3) 
+d <- bind_rows(d1,d2, d3) 
 ```
 
 Counts and exclusions.
@@ -75,14 +76,21 @@ ms <- dc %>%
             cih = ci.high(choice == "target"),
             cil = ci.low(choice == "target"))
 
-ms$cond <- factor(ms$cond, levels=c("simple","complex","complex prior"))
-ms$level <- factor(ms$level)
+ms$cond <- factor(ms$cond, levels = c("simple", "complex", "complex prior"),
+                  labels=c("M simple","M complex","complex prior"))
+ms$level <- factor(ms$level, labels = c("-1", "literal","simple","complex"))
 
 pdf("../../plots/3-levels-levels.pdf",width=6, height=3.5)
-qplot(level, correct, geom=c("bar","linerange"), stat="identity",
-      ymin=correct - cil, ymax=correct + cih, fill=factor(level),
-      facets=.~cond, 
-      data=filter(ms,level!="-1")) 
+ggplot(filter(ms, level!="-1"), 
+       aes(x = level, y = correct, fill=factor(level))) + 
+  geom_bar(stat="identity") + 
+  geom_linerange(aes(ymin=correct - cil, ymax=correct + cih)) + 
+  facet_grid(.~cond) + 
+  ylab("Proportion correct") + 
+  xlab("Level of recursion for target inference") +
+  scale_fill_solarized(guide = FALSE) 
+  # scale_fill_solarized(name = "Level of Recursion") + 
+  # theme(legend.position="bottom")
 dev.off()
 ```
 
@@ -159,11 +167,14 @@ ms <- dc %>%
             cil = ci.low(choice == "twin"))
 
 pdf("../../plots/3-levels-twins.pdf",width=4.5, height=3.5)
-qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
-      ymin=correct - cil, ymax=correct + cih, fill=cond,
-      data=filter(ms, cond != "prior")) + 
+ggplot(filter(ms, cond != "prior"), 
+       aes(x = cond, y = correct, fill=cond)) + 
+  geom_bar(stat="identity") + 
+  geom_linerange(aes(ymin=correct - cil, ymax=correct + cih), 
+                 position = position_dodge(width=.9)) + 
   ylab("Proportion choosing either twin face") + 
-  xlab("Target feature")
+  xlab("Target feature") + 
+  scale_fill_solarized(guide = FALSE)
 dev.off()
 ```
 
@@ -229,12 +240,22 @@ ms <- dc %>%
             cil = ci.low(choice == "odd_one"))
 
 pdf("../../plots/3-levels-oddman.pdf",width=4.5, height=3.5)
-qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
-      ymin=correct - cil, ymax=correct + cih, fill=cond,
-      data=filter(ms, cond!="prior")) + 
+# qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
+#       ymin=correct - cil, ymax=correct + cih, fill=cond,
+#       data=filter(ms, cond!="prior")) + 
+#   ylab("Proportion choosing non-literal interpretation") + 
+#   xlab("Target feature") + 
+#   ylim(c(0,1))
+
+ggplot(filter(ms, cond != "prior"), 
+       aes(x = cond, y = correct, fill=cond)) + 
+  geom_bar(stat="identity") + 
+  geom_linerange(aes(ymin=correct - cil, ymax=correct + cih), 
+                 position = position_dodge(width=.9)) + 
   ylab("Proportion choosing non-literal interpretation") + 
   xlab("Target feature") + 
-  ylim(c(0,1))
+  scale_fill_solarized(guide = FALSE) 
+
 dev.off()
 ```
 
