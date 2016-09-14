@@ -211,9 +211,70 @@ Look at group 'baserate-63': only 'glasses' is queried, but we need to add the l
 fullData <- rrrsa_ready_df(d)
 ```
 
+
+```{r tune_depth_alpha_helper}
+## tune_depth_alpha()
+## ------------------
+## custom tuning if we don't want to use rsa.tuneDepthApha()
+tune_depth_alpha <- function(d,
+                             depths,
+                             alphas,
+                             usePrior,
+                             usePriorEveryRecurse) {
+  res <- data.frame(r=c(), alpha=c(), depth=c())
+  for (depth in depths) {
+    for (alpha in alphas) {
+      ## Prior
+      if (usePrior) {
+        curr_out <- d %>%
+        split(.$grouper) %>%
+        purrr::map_df(~rsa.runDf(data=.x,
+                                 quantityVarName="object",
+                                 semanticsVarName="speaker.p",
+                                 itemVarName="query",
+                                 priorsVarName="priorValue",
+                                 alpha=alpha,
+                                 depth=depth,
+                                 usePriorEveryRecurse=userPriorEveryRecurse)) %>%
+        rowwise %>%
+        mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+               depth = depth,
+               alpha=alpha) %>%
+        filter(tuningData == "keep")
+      }
+      ## No prior
+      else {
+        curr_out <- d %>%
+        split(.$grouper) %>%
+        purrr::map_df(~rsa.runDf(data=.x,
+                                 quantityVarName="object",
+                                 semanticsVarName="speaker.p",
+                                 itemVarName="query",
+                                 alpha=alpha,
+                                 depth=depth,
+                                 usePriorEveryRecurse=userPriorEveryRecurse)) %>%
+        rowwise %>%
+        mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+               depth = depth,
+               alpha=alpha) %>%
+        filter(tuningData == "keep")
+      }
+      res <- rbind(res, data.frame(r=cor(curr_out$p, curr_out$preds), alpha=alpha, depth=depth))
+    }
+  }
+  res
+}
+```
+
+
 # Simulations WITH priors (recursive depth 0-5)
 
 ## Recursive depth sims
+
+```{r purrr_conversion1, eval=FALSE}
+# sims_prior <- tune_depth_alpha(fullData, depths=DEPTHS, alphas=1, usePrior=TRUE, usePriorEveryRecurse=FALSE)
+```
+
 ```{r sims_priors}
 ## Pre-sort by grouper
 fullData <- fullData %>% arrange(grouper)
@@ -227,6 +288,28 @@ sims_prior_temp <- lapply(DEPTHS, function(depth) {
   filter(tuningData == "keep")
 })
 sims_prior <- convertListToDF(sims_prior_temp)
+
+## written with purrr
+##
+# sims_prior_temp2 <- lapply(DEPTHS, function(depth) {
+#   # plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+#   #           quantityVarName = "object", semanticsVarName = "speaker.p",
+#   #           itemVarName = "query", priorsVarName = "priorValue", depth = depth, usePriorEveryRecurse = FALSE) %>%
+#   fullData %>%
+#     split(.$grouper) %>%
+#     purrr::map_df(~rsa.runDf(data=.x,
+#                              quantityVarName="object",
+#                              semanticsVarName="speaker.p",
+#                              itemVarName="query",
+#                              priorsVarName="priorValue",
+#                              depth=depth,
+#                              usePriorEveryRecurse=FALSE)) %>%
+#   rowwise %>%
+#   mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+#          depth = depth) %>%
+#   filter(tuningData == "keep")
+# })
+# sims_prior2 <- convertListToDF(sims_prior_temp2)
 ```
 
 ## Simulation plots
@@ -267,6 +350,15 @@ sims_prior %>%
   mutate("alpha" = 1)
 ```
 
+
+```{r purrr_conversion2, eval=FALSE}
+tune1 <- tune_depth_alpha(fullData, DEPTHS, ALPHAS, FALSE)
+tune1 %>%
+  summarise(max_r=max(r),
+            max_alpha=alpha[which.max(r)],
+            max_depth=depth[which.max(r)])
+```
+
 ## Fitting alpha
 ```{r sims_priors_fitting}
 ## Need to identify indices we want for performance comparisons
@@ -299,7 +391,6 @@ maxCors <- aggregateTuneData %>%
 
 ### Plot performance tuning
 ```{r sims_priors_tuning_plot}
-
 aggregateTuneData_plot <- aggregateTuneData %>%
   mutate(Recursive_depth = as.factor(depth))
 
@@ -701,7 +792,7 @@ ggplot(d5_bstrap_cis, aes(x = preds, y = p, col = expt, pch = object)) +
 ### Boostrapped data - all DEPTHS and calculate CIs
 ```{r bstrap_data_all_depths}
 ## Run simulations for each depth
-sims_prior_bstrap_errs <- read.csv("sims_prior_bstrap_errs.csv") ## From previous run with set.seed(1)
+sims_prior_bstrap_errs <- read.csv("data/sims_prior_bstrap_errs.csv") ## From previous run with set.seed(1)
 
 ## Run below code if we don't have saved previous sims
 ## ---------------------------------------------------
