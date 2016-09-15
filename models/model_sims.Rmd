@@ -267,7 +267,9 @@ tune_depth_alpha <- function(d,
 ```
 
 
-# Simulations WITH priors (recursive depth 0-5)
+# Simulations WITH 'private knowledge priors' (recursive depth 0-5)
+
+"Private knowledge" priors are only multiplied at the bottom level recursion.
 
 ## Recursive depth sims
 
@@ -349,7 +351,6 @@ sims_prior %>%
   summarise("cor" = cor(p, preds)) %>%
   mutate("alpha" = 1)
 ```
-
 
 ```{r purrr_conversion2, eval=FALSE}
 tune1 <- tune_depth_alpha(fullData, DEPTHS, ALPHAS, FALSE)
@@ -438,6 +439,148 @@ ggplot(best_prior_models_fitted_alpha, aes(x = preds, y = p, col = expt, pch = o
   geom_smooth(method="lm", aes(group=1)) + 
   geom_abline(slope = 1, intercept = 0, lty=2) +
   ggtitle("Model performance for recursive depth 0-5 with fitted alphas") + theme_bw()
+```
+
+# Simulations WITH 'Common knowledge priors' (recursive depth 0-5)
+
+"Common knowledge" priors are only multiplied at the bottom level recursion.
+
+## Recursive depth sims
+
+```{r purrr_conversion1, eval=FALSE}
+# sims_prior <- tune_depth_alpha(fullData, depths=DEPTHS, alphas=1, usePrior=TRUE, usePriorEveryRecurse=FALSE)
+```
+
+```{r sims_ck_priors}
+## Pre-sort by grouper
+fullData <- fullData %>% arrange(grouper)
+sims_prior_temp_ck <- lapply(DEPTHS, function(depth) {
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+            quantityVarName = "object", semanticsVarName = "speaker.p",
+            itemVarName = "query", priorsVarName = "priorValue", depth = depth, usePriorEveryRecurse = TRUE) %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+         depth = depth) %>%
+  filter(tuningData == "keep")
+})
+sims_prior_ck <- convertListToDF(sims_prior_temp_ck)
+```
+
+## Simulation plots
+
+### Recursive depth 0-2
+```{r sims_ck_priors_plot1, eval = FALSE}
+sims_prior_ck %>%
+  filter(depth < 3) %>%
+  ggplot(., aes(x = preds, y = p, col = expt, pch = object)) +
+    geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+    xlim(c(0,1)) + ylim(c(0,1)) + 
+    facet_wrap(~depth) +
+    ylab("Proportion choosing target") + 
+    xlab("Model Predictions") + 
+    geom_smooth(method="lm", aes(group=1)) + 
+    geom_abline(slope = 1, intercept = 0, lty=2) +
+    ggtitle("Common knowledge priors model sims, alpha = 1") + theme_bw()
+```
+
+### Recursive depth 0-5
+```{r sims_ck_priors_plot2, eval=FALSE}
+ggplot(sims_prior_ck, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle("Common knowledge priors model sims, alpha = 1") + theme_bw()
+```
+
+## Correlations
+```{r sims_ck_priors_cors, eval=FALSE}
+sims_prior_ck %>%
+  group_by(depth) %>%
+  summarise("cor" = cor(p, preds)) %>%
+  mutate("alpha" = 1)
+```
+
+## Fitting alpha
+```{r sims_ck_priors_fitting}
+## Need to identify indices we want for performance comparisons
+fullData <- fullData %>%
+  rowwise %>%
+  mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"))
+keepIndices <- c("keep", "throwout")
+compareIndices  <- which(fullData$tuningData == "keep")
+
+## Parallelize fitting
+priorFit_ck <- mclapply(DEPTHS, function(i) { ## parallelize over depths
+  rsa.tuneDepthAlpha(fullData, quantityVarName = "object",
+                     semanticsVarName = "speaker.p", itemVarName = "query",
+                     priorsVarName = "priorValue", groupName = "grouper",
+                     compareDataName = "p", compareIndices = compareIndices,
+                     depth = i, alphas = ALPHAS, usePriorEveryRecurse = TRUE)
+  },
+  mc.cores = detectCores())
+aggregateTuneData_ck <- convertListToDF(priorFit_ck)
+```
+
+## Model performance
+```{r sims_ck_priors_fitted_cors}
+## Get best model performance by alpha, depth
+maxCors_ck <- aggregateTuneData_ck %>%
+  group_by(depth) %>%
+  summarize(maxCor = max(cor),
+            alpha = alpha[which.max(cor)])
+```
+
+### Plot performance tuning
+```{r sims_ck_priors_tuning_plot}
+aggregateTuneData_plot_ck <- aggregateTuneData_ck %>%
+  mutate(Recursive_depth = as.factor(depth))
+
+## Plot tuning (Plot adapted for personal_site)
+ggplot(aggregateTuneData_plot_ck, aes(x = alpha, y = cor, col=Recursive_depth)) +
+  geom_point(alpha=0.6, size=4) +
+  geom_vline(xintercept=maxCors$alpha, col="grey", lty="dotdash")+
+  ylab("Correlation") +
+  scale_x_continuous(breaks = round(seq(0, 6, by = 0.1)), "Rationality (alpha level)") +
+  # theme_solarized() +
+  theme_bw() +
+  theme(legend.position="bottom", legend.box="horizontal",
+        legend.text=element_text(size=8), legend.direction="horizontal") 
+```
+
+## Best priors model performance with fitted alphas
+```{r sims_ck_priors_fitted_alpha}
+depths_param_data_ck <- maxCors_ck %>%
+  arrange(depth)
+best_ck_prior_models_fitted_alpha <- convertListToDF(lapply(DEPTHS, function(depth) {
+  plyr::ddply(fullData, .variables = c("grouper"), rsa.runDf,
+              quantityVarName = "object", semanticsVarName = "speaker.p",
+              priors = "priorValue", usePriorEveryRecurse = FALSE,
+              itemVarName = "query", depth = depths_param_data_ck$depth[depth + 1], alpha = depths_param_data_ck$alpha[depth + 1]) %>%
+    mutate(tuningData = ifelse(!is.na(count), "keep", "throwout"),
+           depth = depth) %>%
+    filter(tuningData == "keep")
+  }))
+```
+
+### Plot best common knowldege priors model performance with fitted alphas
+```{r sims_ck_prio_plot2}
+print("Common knowledge priors performance for recursive depth 0-5 with fitted alphas")
+maxCors_ck ## performance data
+
+## plots
+ggplot(best_ck_prior_models_fitted_alpha, aes(x = preds, y = p, col = expt, pch = object)) +
+  geom_pointrange(aes(ymin = cil, ymax = cih)) + 
+  xlim(c(0,1)) + ylim(c(0,1)) + 
+  facet_wrap(~depth, labeller = label_both) +
+  ylab("Proportion choosing target") + 
+  xlab("Model Predictions") + 
+  geom_smooth(method="lm", aes(group=1)) + 
+  geom_abline(slope = 1, intercept = 0, lty=2) +
+  ggtitle("Common knowledge priors model performance for recursive depth 0-5 with fitted alphas") + theme_bw()
 ```
 
 
