@@ -1,0 +1,131 @@
+---
+title: "matrix_explore"
+author: "Ben Peloquin"
+date: "September 15, 2016"
+output: html_document
+---
+
+```{r}
+library(rrrsa)
+library(dplyr)
+library(knitr)
+```
+
+```{r}
+norm_vec <- function(v) {
+  v / sum(v)
+}
+normalize_rows <- function(m) {
+  t(apply(m, MARGIN=1, FUN=norm_vec))
+}
+normalize_cols <- function(m) {
+  apply(m, MARGIN=2, FUN=norm_vec)
+}
+```
+
+3X3
+```{r threebythree, eval=FALSE}
+m3 <- matrix(c(1, 0, 1, 0, 1, 1, 1, 0, 0), nrow = 3)
+L0 <- rsa.reason(normalize_cols(m3), depth=0); L0
+L1 <- rsa.reason(normalize_cols(m3), depth=1); L1
+L2 <- rsa.reason(normalize_cols(m3), depth=2); L2
+```
+
+3X4
+```{r threebyfour, eval=FALSE}
+m3 <- matrix(c(1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0), nrow = 3)
+L0 <- rsa.reason(normalize_cols(m3), depth=0); L0
+L1 <- rsa.reason(normalize_cols(m3), depth=1); L1
+L2 <- rsa.reason(normalize_cols(m3), depth=2); L2
+```
+
+4X4
+```{r fourbyfour, eval=FALSE}
+m4 <- matrix(c(1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1), nrow = 4)
+L0 <- rsa.reason(normalize_cols(m4), depth=0); L0
+L1 <- rsa.reason(normalize_cols(m4), depth=1); L1
+L2 <- rsa.reason(normalize_cols(m4), depth=2); L2
+L0; L1; L2
+```
+
+
+```{r is_separate}
+is_separate <- function(m1, m2) {
+  num_rows <- dim(m1)[1]
+  num_cols <- dim(m1)[2]
+  for (curr_col in 1:num_cols) {
+    if (any(duplicated(m1[,curr_col]) != duplicated(m2[,curr_col]))) return(TRUE)
+  }
+  FALSE
+}
+```
+
+I'm working with a transposed matrix design (utterances are cols, faces are rows). So L0 normalizes over rows.
+```{r generate_random_matrix}
+set.seed(1)
+generate_random_matrix <- function(num_rows, num_cols) {
+  m <- matrix(sample(c(0, 1), size=num_rows * num_cols, replace=TRUE), nrow=num_rows)
+}
+generate_random_matrix(3, 3) %>%
+  data.frame %>%
+  kable(caption="Example generated 3X3 matrix")
+```
+
+```{r bad_matrix}
+bad_matrix <- function(m) {
+  num_rows <- dim(m)[1]
+  num_cols <- dim(m)[2]
+  for (curr_col in 1:num_cols) {
+    if (all(m[, curr_col] == 0)) return(TRUE)
+  }
+  for (curr_row in 1:num_rows) {
+    if (all(m[curr_row,] == 0)) return(TRUE)
+  }
+  FALSE
+}
+
+not_null <- function(x) !is.null(x)
+```
+
+```{r create_good_matrices}
+good_matrices <- list()
+for (i in seq(1,100)) {
+  curr_m <- generate_random_matrix(4, 3)
+  if (bad_matrix(curr_m)) next
+  # print(curr_m)
+  L0 <- rsa.reason(normalize_cols(curr_m), depth=0)
+  L1 <- rsa.reason(normalize_cols(curr_m), depth=1)
+  L2 <- rsa.reason(normalize_cols(curr_m), depth=2)
+  curr_matrices <- list("original"=curr_m, "L0"=L0, "L1"=L1, "L2"=L2)
+  if (is_separate(L1, L2)) good_matrices[[i]] <- curr_matrices
+}
+good_matrices_filtered <- Filter(not_null, good_matrices)
+```
+
+```{r good_matrices}
+good_matrices_filtered
+```
+
+L2 separation always occurs in the column in which one of the features is shared by 3 out of 4 of the faces...
+
+```{r L3_test, eval=FALSE}
+good_matrices <- list()
+for (i in seq(1,100000)) {
+  curr_m <- generate_random_matrix(5, 4)
+  if (bad_matrix(curr_m)) next
+  # print(curr_m)
+  L0 <- rsa.reason(normalize_cols(curr_m), depth=0)
+  L1 <- rsa.reason(normalize_cols(curr_m), depth=1)
+  L2 <- rsa.reason(normalize_cols(curr_m), depth=2)
+  L3 <- rsa.reason(normalize_cols(curr_m), depth=3)
+  curr_matrices <- list("original"=curr_m, "L0"=L0, "L1"=L1, "L2"=L2, "L3"=L3)
+  if (is_separate(L2, L3)) good_matrices[[i]] <- curr_matrices
+}
+not_null <- function(x) !is.null(x)
+good_matrices_filtered <- Filter(not_null, good_matrices)
+```
+
+```{r L3_matrices, eval=FALSE}
+good_matrices_filtered
+```
+
