@@ -106,12 +106,14 @@ good_matrices_filtered <- Filter(not_null, good_matrices)
 good_matrices_filtered
 ```
 
-L2 separation always occurs in the column in which one of the features is shared by 3 out of 4 of the faces...
+L2 separation always occurs in the column in which one of the features is shared by 3 out of 4 of the faces in the 3X4 or 4X3 matrix. 
+
+More types of L2 separation with a 4X4.
 
 ```{r L3_test, eval=FALSE}
 good_matrices <- list()
-for (i in seq(1,100000)) {
-  curr_m <- generate_random_matrix(5, 4)
+for (i in seq(1,10000)) {
+  curr_m <- generate_random_matrix(6, 4)
   if (bad_matrix(curr_m)) next
   # print(curr_m)
   L0 <- rsa.reason(normalize_cols(curr_m), depth=0)
@@ -129,3 +131,4 @@ good_matrices_filtered <- Filter(not_null, good_matrices)
 good_matrices_filtered
 ```
 
+We get L3 separation with a 6X4 or 4X6 matrix.
