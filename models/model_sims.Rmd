@@ -761,7 +761,6 @@ merge(no_fit_alphas_all_models[,which(names(no_fit_alphas_all_models) != "alpha"
   kable()
 ```
 
-
 Seems like Common Knowledge prior underperforms except at the single level of recursion. Of course, results in this case are the same as the Private Knowledge prior, because the prior is included only once...
 
 # Explicit comparisons with MF sims.Rmd
@@ -769,7 +768,7 @@ Seems like Common Knowledge prior underperforms except at the single level of re
 ## Combine priors and unif priors
 ```{r MF_compare}
 ## combine priors and uniform
-sims_prior <- sims_prior %>%
+sims_prior <- sims_prior_pk %>%
   mutate(prior = "prior")
 sims_NoPrior <- sims_NoPrior %>%
   mutate(prior = "uniform")
@@ -1189,17 +1188,17 @@ sims_prior_temp %>%
 ```
 
 
-# Old analysis
+# Salience analysis
 
 ## Plot preds by experiment
-```{r boot_plot, fig.width=12, eval = FALSE}
+```{r boot_plot, fig.width=12}
 ggplot(allData, aes(x = preds, y = p, col = prior)) +
   geom_point(shape = 21, alpha = 0.85) +
   facet_grid(model ~ cond) + theme_bw()
 ```
 
 ## Plot prior's wonkiness
-```{r wonky_preds, eval = FALSE}
+```{r wonky_preds}
 allData %>%
   filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   ggplot(aes(x = preds, y = p, col = prior, shape = as.factor(object))) +
@@ -1207,10 +1206,11 @@ allData %>%
     facet_grid(model ~ grouper) +
     geom_abline(slope = 1, intercept = 0, lty=2) + theme_bw()
 ```
+
 Almost looks like `target` and `logical` could be swapped... But with more recursions, the priors-model begins to improve...
 
 ## Wonky priors vs unif priors
-```{r, eval = FALSE}
+```{r}
 temp_d <- sims_prior %>% filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   arrange(cond, expt, matrix, prior, object, count, p)
 
@@ -1230,12 +1230,13 @@ ggplot(temp_d, aes(x = unif_preds, y = preds, col = factor(grouper), size = fact
   geom_abline(slope = 1, intercept = 0, lty=2) + theme_bw()
 
 ## Take a look at the data
-temp_d
+temp_d %>% kable()
 ```
+
 Still looks like these might have been swapped...
 
 ## Wonky priors data
-```{r wonky_priors, , eval = FALSE}
+```{r wonky_priors, eval=FALSE}
 allData %>%
   filter(grouper == 'baserate-72' | grouper == 'color-47') %>%
   mutate(delta = p - preds) %>%
