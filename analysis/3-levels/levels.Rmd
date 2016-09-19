@@ -254,7 +254,8 @@ ggplot(filter(ms, cond != "prior"),
                  position = position_dodge(width=.9)) + 
   ylab("Proportion choosing non-literal interpretation") + 
   xlab("Target feature") + 
-  scale_fill_solarized(guide = FALSE) 
+  scale_fill_solarized(guide = FALSE) + 
+  ylim(c(0,1))
 
 dev.off()
 ```

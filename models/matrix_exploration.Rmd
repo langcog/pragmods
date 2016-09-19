@@ -60,7 +60,19 @@ is_separate <- function(m1, m2) {
 }
 ```
 
+We want a matrix that has a unique column max for every column in m2 but not m1.
+
+```{r} is_unique}
+# 
+
+has_unique_maxes <- function(m1, m2) {
+ all(apply(m1, 2, function(x) length(which(x==max(x)))==1) == FALSE) &
+    all(apply(m2, 2, function(x) length(which(x==max(x)))==1) == TRUE)
+}
+```
+
 I'm working with a transposed matrix design (utterances are cols, faces are rows). So L0 normalizes over rows.
+
 ```{r generate_random_matrix}
 set.seed(1)
 generate_random_matrix <- function(num_rows, num_cols) {
@@ -70,6 +82,8 @@ generate_random_matrix(3, 3) %>%
   data.frame %>%
   kable(caption="Example generated 3X3 matrix")
 ```
+
+A bad matrix is one that doesn't have zeros in any column. 
 
 ```{r bad_matrix}
 bad_matrix <- function(m) {
@@ -89,7 +103,7 @@ not_null <- function(x) !is.null(x)
 
 ```{r create_good_matrices}
 good_matrices <- list()
-for (i in seq(1,100)) {
+for (i in seq(1,1000)) {
   curr_m <- generate_random_matrix(4, 3)
   if (bad_matrix(curr_m)) next
   # print(curr_m)
@@ -110,25 +124,25 @@ L2 separation always occurs in the column in which one of the features is shared
 
 More types of L2 separation with a 4X4.
 
-```{r L3_test, eval=FALSE}
+```{r L3_test, eval=TRUE}
 good_matrices <- list()
-for (i in seq(1,10000)) {
-  curr_m <- generate_random_matrix(6, 4)
+for (i in seq(1,1000)) {
+  curr_m <- generate_random_matrix(4, 4)
   if (bad_matrix(curr_m)) next
   # print(curr_m)
   L0 <- rsa.reason(normalize_cols(curr_m), depth=0)
   L1 <- rsa.reason(normalize_cols(curr_m), depth=1)
   L2 <- rsa.reason(normalize_cols(curr_m), depth=2)
-  L3 <- rsa.reason(normalize_cols(curr_m), depth=3)
-  curr_matrices <- list("original"=curr_m, "L0"=L0, "L1"=L1, "L2"=L2, "L3"=L3)
-  if (is_separate(L2, L3)) good_matrices[[i]] <- curr_matrices
+  # L3 <- rsa.reason(normalize_cols(curr_m), depth=3)
+  curr_matrices <- list("original"=curr_m, "L0"=L0, "L1"=L1, "L2"=L2)
+  if (has_unique_maxes(L1, L2)) good_matrices[[i]] <- curr_matrices
 }
 not_null <- function(x) !is.null(x)
 good_matrices_filtered <- Filter(not_null, good_matrices)
 ```
 
-```{r L3_matrices, eval=FALSE}
+```{r L3_matrices, eval=TRUE}
 good_matrices_filtered
 ```
 
-We get L3 separation with a 6X4 or 4X6 matrix.
+<!-- We get L3 separation with a 6X4 or 4X6 matrix. -->

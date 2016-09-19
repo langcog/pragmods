@@ -155,14 +155,6 @@ mason = matrix(
     c('r1', 'r2', 'r3'), # Row names; referents.
     c('hat', 'glasses', 'mustache'))) # Column names; messages.
 
-## Mason Chua matrix
-mason = matrix(
-  c(1,   1,   1,
-    1,   1,   0,
-    1,   0,   1), byrow=T, nrow=3,
-  dimname=list(
-    c('r1', 'r2', 'r3'), # Row names; referents.
-    c('hat', 'glasses', 'mustache'))) # Column names; messages.
 
 ## The Horn division of labor game (makes crucial use of the costs)
 hornnames = list(
@@ -187,4 +179,4 @@ m7 = matrix(
     0,1,0,1,
     1,0,0,1), byrow=T, nrow=4,
   dimnames=list(paste("t", seq(1,4),sep=''), ## Row names; refernets.
-                c('hat', 'glasses', 'must', 'hair'))) ## Column names; messages.
+                c('hat', 'glasses', 'mustache', 'bowtie'))) ## Column names; messages.
