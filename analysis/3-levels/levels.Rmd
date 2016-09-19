@@ -87,7 +87,7 @@ ggplot(filter(ms, level!="-1"),
   geom_linerange(aes(ymin=correct - cil, ymax=correct + cih)) + 
   facet_grid(.~cond) + 
   ylab("Proportion correct") + 
-  xlab("Level of recursion for target inference") +
+  xlab("Difficulty of target inference") +
   scale_fill_solarized(guide = FALSE) 
   # scale_fill_solarized(name = "Level of Recursion") + 
   # theme(legend.position="bottom")
