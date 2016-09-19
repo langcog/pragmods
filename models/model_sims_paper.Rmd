@@ -226,7 +226,7 @@ ggplot(tune_data, aes(x = alpha, y = cor, col=Recursive_depth)) +
   theme_bw() +
   theme(legend.position="bottom", legend.box="horizontal",
         legend.text=element_text(size=8), legend.direction="horizontal")+ 
-  ylim(c(0,1))
+  ylim(c(.5,1))
 dev.off()
 ```
 
