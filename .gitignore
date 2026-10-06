@@ -22,3 +22,6 @@ pragmods.pdf
 *.blg
 *.bbl
 *.*~
+
+# raw MTurk data with worker IDs -- never commit (de-identified copy is in data/)
+unanon_data/

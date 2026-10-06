@@ -24,7 +24,7 @@ d <- data.frame()
 
 for (m in ms) {
   for (n in ns) {
-    d <- rbind_list(d, 
+    d <- bind_rows(d, 
                    data.frame(m = m,                            
                               n = n,
                               p = rbinom(n.samps, n, m)))  
@@ -38,9 +38,9 @@ ms <- d %>%
             ymax = quantile(p/n, .975), 
             width = ymax - ymin)
 
-qplot(x=m, y=em, ymin=ymin, ymax=ymax, col=factor(n), 
-      position=position_dodge(.03), group=factor(n),
-      geom=c("line","linerange"), data=ms) + facet_wrap(~n)
+ggplot(ms, aes(x=m, y=em, ymin=ymin, ymax=ymax, col=factor(n), group=factor(n))) + 
+  geom_line(position=position_dodge(.03)) + 
+  geom_linerange(position=position_dodge(.03)) + facet_wrap(~n)
 ```
   
 
@@ -63,7 +63,7 @@ for (t in measures) {
     print(f)
     d.new <- read.turk(paste("../../data/1-prelims/dv/",f, sep=""))
     d.new$dataset <- f
-    d <- rbind_list(d, d.new)
+    d <- bind_rows(d, d.new)
   }
 }
 
@@ -141,7 +141,7 @@ d.bet <- dc %>% filter(response.cond == "betting") %>%
 Plot. 
 
 ```{r}
-ms <- rbind_list(d.fc, d.likert, d.bet) %>% 
+ms <- bind_rows(d.fc, d.likert, d.bet) %>% 
   gather(measure, value, pragmatic, logical, 
          foil, pragmatic.cil, logical.cil, 
          foil.cil, pragmatic.cih, logical.cih, foil.cih) %>%
@@ -248,7 +248,7 @@ d1$cond <- "manip check"
 d2$cond <- "no manip check"
 d1$mc.targ <- as.numeric(d1$mc.targ)
 d1$mc.dist <- as.numeric(d1$mc.dist)
-d <- rbind_list(d1,d2)
+d <- bind_rows(d1,d2)
 ```
 
 Counts and exclusions
@@ -297,7 +297,7 @@ ms <- d.fc %>%
          measure = str_replace(measure,".ci[lh]","")) %>%
   spread(role, value)
 
-qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+qplot(measure, mean, geom=c("col","linerange"),
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=cond~item, 
   data=ms) + 
@@ -331,7 +331,7 @@ ms <- d.fc %>%
   spread(role, value)
 
 pdf("../../plots/1-prelims-manip.pdf", width=6, height=3)
-qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+qplot(measure, mean, geom=c("col","linerange"),
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~cond, 
   data=ms) + 
@@ -418,7 +418,7 @@ ms <- d.fc %>%
   spread(role, value)
 
 pdf("../../plots/1-prelims-lingframe.pdf", width=6, height=3)
-qplot(measure, mean, geom=c("bar","linerange"), stat="identity",
+qplot(measure, mean, geom=c("col","linerange"),
       ymin=mean - cil, ymax=mean + cih, fill=measure,
       facets=.~ling.cond, 
   data=ms) + 

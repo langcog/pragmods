@@ -8,13 +8,14 @@ read.turk <- function (fname) {
   }
   names(d) <- str_replace(tolower(names(d)),"answer.","")
   d <- d %>%
-    select(-hitid, -hittypeid, -title, -description, -keywords,
-           -reward, -creationtime, -assignments, -numavailable, -numpending,
-           -numcomplete, -hitstatus, -reviewstatus, -annotation,
-           -assignmentduration, -autoapprovaldelay, -hitlifetime,
-           -viewhit, -assignmentid, -assignmentstatus, -autoapprovaltime,
-           -assignmentaccepttime, -assignmentapprovaltime,
-           -assignmentrejecttime, -deadline, -feedback, -reject) %>%
+    # MTurk metadata; identifying columns are already removed in data/
+    select(-any_of(c("hitid", "hittypeid", "title", "description", "keywords",
+           "reward", "creationtime", "assignments", "numavailable", "numpending",
+           "numcomplete", "hitstatus", "reviewstatus", "annotation",
+           "assignmentduration", "autoapprovaldelay", "hitlifetime",
+           "viewhit", "assignmentid", "assignmentstatus", "autoapprovaltime",
+           "assignmentaccepttime", "assignmentsubmittime", "assignmentapprovaltime",
+           "assignmentrejecttime", "deadline", "feedback", "reject"))) %>%
     select(-about, -comment,          
            -familiarization_present_in_study,
            -participant_feature_count_condition, 
@@ -35,8 +36,7 @@ read.turk <- function (fname) {
   
 
   
-  d <- d %>% rename(time = assignmentsubmittime, 
-                    targ.prop = target_property,
+  d <- d %>% rename(targ.prop = target_property,
                     familiarization = familiarization_cond, 
                     response.cond = participant_response_type_condition,
                     ling.cond = linguistic_framing_condition,

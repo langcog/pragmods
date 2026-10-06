@@ -101,6 +101,7 @@ m.levels <- dc %>%
   group_by(cond, level, choice) %>%
   summarise(n = n()) %>%
   spread(choice, n) %>%
+  ungroup() %>%
   mutate(question = c("inference","inference","inference",
                       "prior","inference","inference"), 
          expt = c("complex","complex","complex",
@@ -185,6 +186,7 @@ m.twins <- dc %>%
   group_by(cond, choice) %>%
   summarise(n = n()) %>%
   spread(choice, n) %>%
+  ungroup() %>%
   mutate(cond = c("prior","twin","uniform"), 
          expt = "twins", 
          question = c("prior", "inference", "inference"), 
@@ -240,7 +242,7 @@ ms <- dc %>%
             cil = ci.low(choice == "odd_one"))
 
 pdf("../../plots/3-levels-oddman.pdf",width=4.5, height=3.5)
-# qplot(cond, correct, geom=c("bar","linerange"), stat="identity",
+# qplot(cond, correct, geom=c("col","linerange"),
 #       ymin=correct - cil, ymax=correct + cih, fill=cond,
 #       data=filter(ms, cond!="prior")) + 
 #   ylab("Proportion choosing non-literal interpretation") + 
@@ -268,6 +270,7 @@ m.oddman <- dc %>%
   group_by(cond, choice) %>%
   summarise(n = n()) %>%
   spread(choice, n) %>%
+  ungroup() %>%
   mutate(expt = "oddman",
          question = c("inference","prior","inference"), 
          target = odd_one, 
@@ -307,7 +310,7 @@ d3$cond <- "inference"
 d4 <- read.turk("../../data/3-levels/size/pragmods_salience_priors.results.tsv")
 d4$cond <- "prior"
 
-d <- rbind_list(d1, d2, d3, d4) 
+d <- bind_rows(d1, d2, d3, d4) 
 ```
 
 Merge condition. 
@@ -347,7 +350,7 @@ ms <- dc %>%
 ms$targ.features <- factor(ms$targ.features)
 ms$features <- factor(ms$features)
 # pdf("plots/4-size-dists.pdf",width=6, height=3.5)
-qplot(targ.features, correct, geom=c("bar","linerange"), stat="identity",
+qplot(targ.features, correct, geom=c("col","linerange"),
       ymin=correct - cil, ymax=correct + cih, fill=targ.features,
       facets = objects ~ features,
       data=filter(ms, cond=="inference")) 
@@ -358,10 +361,10 @@ Another plot:
 
 ```{r}
 pdf("../../plots/3-levels-dists.pdf",width=8, height=4)
-qplot(objects, correct, geom=c("line","pointrange"), 
-      ymin=correct - cil, ymax=correct + cih, col=features,
-      position=position_dodge(width=.1),
-      data=filter(ms, cond=="inference")) + facet_grid(.~ targ.features) +
+ggplot(filter(ms, cond=="inference"), 
+       aes(objects, correct, ymin=correct - cil, ymax=correct + cih, col=features)) + 
+  geom_line(position=position_dodge(width=.1)) + 
+  geom_pointrange(position=position_dodge(width=.1)) + facet_grid(.~ targ.features) +
   ylim(c(0,1))
 dev.off()
 ```

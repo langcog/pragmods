@@ -9,27 +9,26 @@ Sequential effects
 ----
 
 ```{r}
-setwd("~/Projects/Pragmatics/pragmods/")
 rm(list=ls())
-source("analysis/helper.R")
-source("analysis/useful_dplyr.R")
+source("../helper.R")
+source("../useful_dplyr.R")
 ```
 
 Read data.
 
 ```{r}
-d.seq <- read.turk("data/5-sequences/pragmods_seq.anondata.csv")
+d.seq <- read.turk("../../data/4-sequences/pragmods_seq.anondata.csv")
 d.seq$expt <- "L1"
-d.wx3 <- read.turk("data/5-sequences/pragmods_wx3.anondata.csv")
+d.wx3 <- read.turk("../../data/4-sequences/pragmods_wx3.anondata.csv")
 d.wx3$expt <- "x3"
-d.bx3 <- read.turk("data/5-sequences/pragmods_bx3.anondata.csv")
+d.bx3 <- read.turk("../../data/4-sequences/pragmods_bx3.anondata.csv")
 d.bx3$expt <- "x3"
-d.seq2 <- read.turk("data/5-sequences/pragmods_seq2.anondata.csv")
+d.seq2 <- read.turk("../../data/4-sequences/pragmods_seq2.anondata.csv")
 d.seq2$expt <- "L2"
-d.L2second <- read.turk("data/5-sequences/pragmods_L2second.anondata.tsv")
+d.L2second <- read.turk("../../data/4-sequences/pragmods_L2second.anondata.tsv")
 d.L2second$expt <- "L2"
 
-d <- rbind_list(d.seq, d.wx3, d.bx3, d.seq2, d.L2second)
+d <- bind_rows(d.seq, d.wx3, d.bx3, d.seq2, d.L2second)
 ```
 
 Counts and exclusions. Note that these experiments have no manipulation check (Must check whether it has a manipulation check at all!). 
@@ -125,7 +124,7 @@ Level 1 expts
 ms.L1 <- filter(ms,!grepl("2w",seqCond) & !grepl("x3",seqCond))
 # levels(ms.L1$seqCond) <- c("aaa","bbb","ccc","ddd","0,1,2","2,1,0","0,2,1","1,2,0")
 
-pdf("plots/5-sequences-level1.pdf",width=6,height=3.5)
+pdf("../../plots/5-sequences-level1.pdf",width=6,height=3.5)
 ggplot(data = ms.L1, aes(x = trial, y = correct, fill = level)) +
   geom_bar(stat = "identity", position="dodge") +
   geom_linerange(aes(ymin = correct - cil, ymax = correct + cih), 
@@ -142,7 +141,7 @@ Level 1 x3 expts
 ```{r}
 ms.L1x3 <- filter(ms,!grepl("2w",seqCond) & grepl("x3",seqCond))
 
-pdf("plots/5-sequences-level1x3.pdf",width=6,height=3.5)
+pdf("../../plots/5-sequences-level1x3.pdf",width=6,height=3.5)
 ggplot(data = ms.L1x3, aes(x = trial, y = correct, fill = level)) +
   geom_bar(stat = "identity", position="dodge") +
   geom_linerange(aes(ymin = correct - cil, ymax = correct + cih), 
@@ -157,7 +156,7 @@ Level 2
 ----
 
 ```{r}
-pdf("plots/5-sequences-level2.pdf",width=8,height=4)
+pdf("../../plots/5-sequences-level2.pdf",width=8,height=4)
 ms.L2 <- filter(ms,grepl("2w",seqCond))
 levels(ms.L2$seqCond) <- c("aaa","bbb","ccc","ddd","0,1,2","2,1,0","0,2,1","1,2,0")
 ggplot(data = ms.L2, aes(x = trial, y = correct, fill = level)) +
